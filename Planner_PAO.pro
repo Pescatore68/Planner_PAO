@@ -10,19 +10,21 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    orario.cpp
 
 HEADERS += \
     AbstractActivity.h \
+    config.h \
     date.h \
     event.h \
     mainwindow.h \
+    orario.h \
     project.h \
     rec_ev.h \
     reminder.h \
     tag.h \
-    task.h \
-    time.h
+    task.h
 
 FORMS += \
     mainwindow.ui

@@ -1,7 +1,8 @@
 #ifndef ABSTRACTACTIVITY_H
 #define ABSTRACTACTIVITY_H
-#include <string>
 #include "tag.h"
+#include <string>
+
 using std::string;
 
 class AbstractActivity{
@@ -18,4 +19,4 @@ public:
 
 };
 
-#endif // ABSTRACTACTIVITY_H
+#endif

@@ -1,20 +1,19 @@
 #ifndef TAG_H
 #define TAG_H
 #include <string>
-
-using std::string;
+//using std::string;
 
 class tag {
 private:
-    string category;
+    std::string category;
     unsigned int id;
     bool fix;
 public:
-    tag()=default;
-    ~tag()=default;
-    string getCat() {return category;}
-
-
+    tag() {};
+    ~tag() {};
+    std::string getCat() const {return category;}
+    unsigned int getId() const {return id;}
+    bool getFix() const {return fix;}
 };
 
 

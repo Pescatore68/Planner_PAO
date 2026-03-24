@@ -1,0 +1,17 @@
+# Build
+build/
+build-*/
+
+# Qt Creator
+*.pro.user
+*.user
+*.qtc_clangd/
+
+# File compilati
+*.o
+*.obj
+*.exe
+*.out
+
+# OS
+.DS_Store

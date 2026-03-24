@@ -6,6 +6,7 @@ build-*/
 *.pro.user
 *.user
 *.qtc_clangd/
+*.pro.autosave
 
 # File compilati
 *.o

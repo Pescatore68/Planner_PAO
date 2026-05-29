@@ -1,21 +1,23 @@
 #ifndef ABSTRACTACTIVITY_H
 #define ABSTRACTACTIVITY_H
-#include "tag.h"
+#include "Headers/tag.h"
 #include <string>
 
 using std::string;
 
 class AbstractActivity{
 private:
+    unsigned int id;
     string name;
-    unsigned int priority;
-    tag t;
+    string description;
+    tag tag;
+
 public:
-    AbstractActivity()=default;
+    AbstractActivity(int id, const string&, const string&);
     virtual ~AbstractActivity()=default;
-    virtual string getName() {return name;}
-    virtual unsigned int getPriority() {return priority;}
-    virtual tag getTag() {return t;}
+    virtual string getName() const;
+
+
 
 };
 

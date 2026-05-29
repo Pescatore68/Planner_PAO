@@ -9,25 +9,31 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp \
-    orario.cpp
+    Sources/AbstractActivity.cpp \
+    Sources/date.cpp \
+    Sources/main.cpp \
+    Sources/mainwindow.cpp \
+    Sources/orario.cpp \
+    Sources/tag.cpp \
+    Sources/task.cpp
 
 HEADERS += \
-    AbstractActivity.h \
-    config.h \
-    date.h \
-    event.h \
-    mainwindow.h \
-    orario.h \
-    project.h \
-    rec_ev.h \
-    reminder.h \
-    tag.h \
-    task.h
+    Headers/AbstractActivity.h \
+    Headers/config.h \
+    Headers/date.h \
+    Headers/event.h \
+    Headers/mainwindow.h \
+    Headers/orario.h \
+    Headers/project.h \
+    Headers/rec_ev.h \
+    Headers/remainder.h \
+    Headers/routine.h \
+    Headers/tag.h \
+    Headers/tagManager.h \
+    Headers/task.h
 
 FORMS += \
-    mainwindow.ui
+    Forms/mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

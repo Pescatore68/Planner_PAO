@@ -7,11 +7,15 @@ private:
     unsigned int month;
     unsigned int year;
 public:
-    date(unsigned int d, unsigned int m, unsigned int y) : day(d), month(m), year(y) {
+    date(unsigned int d, unsigned int m, unsigned int y);
+    unsigned int getDay();
+    unsigned int getMonth();
+    unsigned int getYear();
+    void setYear(const unsigned int& y);
+    void setMonth(const unsigned int& m);
+    void setDay(const unsigned int& d);
+    void changeDate(const unsigned int& y, const unsigned int& m, const unsigned int& d);
+    static date today();
 
-    }
-    unsigned int getDay() {return day;}
-    unsigned int getMonth() {return month;}
-    unsigned int getYear() {return year;}
 };
 #endif // DATE_H

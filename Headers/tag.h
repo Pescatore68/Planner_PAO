@@ -1,20 +1,29 @@
 #ifndef TAG_H
 #define TAG_H
 #include <string>
-//using std::string;
+#include <QColor>
+
 
 class tag {
 private:
-    std::string category;
     unsigned int id;
+    std::string name;
     bool fix;
+    QColor color;
+
 public:
-    tag() {};
+    tag() {}; // da ridefinire!!
     ~tag() {};
-    std::string getCat() const {return category;}
-    unsigned int getId() const {return id;}
-    bool getFix() const {return fix;}
+    std::string getName() const;
+    QColor getColor() const;
+    bool getFix() const;
+    void setName(const std::string&);
+    void setFix(const bool&);
+    void setColor(const QColor&);
+
 };
+
+//tag::*tag tag::defaultTag const {return }
 
 
 #endif // TAG_H

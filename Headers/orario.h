@@ -5,9 +5,10 @@ class orario{ // time creava problemi di conflitto
 private:
     unsigned int min;
 public:
-    orario (unsigned int m, unsigned int o);
+    orario (unsigned int h, unsigned int m);
     unsigned int getMin() const;
     unsigned int getOre() const;
+    static orario now();
 };
 
 #endif // ORARIO_H

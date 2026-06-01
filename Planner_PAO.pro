@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     Sources/AbstractActivity.cpp \
+    Sources/ActivityManager.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     Headers/AbstractActivity.h \
+    Headers/ActivityManager.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \

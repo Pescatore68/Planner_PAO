@@ -1,4 +1,5 @@
 #include "Headers/date.h"
+#include <ctime>
 
 date::date(unsigned int d, unsigned int m, unsigned int y) : day(d), month(m), year(y) {}
 unsigned int date::getDay() {return day;}
@@ -11,5 +12,10 @@ void date::changeDate(const unsigned int& y, const unsigned int& m, const unsign
     setYear(y);
     setMonth(m);
     setDay(d);
+date date::today() {
+    time_t t = time(nullptr);
+    tm local = *localtime(&t);
+    return date(local.tm_mday, local.tm_mon + 1, local.tm_year + 1900);
+    }
 }
 

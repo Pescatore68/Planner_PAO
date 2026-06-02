@@ -6,29 +6,21 @@
 #include "Headers/orario.h"
 #include "Headers/tag.h"
 
-class task : virtual public AbstractActivity {
+class task : public AbstractActivity {
 private:
-    date starts;
-    date ends;
-    orario oStarts;
-    orario oEnds;
+    date deadline;
+    orario oDeadline;
     bool check;
 public:
-    task(std::string n, date s, date e, orario os, orario oe, tag t);
-    task(std::string n, date s, date e, orario os, orario oe);
+    task(std::string n, date e, orario oe, tag t);
+    task(std::string n, date e, orario oe);
     ~task();
-    std::string getName() const override ;
-    date getStarts() const;
-    date getEnds() const;
-    orario getOStarts() const;
-    orario getOEnds() const;
+    date getDeadline() const;
+    orario getODeadline() const;
     bool isCompleted() const;
     void setCompleted (bool b);
-    void setName(std::string n);
-    void setStarts(date s);
-    void setEnds(date e);
-    void setOStarts(orario os);
-    void setOEnds(orario oe);
+    void setDeadline (date e);
+    void setODeadline (orario oe);
 };
 
 #endif // TASK_H

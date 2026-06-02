@@ -1,56 +1,13 @@
 #include "Headers/task.h"
 
-task::task(std::string n, date s, date e, orario os, orario oe, tag* t) :
-    name(n), starts(s), ends(e), oStarts(os), oEnds(oe), tag(t), check(false) {
-}
+task::task(const string& n, const string& d, const tag* t, date e, orario oe) : AbstractActivity(n, d, t), deadline(e), oDeadline(oe) {};
+task::task(const string& n, const string& d, date e, orario oe) : AbstractActivity(n, d), deadline(e), oDeadline(oe) {};
 
-task::task(std::string n, date s, date e, orario os, orario oe) :
-    name(n), starts(s), ends(e), oStarts(os), oEnds(oe), tag*(tag::defaultTag()), check(false) {}
 
-std::string task::getName() const {
-    return name;
-};
+date task::getDeadline() const { return deadline; }
+orario task::getODeadline() const { return oDeadline; }
+void task::setDeadline (date e) { deadline = e; }
+void task::setODeadline (orario oe) { oDeadline = oe; }
+bool task::isCompleted() const { return check; }
+void task::setCompleted (bool b) { check = b; }
 
-date task::getStarts() const {
-    return starts;
-};
-
-date task::getEnds() const {
-    return ends;
-};
-
-orario task::getOStarts() const {
-    return oStarts;
-};
-
-orario task::getOEnds() const {
-    return oEnds;
-};
-
-bool task::isCompleted() const {
-    return check;
-};
-
-void task::setCompleted (bool b) {
-    check=b;
-};
-
-void task::setName(std::string n) {
-    name=n;
-};
-
-void task::setStarts(date s) {
-    starts=s;
-};
-
-void task::setEnds(date e) {
-    ends=e;
-};
-
-void task::setOStarts(orario os) {
-    oStarts=os;
-};
-
-void task::setOEnds(orario oe) {
-    oEnds=oe;
-};

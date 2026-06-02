@@ -2,6 +2,7 @@
 #define TAGMANAGER_H
 #include "Headers/tag.h"
 #include <vector>
+#include <string>
 
 class tagManager {
 private:
@@ -12,15 +13,19 @@ private:
     tagManager();
     tagManager(const tagManager&) = delete; //rendo non disponibile il costruttore di copia
     tagManager& operator=(const tagManager&) = delete; //"" l'operatore di assegnazione
+
 public:
 
     ~tagManager();
 
-    static tagManager& retPpt();
-
-    tag* createTag(const )
-
-
+    tag* newTag(const std::string& name, const QColor& color, bool fix=false);
+    tag* findTag(const std::string& name) const;
+    void removeTag( const std::string& name );
+    const std::vector<tag*>& getTags() const;
+    std::vector<tag*> getFixedTags() const;
+    std::vector<tag*> getTemporaryTags() const;
+    tag* getDefaultTag() const;
+	void rmvTemporaryTag(const std::vector<std::string>& activeTags);
 };
 
 

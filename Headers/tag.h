@@ -16,7 +16,7 @@ public:
 
     std::string getName() const;
     QColor getColor() const;
-    bool getFix() const;
+    bool isFix() const;
 
     void setName(const std::string& name);
     void setColor(const QColor& color);
@@ -24,8 +24,6 @@ public:
     bool operator == (const tag& t) const; //use to filter by tag
 
 };
-
-//tag::*tag tag::defaultTag const {return }
 
 
 #endif // TAG_H

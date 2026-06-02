@@ -1,4 +1,5 @@
 #include "Headers/ActivityManager.h"
+#include "Headers/tagManager.h"
 
 ActivityManager::~ActivityManager() {
     for ( auto *a : activities ) {
@@ -10,10 +11,11 @@ void ActivityManager::add(AbstractActivity* a) {
     activities.push_back(a); //ach! è this->activities.push_back(a)
 }
 
-void ActivityManager::remove(unsigned int idx) {
+void ActivityManager::remove(unsigned int idx, tagManager& tm) {
     if (idx >= activities.size()) return;
     delete activities[idx];
     activities.erase(activities.begin() + idx);
+    tm.rmvTemporaryTag(*this);
 }
 
 AbstractActivity* ActivityManager::get(unsigned int idx) {

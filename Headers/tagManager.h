@@ -20,7 +20,7 @@ public:
 
     tag* newTag(const std::string& name, const QColor& color, bool fix=false);
     tag* findTag(const std::string& name) const;
-    void removeTag( const std::string& name );
+    void removeTag( const std::string& name, ActivityManager& am);
     const std::vector<tag*>& getTags() const;
     std::vector<tag*> getFixedTags() const;
     std::vector<tag*> getTemporaryTags() const;

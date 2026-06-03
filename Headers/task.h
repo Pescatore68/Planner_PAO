@@ -1,6 +1,5 @@
 #ifndef TASK_H
 #define TASK_H
-#include <string>
 #include "Headers/AbstractActivity.h"
 #include "Headers/date.h"
 #include "Headers/orario.h"
@@ -12,8 +11,8 @@ private:
     orario oDeadline;
     bool check;
 public:
-    task(std::string n, date e, orario oe, tag t);
-    task(std::string n, date e, orario oe);
+    task(const string&, const string&, const tag*, date, orario);
+    task(const string&, const string&, date, orario);
     ~task();
     date getDeadline() const;
     orario getODeadline() const;
@@ -21,6 +20,8 @@ public:
     void setCompleted (bool b);
     void setDeadline (date e);
     void setODeadline (orario oe);
+    bool isExpired() const override;
+    string summary() const override;
 };
 
 #endif // TASK_H

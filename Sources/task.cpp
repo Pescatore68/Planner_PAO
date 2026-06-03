@@ -11,3 +11,11 @@ void task::setODeadline (orario oe) { oDeadline = oe; }
 bool task::isCompleted() const { return check; }
 void task::setCompleted (bool b) { check = b; }
 
+bool task::isExpired() const {
+    return (deadline > date::today() && oDeadline > orario::now() ) ? true : false;
+}
+
+string task::summary() const {
+
+}
+

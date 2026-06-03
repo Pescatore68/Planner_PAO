@@ -1,5 +1,6 @@
 #ifndef TAGMANAGER_H
 #define TAGMANAGER_H
+
 #include "Headers/tag.h"
 #include <vector>
 #include <string>

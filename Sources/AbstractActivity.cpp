@@ -2,6 +2,10 @@
 
 AbstractActivity::AbstractActivity(const string& n, const string& d) : name(n), description(d), t() {};
 AbstractActivity::AbstractActivity(const string& n, const string& d, const tag* t) : name(n), description(d), t(t) {};
+AbstractActivity::AbstractActivity(const string& n, const string& d, std::vector<AbstractActivity*>& v) : name(n), description(d), t() {
+    v.add(*this)
+};
+AbstractActivity::AbstractActivity(const string& n, const string& d, const tag* t, std::vector<AbstractActivity*>& v) : name(n), description(d), t(t) {};
 
 string AbstractActivity::getName() const { return name; }
 string AbstractActivity::getDesc() const { return description; }

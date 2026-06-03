@@ -20,3 +20,9 @@ date date::today() {
     return date(local.tm_mday, local.tm_mon + 1, local.tm_year + 1900);
 }
 
+bool operator>(const date& n, const date& m) {
+    if (n.year>m.year) return true;
+    if (n.month>m.month) return true;
+
+}
+

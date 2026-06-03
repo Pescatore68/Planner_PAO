@@ -1,5 +1,11 @@
+#ifndef TAGMANAGER_H
+#define TAGMANAGER_H
+
 #ifndef ACTIVITYMANAGER_H
 #define ACTIVITYMANAGER_H
+
+class tagManager;
+
 #include "AbstractActivity.h"
 
 class ActivityManager {

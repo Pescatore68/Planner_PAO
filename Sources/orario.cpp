@@ -25,4 +25,8 @@ orario orario::now() {
     return orario(local.tm_hour, local.tm_min);
 }
 
+bool operator>(const orario& n, const orario& m) {
+    return n.min > m.min ? true : false;
+}
+
 

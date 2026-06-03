@@ -9,6 +9,8 @@ public:
     unsigned int getMin() const;
     unsigned int getOre() const;
     static orario now();
+    //ridefinizione dell'operatore >
+    friend bool operator>(const orario&, const orario&);
 };
 
 #endif // ORARIO_H

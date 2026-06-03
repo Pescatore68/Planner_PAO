@@ -15,6 +15,7 @@ SOURCES += \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
     Sources/orario.cpp \
+    Sources/project.cpp \
     Sources/tag.cpp \
     Sources/task.cpp
 

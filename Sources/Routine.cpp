@@ -1,7 +1,7 @@
 #include "Headers/routine.h"
 
 Routine::Routine(const std::string& name, const std::string& description,
-                 const tag* t, const orario& startTime, const orario& endTime,
+                 const tag* t, const HourMinute& startTime, const HourMinute& endTime,
                  const date& startDate, const date& endDate,
                  Frequency freq)
     : AbstractActivity(name, description, t),
@@ -9,16 +9,16 @@ Routine::Routine(const std::string& name, const std::string& description,
       startDate(startDate), endDate(endDate),
       freq(freq), check(false) {}
 
-orario Routine::getStartTime() const { return startTime; }
-orario Routine::getEndTime() const { return endTime; }
+HourMinute Routine::getStartTime() const { return startTime; }
+HourMinute Routine::getEndTime() const { return endTime; }
 date Routine::getStartDate() const { return startDate; }
 date Routine::getEndDate() const { return endDate; }
 Routine::Frequency Routine::getFrequency() const { return freq; }
 bool Routine::getCheck() const { return check; }
 const std::vector<bool>& Routine::getcheckHistory() const { return check_history; }
 
-void Routine::setStartTime(const orario& o) { startTime = o; }
-void Routine::setEndTime(const orario& o) { endTime = o; }
+void Routine::setStartTime(const HourMinute& o) { startTime = o; }
+void Routine::setEndTime(const HourMinute& o) { endTime = o; }
 void Routine::setStartDate(const date& d) { startDate = d; }
 void Routine::setEndDate(const date& d) { endDate = d; }
 void Routine::setFrequency(Frequency f) { freq = f; }
@@ -31,10 +31,7 @@ void Routine::closeCheck() {
 }
 
 bool Routine::isExpired() const {
-    date current = date::today();
-    int current_day = current.getYear() * 10000 + current.getMonth() * 100 + current.getDay();
-    int endRoutine = endDate.getYear() * 10000 + endDate.getMonth() * 100 + endDate.getDay();
-    return current_day > endRoutine;
+    return date::today() > endDate;
 }
 
 /*std::string Routine::summary() const {

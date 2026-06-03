@@ -11,10 +11,10 @@ CONFIG += c++17
 SOURCES += \
     Sources/AbstractActivity.cpp \
     Sources/ActivityManager.cpp \
+    Sources/HourMinute.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
-    Sources/orario.cpp \
     Sources/project.cpp \
     Sources/tag.cpp \
     Sources/task.cpp
@@ -22,11 +22,11 @@ SOURCES += \
 HEADERS += \
     Headers/AbstractActivity.h \
     Headers/ActivityManager.h \
+    Headers/HourMinute.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \
     Headers/mainwindow.h \
-    Headers/orario.h \
     Headers/project.h \
     Headers/rec_ev.h \
     Headers/remainder.h \

@@ -1,11 +1,14 @@
 #include "Headers/AbstractActivity.h"
+#include "Headers/ActivityManager.h"
 
 AbstractActivity::AbstractActivity(const string& n, const string& d) : name(n), description(d), t() {};
 AbstractActivity::AbstractActivity(const string& n, const string& d, const tag* t) : name(n), description(d), t(t) {};
-AbstractActivity::AbstractActivity(const string& n, const string& d, std::vector<AbstractActivity*>& v) : name(n), description(d), t() {
-    v.add(*this)
+AbstractActivity::AbstractActivity(const string& n, const string& d, ActivityManager& mgr) : name(n), description(d), t() {
+    mgr.add(this);
 };
-AbstractActivity::AbstractActivity(const string& n, const string& d, const tag* t, std::vector<AbstractActivity*>& v) : name(n), description(d), t(t) {};
+AbstractActivity::AbstractActivity(const string& n, const string& d, const tag* t, ActivityManager& mgr) : name(n), description(d), t(t) {
+    mgr.add(this);
+};
 
 string AbstractActivity::getName() const { return name; }
 string AbstractActivity::getDesc() const { return description; }

@@ -5,19 +5,20 @@
 
 class project : public task {
 private:
-    std::vector<task*> p;
+    std::vector<task*> subtasks;
 
 public:
     //metodo per barra di completamento
     unsigned int nCompleted();
     //add
-    void add(string n, date e, orario oe, tag t);
-    void add(string n, date e, orario oe);
+    void add(const string&, const string&, const tag*, const date&, const HourMinute&);
+    void add(const string&, const string&, const date&, const HourMinute&);
     //size
     unsigned int size();
     //remove
-    void remove(const tag& t);
+    void remove(task*);
     void remove(unsigned int i);
+
     bool isExpired() const override;
     string summary() const override;
     float completionPercentage() const; // nCompleted() / size() * 100 → per la barra

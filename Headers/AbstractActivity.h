@@ -3,6 +3,8 @@
 #include "tag.h"
 #include <string>
 
+class ActivityManager;
+
 using std::string;
 
 class AbstractActivity{
@@ -14,8 +16,8 @@ private:
 public:
     AbstractActivity(const string&, const string&);
     AbstractActivity(const string& n, const string& d, const tag* t);
-    AbstractActivity(const string&, const string&, std::vector<AbstractActivity*>& );
-    AbstractActivity(const string& n, const string& d, const tag* t, std::vector<AbstractActivity*>&);
+    AbstractActivity(const string&, const string&, ActivityManager& mgr);
+    AbstractActivity(const string& n, const string& d, const tag* t, ActivityManager& mgr);
     virtual ~AbstractActivity()=default;
     string getName() const;
     string getDesc() const;

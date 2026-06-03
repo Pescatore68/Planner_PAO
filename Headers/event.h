@@ -3,7 +3,7 @@
 
 #include "AbstractActivity.h"
 #include "Headers/date.h"
-#include "Headers/orario.h"
+#include "Headers/HourMinute.h"
 #include <string>
 
 class Event : public AbstractActivity{

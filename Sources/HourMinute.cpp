@@ -1,8 +1,8 @@
-#include "Headers/orario.h"
+#include "Headers/HourMinute.h"
 #include <stdexcept>
 #include <ctime>
 
-orario::orario (unsigned int h, unsigned int m) {
+HourMinute::HourMinute (unsigned int h, unsigned int m) {
     if ( h>23 || m>59) {
         throw std::invalid_argument("invalid time");
     }
@@ -11,21 +11,21 @@ orario::orario (unsigned int h, unsigned int m) {
     }
 }
 
-unsigned int orario::getMin() const {
+unsigned int HourMinute::getMin() const {
     return min%60;
 }
 
-unsigned int orario::getOre() const {
+unsigned int HourMinute::getOre() const {
     return min/60;
 }
 
-orario orario::now() {
+HourMinute HourMinute::now() {
     time_t t = time(nullptr);
     tm local = *localtime(&t);
-    return orario(local.tm_hour, local.tm_min);
+    return HourMinute(local.tm_hour, local.tm_min);
 }
 
-bool operator>(const orario& n, const orario& m) {
+bool operator>(const HourMinute& n, const HourMinute& m) {
     return n.min > m.min ? true : false;
 }
 

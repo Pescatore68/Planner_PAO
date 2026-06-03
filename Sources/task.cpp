@@ -1,18 +1,22 @@
 #include "Headers/task.h"
 
-task::task(const string& n, const string& d, const tag* t, date e, orario oe) : AbstractActivity(n, d, t), deadline(e), oDeadline(oe) {};
-task::task(const string& n, const string& d, date e, orario oe) : AbstractActivity(n, d), deadline(e), oDeadline(oe) {};
+task::task(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd)
+    : AbstractActivity(name, description, Tag), deadline(end), oDeadline(oEnd) {};
+
+task::task(const string& name, const string& description,  const date& end, const HourMinute& oEnd)
+    : AbstractActivity(name, description), deadline(end), oDeadline(oEnd) {};
 
 
 date task::getDeadline() const { return deadline; }
-orario task::getODeadline() const { return oDeadline; }
-void task::setDeadline (date e) { deadline = e; }
-void task::setODeadline (orario oe) { oDeadline = oe; }
+HourMinute task::getODeadline() const { return oDeadline; }
+
+void task::setDeadline (const date& end) { deadline = end; }
+void task::setODeadline (const HourMinute& oEnd) { oDeadline = oEnd; }
 bool task::isCompleted() const { return check; }
-void task::setCompleted (bool b) { check = b; }
+void task::setCompleted (const bool& b) { check = b; }
 
 bool task::isExpired() const {
-    return (deadline > date::today() && oDeadline > orario::now() ) ? true : false;
+    return (deadline > date::today() && oDeadline > HourMinute::now() ) ? true : false;
 }
 
 string task::summary() const {

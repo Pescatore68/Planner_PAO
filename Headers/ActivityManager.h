@@ -1,6 +1,3 @@
-#ifndef TAGMANAGER_H
-#define TAGMANAGER_H
-
 #ifndef ACTIVITYMANAGER_H
 #define ACTIVITYMANAGER_H
 

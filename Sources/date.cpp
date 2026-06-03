@@ -21,8 +21,10 @@ date date::today() {
 }
 
 bool operator>(const date& n, const date& m) {
-    if (n.year>m.year) return true;
-    if (n.month>m.month) return true;
-
+    if (n.getYear() != m.getYear())
+        return n.getYear() > m.getYear();
+    if (n.getMonth() != m.getMonth())
+        return n.getMonth() > m.getMonth();
+    return n.getDay() > m.getDay();
 }
 

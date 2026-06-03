@@ -1,7 +1,7 @@
 #include <Headers/project.h>
 
 //metodo per barra di completamento
-unsigned int project::nCompleted() {
+unsigned int project::nCompleted() const {
     unsigned int i=0;
     for(task* t : subtasks) {
         if (t->isCompleted())
@@ -17,7 +17,7 @@ void project::add(const string& name, const string& description, const date& end
     subtasks.push_back(new task(name, description, end, oEnd));
 }
 
-unsigned int project::size() {
+unsigned int project::size() const {
     return subtasks.size();
 }
 
@@ -26,15 +26,19 @@ void project::remove(task* rm) {
         if (*it==rm) {
             delete *it;
             subtasks.erase(it);
+            return;
         }
     }
 }
 
-void project::remove(unsigned int i) {
-
+void project::remove(unsigned int idx) {
+    delete subtasks[idx];
+    subtasks.erase(subtasks.begin()+idx);
 }
-bool project::isExpired() const override {
 
+//string project::summary() const;
+
+float project::completionPercentage() const {
+    if (size() == 0) return 0.0f;                        // evita divisione per zero
+    return (float)nCompleted() / size() * 100.0f;        // cast a float prima della divisione
 }
-string project::summary() const override;
-float project::completionPercentage() const; // nCompleted() / size() * 100 → per la barra

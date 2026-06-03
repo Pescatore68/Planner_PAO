@@ -1,10 +1,10 @@
 #include "Headers/routine.h"
 
-Routine::Routine(unsigned int id, const std::string& name, const std::string& description,
+Routine::Routine(const std::string& name, const std::string& description,
                  const tag* t, const orario& startTime, const orario& endTime,
                  const date& startDate, const date& endDate,
                  Frequency freq)
-    : AbstractActivity(id, name, description, t),
+    : AbstractActivity(name, description, t),
       startTime(startTime), endTime(endTime),
       startDate(startDate), endDate(endDate),
       freq(freq), check(false) {}
@@ -26,7 +26,7 @@ void Routine::setFrequency(Frequency f) { freq = f; }
 void Routine::setCheck(bool b) { check = b; }
 
 void Routine::closeCheck() {
-    history.push_back(check);
+    check_history.push_back(check);
     check = false;
 }
 
@@ -50,4 +50,5 @@ std::string Routine::FrequencyToString(Frequency freq) {
     if (freq == Frequency::Weekly) return "Weekly";
     if (freq == Frequency::Monthly) return "Monthly";
     if (freq == Frequency::Yearly) return "Yearly";
+	return "Not implemented";
 }

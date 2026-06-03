@@ -1,9 +1,9 @@
 #include "Headers/event.h"
 
-Event::Event(unsigned int id, const std::string& name, const std:: string& description, const Tag& tag, const date& StartDate, const date& EndDate,
+Event::Event(const std::string& name, const std:: string& description, const tag* Tag, const date& StartDate, const date& EndDate,
           const orario& StartTime, const orario& EndTime,
           const std::string& Location )
-    : AbstractActivity(id, name, description, tag),
+    : AbstractActivity(name, description, Tag),
       StartDate(StartDate), EndDate(EndDate),
       StartTime(new orario(StartTime)), EndTime(new orario(EndTime)),
       location(Location){}
@@ -29,7 +29,7 @@ date Event::getEndDate() const { return EndDate; }
 orario* Event::getStartTime() const { return StartTime; }
 orario* Event::getEndTime() const { return EndTime; }
 bool Event::Time() const { return StartTime != nullptr; }
-std::string Event::getLocation() const { return Location; }
+std::string Event::getLocation() const { return location; }
 
 //set
 void Event::setSDate(const date& d) { StartDate = d; }
@@ -51,7 +51,7 @@ bool Event::isExpired() const {
 
     if(today_N > DueDay) return true;
 
-    if(Time() && today_N == EndDay){
+    if(hasTime() && today_N == DueDay){
         orario current_time = orario :: now();
         unsigned int Min = current_time.getOre() * 60 + current_time.getMin();
         unsigned int EndMin = EndTime->getOre() * 60 + EndTime->getMin();

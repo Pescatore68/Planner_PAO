@@ -16,7 +16,7 @@ public:
 
     std::string getName() const;
     QColor getColor() const;
-    bool isFix() const;
+    bool isFix();
 
     void setName(const std::string& name);
     void setColor(const QColor& color);

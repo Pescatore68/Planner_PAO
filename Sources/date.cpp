@@ -2,9 +2,9 @@
 #include <ctime>
 
 date::date(unsigned int d, unsigned int m, unsigned int y) : day(d), month(m), year(y) {}
-unsigned int date::getDay() {return day;}
-unsigned int date::getMonth() {return month;}
-unsigned int date::getYear() {return year;}
+unsigned int date::getDay() const {return day;}
+unsigned int date::getMonth() const {return month;}
+unsigned int date::getYear() const {return year;}
 void date::setYear(const unsigned int& y) {year=y;}
 void date::setMonth(const unsigned int& m) {month=m;}
 void date::setDay(const unsigned int& d) {day=d;}

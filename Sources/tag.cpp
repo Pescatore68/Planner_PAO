@@ -9,7 +9,7 @@ bool tag::isFix() const {return fix;}
 
 void tag::setName(const std::string& n) {name=n;}
 void tag::setColor(const QColor& c) { color=c;}
-void tag::setFix(bool b) { fix=b; }
+void tag::setFix(const bool& b) { fix=b; }
 
 bool tag::operator==(const tag& t) const {
     return name == t.getName();

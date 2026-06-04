@@ -19,14 +19,11 @@ public:
 
     ~tagManager();
 
-    tag* newTag(const std::string& name, const QColor& color, bool fix=false);
+    tag* newTag(const std::string& name, const QColor& color);
     tag* findTag(const std::string& name) const;
     void removeTag( const std::string& name, ActivityManager& am);
     const std::vector<tag*>& getTags() const;
-    std::vector<tag*> getFixedTags() const;
-    std::vector<tag*> getTemporaryTags() const;
     tag* getDefaultTag() const;
-    void rmvTemporaryTag(const ActivityManager& activeTags);
 };
 
 

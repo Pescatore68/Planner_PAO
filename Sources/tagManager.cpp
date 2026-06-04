@@ -2,7 +2,7 @@
 #include "Headers/tag.h"
 #include "Headers/ActivityManager.h"
 tagManager::tagManager(){
-    defaultTag=new tag("no tag", QColor(128,128,128),true);
+    defaultTag=new tag("no tag", QColor(128,128,128));
     tags.push_back(defaultTag);
 }
 
@@ -13,10 +13,10 @@ tagManager::~tagManager() {
     tags.clear();
 }
 
-tag* tagManager::newTag(const std::string& name, const QColor& color, bool fix) {
+tag* tagManager::newTag(const std::string& name, const QColor& color) {
     if(findTag(name))
         return findTag(name);
-    tag* t = new tag(name, color, fix);
+    tag* t = new tag(name, color);
     tags.push_back(t);
     return t;
 }
@@ -49,49 +49,4 @@ void tagManager::removeTag(const std::string& name, ActivityManager& am) {
 const std::vector<tag*>& tagManager::getTags() const {
     return tags;
 }
-std::vector<tag*> tagManager::getFixedTags() const {
-    std::vector<tag*> fixed;
-    for (auto t : tags) {
-        // dosen't show defaultag
-        if (t->isFix() && t != defaultTag) {
-            fixed.push_back(t);
-        }
-    }
-    return fixed;
-}
-std::vector<tag*> tagManager::getTemporaryTags() const {
-    std::vector<tag*> temporary;
-    for (auto t : tags) {
-        if (!t->isFix()) {
-            temporary.push_back(t);
-        }
-    }
-    return temporary;
-}
-void tagManager::rmvTemporaryTag(ActivityManager& am) {
-    // tag in use
-    vector<string> usedTags;
-    for (unsigned int i = 0; i < am.size(); i++) {
-        const tag* t = am.get(i)->getTag();
-        if (t) {
-            auto f = std::find(usedTags.begin(), usedTags.end(), t->getName());
-            if (f == usedTags.end()) {
-                usedTags.push_back(t->getName());
-            }
-        }
-    }
-
-    // remove temporary tag not in use
-    auto it = tags.begin();
-    while (it != tags.end()) {
-        tag* t = *it;
-        if (!t->isFix() && std::find(usedTags.begin(), usedTags.end(), t->getName()) == usedTags.end())
-        {
-            removeTag(t->getName(), am);
-            it = tags.begin();
-        }
-        else {
-            ++it;
-        }
-    }
-}
+tag*::getDefaultTag() const {return defaultTag;}

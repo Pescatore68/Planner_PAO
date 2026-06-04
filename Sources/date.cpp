@@ -20,3 +20,11 @@ date date::today() {
     return date(local.tm_mday, local.tm_mon + 1, local.tm_year + 1900);
 }
 
+bool operator>(const date& n, const date& m) {
+    if (n.getYear() != m.getYear())
+        return n.getYear() > m.getYear();
+    if (n.getMonth() != m.getMonth())
+        return n.getMonth() > m.getMonth();
+    return n.getDay() > m.getDay();
+}
+

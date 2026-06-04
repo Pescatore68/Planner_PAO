@@ -16,6 +16,6 @@ public:
     void setDay(const unsigned int& d);
     void changeDate(const unsigned int& y, const unsigned int& m, const unsigned int& d);
     static date today();
-
+    friend bool operator>(const date&, const date&);
 };
 #endif // DATE_H

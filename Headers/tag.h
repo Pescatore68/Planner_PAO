@@ -11,12 +11,12 @@ private:
     QColor color;
 
 public:
-    tag() {const std:: string& name const Qcolor& color, bool fix=false}; // default: tempoary tag
+    tag(const std::string&, const QColor&, bool fix=false);// default: temporary tag
     ~tag() = default;
 
     std::string getName() const;
     QColor getColor() const;
-    bool isFix();
+    bool isFix() const;
 
     void setName(const std::string& name);
     void setColor(const QColor& color);

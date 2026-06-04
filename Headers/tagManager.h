@@ -26,7 +26,7 @@ public:
     std::vector<tag*> getFixedTags() const;
     std::vector<tag*> getTemporaryTags() const;
     tag* getDefaultTag() const;
-	void rmvTemporaryTag(const std::vector<std::string>& activeTags);
+    void rmvTemporaryTag(const ActivityManager& activeTags);
 };
 
 

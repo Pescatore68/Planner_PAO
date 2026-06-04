@@ -8,9 +8,9 @@ private:
     unsigned int year;
 public:
     date(unsigned int d, unsigned int m, unsigned int y);
-    unsigned int getDay();
-    unsigned int getMonth();
-    unsigned int getYear();
+    unsigned int getDay() const;
+    unsigned int getMonth() const;
+    unsigned int getYear() const;
     void setYear(const unsigned int& y);
     void setMonth(const unsigned int& m);
     void setDay(const unsigned int& d);

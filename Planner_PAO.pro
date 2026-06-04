@@ -17,7 +17,8 @@ SOURCES += \
     Sources/mainwindow.cpp \
     Sources/project.cpp \
     Sources/tag.cpp \
-    Sources/task.cpp
+    Sources/task.cpp \
+    Sources/tagManager.cpp
 
 HEADERS += \
     Headers/AbstractActivity.h \

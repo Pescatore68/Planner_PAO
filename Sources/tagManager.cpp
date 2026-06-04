@@ -1,9 +1,9 @@
 #include "Headers/tagManager.h"
-#include "Headers/Tag.h"
+#include "Headers/tag.h"
 #include "Headers/ActivityManager.h"
 tagManager::tagManager(){
     defaultTag=new tag("no tag", QColor(128,128,128),true);
-    tags.push_back(defaultTag)
+    tags.push_back(defaultTag);
 }
 
 tagManager::~tagManager() {

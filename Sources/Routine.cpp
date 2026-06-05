@@ -1,9 +1,6 @@
 #include "Headers/routine.h"
 
-Routine::Routine(const std::string& name, const std::string& description,
-                 const tag* t, const HourMinute& startTime, const HourMinute& endTime,
-                 const date& startDate, const date& endDate,
-                 Frequency freq)
+Routine::Routine(const std::string& name, const std::string& description, const tag* t, const HourMinute& startTime, const HourMinute& endTime, const date& startDate, const date& endDate, Frequency freq)
     : AbstractActivity(name, description, t),
       startTime(startTime), endTime(endTime),
       startDate(startDate), endDate(endDate),
@@ -34,15 +31,22 @@ bool Routine::isExpired() const {
     return date::today() > endDate;
 }
 
-/*std::string Routine::summary() const {
-    return getName() + " — " + frequencyToString(frequency)
-           + " " + std::to_string(startTime.getOre()) + ":"
-           + std::to_string(startTime.getMin()) + "–"
-           + std::to_string(endTime.getOre()) + ":"
-           + std::to_string(endTime.getMin());
-}*/
+std::string Routine::summary() const {
+    std::string s = getName() + " — " + FrequencyToString() + " - " + getDescription() + "\n";
+    s += startTime.toString() + "–" + endTime.toString();
+    s += " | oggi: ";
+    s += check ? "✓" : "○";
 
-std::string Routine::FrequencyToString(Frequency freq) {
+    if (!check_history.empty()) {
+        s += " | ";
+        for (bool b : check_history) {
+            s += b ? "●" : "○";
+        }
+    }
+    return s;
+}
+
+std::string Routine::FrequencyToString() const {
     if (freq == Frequency::Daily) return "Daily";
     if (freq == Frequency::Weekly) return "Weekly";
     if (freq == Frequency::Monthly) return "Monthly";

@@ -49,4 +49,7 @@ void tagManager::removeTag(const std::string& name, ActivityManager& am) {
 const std::vector<tag*>& tagManager::getTags() const {
     return tags;
 }
-tag*::getDefaultTag() const {return defaultTag;}
+
+tag* tagManager::getDefaultTag() const {
+    return defaultTag;
+}

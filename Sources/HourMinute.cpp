@@ -29,4 +29,13 @@ bool operator>(const HourMinute& n, const HourMinute& m) {
     return n.min > m.min ? true : false;
 }
 
+bool operator==(const HourMinute& n, const HourMinute& m) {
+    return n.min == m.min ? true : false;
+}
+
+std::string HourMinute::toString() const {
+    std::string h = (getOre() < 10 ? "0" : "") + std::to_string(getOre());
+    std::string m = (getMin() < 10 ? "0" : "") + std::to_string(getMin());
+    return h + ":" + m;
+}
 

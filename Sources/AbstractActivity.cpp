@@ -11,7 +11,7 @@ AbstractActivity::AbstractActivity(const string& n, const string& d, const tag* 
 };
 
 string AbstractActivity::getName() const { return name; }
-string AbstractActivity::getDesc() const { return description; }
+string AbstractActivity::getDescription() const { return description; }
 const tag* AbstractActivity::getTag() const { return t; }
 
 void AbstractActivity::setName(const string& n) { name = n; }

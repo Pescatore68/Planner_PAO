@@ -19,7 +19,18 @@ bool task::isExpired() const {
     return (deadline > date::today() && oDeadline > HourMinute::now() ) ? true : false;
 }
 
-string task::summary() const {
+std::string task::summary() const {
+    std::string status = check ? "[✓]" : "[ ]";
+    std::string result;
 
+    result += status + " " + getName() + "\n";
+
+    if (!getDescription().empty())
+        result += "  " + getDescription() + "\n";
+
+    result += "  Scadenza: " + deadline.toString()
+              + " ore " + oDeadline.toString() + "\n";
+
+    return result;
 }
 

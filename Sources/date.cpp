@@ -28,3 +28,8 @@ bool operator>(const date& n, const date& m) {
     return n.getDay() > m.getDay();
 }
 
+std::string date::toString() const {
+    std::string d = (day < 10 ? "0" : "") + std::to_string(day);
+    std::string m = (month < 10 ? "0" : "") + std::to_string(month);
+    return d + "/" + m + "/" + std::to_string(year);
+}

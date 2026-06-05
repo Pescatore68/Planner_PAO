@@ -4,13 +4,20 @@ Event::Event(const std::string& name, const std::string& description, const tag*
     : AbstractActivity(name, description, Tag),
       StartDate(StartDate), EndDate(EndDate),
       StartTime(StartTime), EndTime(EndTime),
-      location(location) {}
+      location(location) {
+    if (StartDate > EndDate)
+        throw std::invalid_argument("StartDate must be before or equal to EndDate");
+}
 
 Event::Event(const std::string& name, const std::string& description, const tag* tag, const date& StartDate, const date& EndDate, const std::string& location)
     : AbstractActivity(name, description, tag),
       StartDate(StartDate), EndDate(EndDate),
       StartTime(HourMinute(0,0)), EndTime(HourMinute(23,59)),
-      location(location) {}
+      location(location) {
+    if (StartDate > EndDate)
+        throw std::invalid_argument("StartDate must be before or equal to EndDate");
+
+}
 
 Event::Event(const std::string& name, const std:: string& description, const tag* tag, const date& StartDate, const HourMinute& StartTime, const HourMinute& EndTime, const std::string& location)
     : AbstractActivity(name, description, tag),
@@ -27,8 +34,14 @@ bool Event::hasTime() const { return !(StartTime==HourMinute(0,0) && EndTime==Ho
 std::string Event::getLocation() const { return location; }
 
 //set
-void Event::setStartDate(const date& d) { StartDate = d; }
-void Event::setEndDate(const date& d) { EndDate = d; }
+void Event::setStartDate(const date& d) {
+    if (d > EndDate)
+        throw std::invalid_argument("StartDate must be before or equal to EndDate");
+    StartDate = d; }
+void Event::setEndDate(const date& d) {
+    if (d < StartDate)
+        throw std::invalid_argument("EndDate must be after or equal to StartDate");
+    EndDate = d;}
 void Event::setStartTime(const HourMinute& t) { StartTime = t; }
 void Event::setEndTime(const HourMinute& t) { EndTime = t; }
 void Event::setLocation(const std::string& l) { location = l; }

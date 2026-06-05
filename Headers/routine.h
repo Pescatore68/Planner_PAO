@@ -28,6 +28,7 @@ public:
     void setCheck(bool check);
 
     void closeCheck();
+    bool isActive(const date& d) const;
 
 
     bool isExpired() const override;

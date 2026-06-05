@@ -20,7 +20,7 @@ public:
     AbstractActivity(const string& n, const string& d, const tag* t, ActivityManager& mgr);
     virtual ~AbstractActivity()=default;
     string getName() const;
-    string getDesc() const;
+    string getDescription() const;
     const tag* getTag() const;
     void setName(const string&);
     void setDesc(const string&);

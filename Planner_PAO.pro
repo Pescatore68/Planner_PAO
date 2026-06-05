@@ -18,7 +18,10 @@ SOURCES += \
     Sources/project.cpp \
     Sources/tag.cpp \
     Sources/task.cpp \
-    Sources/tagManager.cpp
+    Sources/tagManager.cpp \
+    Sources/routine.cpp \
+    Sources/reminder.cpp \
+    Sources/event.cpp \
 
 HEADERS += \
     Headers/AbstractActivity.h \
@@ -29,8 +32,7 @@ HEADERS += \
     Headers/event.h \
     Headers/mainwindow.h \
     Headers/project.h \
-    Headers/rec_ev.h \
-    Headers/remainder.h \
+    Headers/reminder.h \
     Headers/routine.h \
     Headers/tag.h \
     Headers/tagManager.h \

@@ -10,40 +10,37 @@ class Event : public AbstractActivity{
 private:
     date StartDate;
     date EndDate;
-    HourMinute* StartTime;
-    HourMinute* EndTime;
-    std::string Location;
+    HourMinute StartTime;
+    HourMinute EndTime;
+    std::string location;
 public:
     //Constructors with time
-    Event(unsigned int id, const std::string& name, const std:: string& description, const Tag& tag, const date& StartDate, const date& EndDate,
-          const HourMinute& StartTime, const HourMinute& EndTime,
-          const std::string& Location = "" );
+    Event(const std::string&, const std::string&, const tag*, const date&, const date&, const HourMinute&, const HourMinute&, const std::string& Location = "" );
     //Constructors with no time
-    Event(unsigned int id, const std::string& name, const std:: string& description, const Tag& tag, const date& StartDate, const date& EndDate,
-          const std::string& Location = "");
+    Event(const std::string& name, const std::string& description, const tag* tag, const date& StartDate, const date& EndDate, const std::string& Location = "");
     //Constructors only
     //      one day
-    Event(unsigned int id, const std::string& name, const std::string& description,
-          const Tag& tag, const date& startDate,
+    Event(const std::string& name, const std::string& description,
+          const tag* tag, const date& startDate,
           const HourMinute& startTime, const HourMinute& endTime,
           const std::string& location = "");
 
-    ~Event() override;
-
     date getStartDate() const;
     date getEndDate() const;
-    HourMinute* getStartTime() const;
-    HourMinute* getEndTime() const;
-    bool Time() const; // non so se tenerlo, serve nella gui per mostrare l'HourMinute o allday
+    HourMinute getStartTime() const;
+    HourMinute getEndTime() const;
+    bool hasTime() const; // non so se tenerlo, serve nella gui per mostrare l'HourMinute o allday
     std::string getLocation()const;
 
-    void setSDate(const date& d);
-    void setEDate(const date& d);
-    void setSTime(const HourMinute& t);
-    void setETime(const HourMinute& t);
-    void setLocation(const std::string& l);
+    void setStartDate(const date&);
+    void setEndDate(const date&);
+    void setStartTime(const HourMinute&);
+    void setEndTime(const HourMinute&);
+    void setLocation(const std::string&);
 
     //bool current() const; non credo serva
     bool isExpired() const override;
+    std::string summary() const override;
 
+};
 #endif // EVENT_H

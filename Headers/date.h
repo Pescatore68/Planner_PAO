@@ -1,5 +1,7 @@
 #ifndef DATE_H
 #define DATE_H
+#include <string>
+using std::string;
 
 class date {
 private:
@@ -17,5 +19,6 @@ public:
     void changeDate(const unsigned int& y, const unsigned int& m, const unsigned int& d);
     static date today();
     friend bool operator>(const date&, const date&);
+    string toString() const;
 };
 #endif // DATE_H

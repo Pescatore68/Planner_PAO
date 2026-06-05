@@ -11,11 +11,10 @@ void ActivityManager::add(AbstractActivity* a) {
     activities.push_back(a); //ach! è this->activities.push_back(a)
 }
 
-void ActivityManager::remove(unsigned int idx, tagManager& tm) {
+void ActivityManager::remove(unsigned int idx) {
     if (idx >= activities.size()) return;
     delete activities[idx];
     activities.erase(activities.begin() + idx);
-    tm.rmvTemporaryTag(*this);
 }
 
 AbstractActivity* ActivityManager::get(unsigned int idx) {

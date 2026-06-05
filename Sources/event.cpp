@@ -39,7 +39,7 @@ void Event::setStartDate(const date& d) {
         throw std::invalid_argument("StartDate must be before or equal to EndDate");
     StartDate = d; }
 void Event::setEndDate(const date& d) {
-    if (d < StartDate)
+    if (StartDate > d)
         throw std::invalid_argument("EndDate must be after or equal to StartDate");
     EndDate = d;}
 void Event::setStartTime(const HourMinute& t) { StartTime = t; }

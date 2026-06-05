@@ -24,7 +24,7 @@ void Routine::setStartDate(const date& d) {
         throw std::invalid_argument("StartDate must be before or equal to EndDate");
     startDate = d; }
 void Routine::setEndDate(const date& d) {
-    if (d < startDate)
+    if (startDate > d)
         throw std::invalid_argument("EndDate must be after or equal to StartDate");
     endDate = d;
     }

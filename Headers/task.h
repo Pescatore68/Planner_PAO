@@ -13,7 +13,6 @@ private:
 public:
     task(const string&, const string&, const tag*, const date&, const HourMinute&);
     task(const string&, const string&, const date&, const HourMinute&);
-    ~task();
     date getDeadline() const;
     HourMinute getODeadline() const;
     bool isCompleted() const;

@@ -1,6 +1,8 @@
 #ifndef TAGMANAGER_H
 #define TAGMANAGER_H
 
+class ActivityManager;
+
 #include "Headers/tag.h"
 #include <vector>
 #include <string>
@@ -10,13 +12,12 @@ private:
     std::vector<tag*> tags;
     tag* defaultTag;
 
-    //impedisco duplicati
-    tagManager();
     tagManager(const tagManager&) = delete; //rendo non disponibile il costruttore di copia
     tagManager& operator=(const tagManager&) = delete; //"" l'operatore di assegnazione
 
 public:
 
+    tagManager();
     ~tagManager();
 
     tag* newTag(const std::string& name, const QColor& color);

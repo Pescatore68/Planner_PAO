@@ -25,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QLabel* label = new QLabel(this);
     label->setText(QString::fromStdString(r.summary()));
-    label->setGeometry(10, 10, 500, 120);
-    label->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    label->setGeometry(120, 120, 500, 120);
+    label->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
     label->setWordWrap(true);
     label->show();
 }

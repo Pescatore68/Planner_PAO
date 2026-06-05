@@ -13,7 +13,7 @@ public:
     ActivityManager() = default;
     ~ActivityManager();
     void add(AbstractActivity*);
-    void remove(unsigned int, tagManager& tm);
+    void remove(unsigned int);
     AbstractActivity* get(unsigned int);
     unsigned int size();
     void fit();

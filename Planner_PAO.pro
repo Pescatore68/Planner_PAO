@@ -19,7 +19,7 @@ SOURCES += \
     Sources/tag.cpp \
     Sources/task.cpp \
     Sources/tagManager.cpp \
-    Sources/routine.cpp \
+    Sources/Routine.cpp \
     Sources/reminder.cpp \
     Sources/event.cpp \
 

@@ -2,6 +2,9 @@
 #define PROJECT_H
 
 #include "task.h"
+#include <QJsonObject>
+#include <QJsonArray>
+#include "tagManager.h"
 
 class project : public task {
 private:
@@ -20,6 +23,8 @@ public:
     void remove(unsigned int i);
     string summary() const override;
     float completionPercentage() const; // nCompleted() / size() * 100 → per la barra
+    QJsonObject toJson() const override;
+    static project* fromJson(const QJsonObject& obj, tagManager& tm);
 
 };
 

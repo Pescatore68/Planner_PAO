@@ -2,6 +2,7 @@
 #define ABSTRACTACTIVITY_H
 #include "tag.h"
 #include <string>
+#include <QJsonObject>
 
 class tagManager;
 class ActivityManager;
@@ -28,6 +29,7 @@ public:
     void setTag(const tag*);
     virtual string summary() const = 0;
     virtual bool isExpired() const = 0;
+    virtual QJsonObject toJson() const = 0;
     //virtual void display() const = 0; non so se serve
 
 };

@@ -21,6 +21,8 @@ public:
     void setODeadline (const HourMinute&);
     bool isExpired() const override;
     string summary() const override;
+    QJsonObject toJson() const override;
+    static task* fromJson(const QJsonObject&, tagManager&);
 };
 
 #endif // TASK_H

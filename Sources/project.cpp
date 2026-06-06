@@ -74,3 +74,48 @@ float project::completionPercentage() const {
     if (size() == 0) return 0.0f;                        // evita divisione per zero
     return (float)nCompleted() / size() * 100.0f;        // cast a float prima della divisione
 }
+
+QJsonObject project::toJson() const{
+    QJsonObject obj;
+    obj["type"] = "project";
+    obj["name"] = QString::fromStdString(getName());
+    obj["description"] = QString::fromStdString(getDescription());
+    obj["tag"] = QString::fromStdString(getTag()->getName());
+    obj["tagColor"] = getTag()->getColor().name();
+    obj["deadline"] = QString::fromStdString(getDeadline().toString());
+    obj["oDeadline"] = QString::fromStdString(getODeadline().toString());
+    obj["check"] = isCompleted();
+    QJsonArray subtasks;
+    for (unsigned int i = 0; i < size(); i++) {
+        QJsonObject sub;
+        const task* t = getSubtask(i);
+        sub["name"] = QString::fromStdString(t->getName());
+        sub["description"] = QString::fromStdString(t->getDescription());
+        sub["deadline"] = QString::fromStdString(t->getDeadline().toString());
+        sub["oDeadline"] = QString::fromStdString(t->getODeadline().toString());
+        sub["check"] = t->isCompleted();
+        subtasks.append(sub);
+    }
+    obj["subtasks"] = subtasks;
+    return obj;
+}
+
+project* project::fromJson(const QJsonObject& obj, tagManager& tm) {
+    auto* p = new project(obj["name"].toString().toStdString(),
+                          obj["description"].toString().toStdString(),
+                          tm.newTag(obj["tag"].toString().toStdString(), QColor(obj["tagColor"].toString())),
+                          date::dateFromString(obj["deadline"].toString().toStdString()),
+                          HourMinute::hmFromString(obj["oDeadline"].toString().toStdString()),
+                          obj["check"].toBool());
+
+    const QJsonArray subtasks = obj["subtasks"].toArray();
+    for (const auto& val : subtasks) {
+        QJsonObject sub = val.toObject();
+        p->add(sub["name"].toString().toStdString(),
+               sub["description"].toString().toStdString(),
+               date::dateFromString(sub["deadline"].toString().toStdString()),
+               HourMinute::hmFromString(sub["oDeadline"].toString().toStdString()),
+               sub["check"].toBool());
+    }
+    return p;
+}

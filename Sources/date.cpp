@@ -47,3 +47,9 @@ std::string date::toString() const {
     std::string m = (month < 10 ? "0" : "") + std::to_string(month);
     return d + "/" + m + "/" + std::to_string(year);
 }
+
+date date::dateFromString(const std::string& s) {
+    return date(std::stoi(s.substr(0,2)),
+                std::stoi(s.substr(3,2)),
+                std::stoi(s.substr(6,4)));
+}

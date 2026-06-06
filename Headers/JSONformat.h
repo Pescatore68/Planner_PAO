@@ -7,14 +7,14 @@
 #include <QFile>
 #include <fstream>
 
+class AbstractActivity;
 class ActivityManager;
 class tagManager;
 
 namespace JSONformat {
-QJsonDocument toJson(const ActivityManager&);
-void fromJson(const QJsonDocument& doc, ActivityManager&, tagManager& tm);
-bool save(const ActivityManager&, const std::string& path);
-bool load(ActivityManager&, tagManager&, const std::string& path);
+static AbstractActivity* fromJson(const QJsonObject& , tagManager& );
+bool loadJson(ActivityManager&, tagManager& , const std::string& );
+bool saveJson(const ActivityManager&, const std::string&);
 }
 
 #endif // JSONFORMAT_H

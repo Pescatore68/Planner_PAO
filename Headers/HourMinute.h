@@ -15,6 +15,7 @@ public:
     friend bool operator>(const HourMinute&, const HourMinute&);
     friend bool operator==(const HourMinute&, const HourMinute&);
     string toString() const;
+    static HourMinute hmFromString(const std::string& s);
 };
 
 #endif // HOURMINUTE_H

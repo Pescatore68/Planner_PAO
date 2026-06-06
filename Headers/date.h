@@ -22,5 +22,6 @@ public:
     bool operator==(const date& other) const;
     friend bool operator>(const date&, const date&);
     string toString() const;
+    static date dateFromString(const std::string& s);
 };
 #endif // DATE_H

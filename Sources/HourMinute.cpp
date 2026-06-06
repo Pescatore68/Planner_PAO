@@ -39,3 +39,8 @@ std::string HourMinute::toString() const {
     return h + ":" + m;
 }
 
+HourMinute HourMinute::hmFromString(const std::string& s) {
+    return HourMinute(std::stoi(s.substr(0,2)),
+                      std::stoi(s.substr(3,2)));
+}
+

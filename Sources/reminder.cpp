@@ -28,3 +28,26 @@ std::string Reminder::summary() const {
         s += " | " + location;
     return s;
 }
+
+QJsonObject Reminder::toJson() const {
+    QJsonObject obj;
+    obj["type"] = "reminder";
+    obj["name"] = QString::fromStdString(getName());
+    obj["description"] = QString::fromStdString(getDescription());
+    obj["tag"] = QString::fromStdString(getTag()->getName());
+    obj["tagColor"] = getTag()->getColor().name();
+    obj["date"] = QString::fromStdString(getDate().toString());
+    obj["time"] = QString::fromStdString(getTime().toString());
+    obj["location"] = QString::fromStdString(getLocation());
+    return obj;
+}
+
+Reminder* Reminder::fromJson(const QJsonObject& obj, tagManager& tm) {
+    auto* rem = new Reminder(obj["name"].toString().toStdString(),
+                             obj["description"].toString().toStdString(),
+                             tm.newTag(obj["tag"].toString().toStdString(), QColor(obj["tagColor"].toString())),
+                             date::dateFromString(obj["date"].toString().toStdString()),
+                             HourMinute::hmFromString(obj["time"].toString().toStdString()),
+                             obj["message"].toString().toStdString());
+    return rem;
+}

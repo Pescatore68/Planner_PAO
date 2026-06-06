@@ -73,3 +73,39 @@ std::string Routine::FrequencyToString() const {
     if (freq == Frequency::Yearly) return "Yearly";
 	return "Not implemented";
 }
+
+QJsonObject Routine::toJson() const {
+    QJsonObject obj;
+    obj["type"] = "routine";
+    obj["name"] = QString::fromStdString(getName());
+    obj["description"] = QString::fromStdString(getDescription());
+    obj["tag"] = QString::fromStdString(getTag()->getName());
+    obj["tagColor"] = getTag()->getColor().name();
+    obj["startDate"] = QString::fromStdString(getStartDate().toString());
+    obj["endDate"] = QString::fromStdString(getEndDate().toString());
+    obj["startTime"] = QString::fromStdString(getStartTime().toString());
+    obj["endTime"] = QString::fromStdString(getEndTime().toString());
+    obj["frequency"] = QString::fromStdString(FrequencyToString());
+    obj["check"] = getCheck();
+    return obj;
+}
+
+Routine* Routine::fromJson(const QJsonObject& obj, tagManager& tm) {
+    auto* r = new Routine(obj["name"].toString().toStdString(),
+                          obj["description"].toString().toStdString(),
+                          tm.newTag(obj["tag"].toString().toStdString(), QColor(obj["tagColor"].toString())),
+                          HourMinute::hmFromString(obj["startTime"].toString().toStdString()),
+                          HourMinute::hmFromString(obj["endTime"].toString().toStdString()),
+                          date::dateFromString(obj["startDate"].toString().toStdString()),
+                          date::dateFromString(obj["endDate"].toString().toStdString()),
+                          freqFromString(obj["frequency"].toString().toStdString()));
+    return r;
+}
+
+Routine::Frequency Routine::freqFromString(const std::string& s) {
+    if (s == "Daily") return Routine::Frequency::Daily;
+    if (s == "Weekly") return Routine::Frequency::Weekly;
+    if (s == "Monthly") return Routine::Frequency::Monthly;
+    if (s == "Yearly") return Routine::Frequency::Yearly;
+    return Routine::Frequency::Daily;
+}

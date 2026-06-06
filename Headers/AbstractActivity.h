@@ -5,6 +5,7 @@
 #include <QJsonObject>
 
 class tagManager;
+class ActivityVisitor;
 class ActivityManager;
 
 using std::string;
@@ -31,7 +32,7 @@ public:
     virtual bool isExpired() const = 0;
     virtual QJsonObject toJson() const = 0;
     //virtual void display() const = 0; non so se serve
-
+    virtual void accept(ActivityVisitor& v) = 0;
 };
 
 #endif

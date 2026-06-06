@@ -1,4 +1,5 @@
 #include "Headers/routine.h"
+#include "Headers/ActivityVisitor.h"
 
 Routine::Routine(const std::string& name, const std::string& description, const tag* t, const HourMinute& startTime, const HourMinute& endTime, const date& startDate, const date& endDate, Frequency freq)
     : AbstractActivity(name, description, t),
@@ -109,3 +110,4 @@ Routine::Frequency Routine::freqFromString(const std::string& s) {
     if (s == "Yearly") return Routine::Frequency::Yearly;
     return Routine::Frequency::Daily;
 }
+void Routine::accept(ActivityVisitor& v) { v.visit(*this); }

@@ -1,4 +1,6 @@
 #include "Headers/event.h"
+#include "Headers/ActivityVisitor.h"
+
 
 Event::Event(const std::string& name, const std::string& description, const tag* Tag, const date& StartDate, const date& EndDate, const HourMinute& StartTime, const HourMinute& EndTime, const std::string& location)
     : AbstractActivity(name, description, Tag),
@@ -96,3 +98,4 @@ Event* Event::fromJson(const QJsonObject& obj, tagManager& tm) {
     e->setLocation(obj["location"].toString().toStdString());
     return e;
 }
+void Event::accept(ActivityVisitor& v) { v.visit(*this); }

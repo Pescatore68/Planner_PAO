@@ -23,6 +23,8 @@ public:
     string summary() const override;
     QJsonObject toJson() const override;
     static task* fromJson(const QJsonObject&, tagManager&);
+    void accept(ActivityVisitor& v) override;
+
 };
 
 #endif // TASK_H

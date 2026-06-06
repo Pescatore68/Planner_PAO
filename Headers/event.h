@@ -46,5 +46,6 @@ public:
     QJsonObject toJson() const override;
     static Event* fromJson(const QJsonObject& , tagManager& );
 
+    void accept(ActivityVisitor& v) override;
 };
 #endif // EVENT_H

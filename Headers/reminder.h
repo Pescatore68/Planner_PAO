@@ -29,5 +29,6 @@ public:
 
     QJsonObject toJson() const override;
     static Reminder* fromJson(const QJsonObject& , tagManager& );
+    void accept(ActivityVisitor& v) override;
 };
 #endif // REMAINDER_H

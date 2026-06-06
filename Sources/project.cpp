@@ -1,3 +1,4 @@
+#include "Headers/ActivityVisitor.h"
 #include <Headers/project.h>
 
 project::project(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd, const bool& b)
@@ -119,3 +120,4 @@ project* project::fromJson(const QJsonObject& obj, tagManager& tm) {
     }
     return p;
 }
+void project::accept(ActivityVisitor& v) { v.visit(*this); }

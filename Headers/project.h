@@ -26,6 +26,9 @@ public:
     QJsonObject toJson() const override;
     static project* fromJson(const QJsonObject& obj, tagManager& tm);
 
+    void accept(ActivityVisitor& v) override;
+
+
 };
 
 #endif // PROJECT_H

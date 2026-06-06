@@ -36,6 +36,8 @@ public:
     std::string summary() const override;
 
     std::string FrequencyToString() const;
+    void accept(ActivityVisitor& v) override;
+
 
     QJsonObject toJson() const override;
     static Routine* fromJson(const QJsonObject& obj, tagManager& );

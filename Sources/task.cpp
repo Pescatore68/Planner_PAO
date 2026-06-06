@@ -1,4 +1,5 @@
 #include "Headers/task.h"
+#include "Headers/ActivityVisitor.h"
 
 task::task(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd)
     : AbstractActivity(name, description, Tag), deadline(end), oDeadline(oEnd) {};
@@ -34,3 +35,4 @@ std::string task::summary() const {
     return result;
 }
 
+void task::accept(ActivityVisitor& v) { v.visit(*this); }

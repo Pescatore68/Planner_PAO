@@ -17,6 +17,9 @@ public:
     string summary() const override;
     float completionPercentage() const; // nCompleted() / size() * 100 → per la barra
 
+    void accept(ActivityVisitor& v) override;
+
+
 };
 
 #endif // PROJECT_H

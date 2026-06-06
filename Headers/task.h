@@ -21,6 +21,8 @@ public:
     void setODeadline (const HourMinute&);
     bool isExpired() const override;
     string summary() const override;
+    void accept(ActivityVisitor& v) override;
+
 };
 
 #endif // TASK_H

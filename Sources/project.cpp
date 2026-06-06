@@ -1,3 +1,4 @@
+#include "Headers/ActivityVisitor.h"
 #include <Headers/project.h>
 
 //metodo per barra di completamento
@@ -42,3 +43,5 @@ float project::completionPercentage() const {
     if (size() == 0) return 0.0f;                        // evita divisione per zero
     return (float)nCompleted() / size() * 100.0f;        // cast a float prima della divisione
 }
+
+void project::accept(ActivityVisitor& v) { v.visit(*this); }

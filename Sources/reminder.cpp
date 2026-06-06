@@ -1,4 +1,5 @@
 #include "Headers/reminder.h"
+#include "Headers/ActivityVisitor.h"
 
 Reminder::Reminder(const std::string& name, const std::string& description, const tag* Tag, const date& day,const HourMinute& time, const std::string& location)
     : AbstractActivity(name, description, Tag), day(day), time(time), location(location) {}
@@ -28,3 +29,5 @@ std::string Reminder::summary() const {
         s += " | " + location;
     return s;
 }
+
+void Reminder::accept(ActivityVisitor& v) { v.visit(*this); }

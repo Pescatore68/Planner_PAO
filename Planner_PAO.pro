@@ -26,6 +26,7 @@ SOURCES += \
 HEADERS += \
     Headers/AbstractActivity.h \
     Headers/ActivityManager.h \
+    Headers/ActivityVisitor.h \
     Headers/HourMinute.h \
     Headers/config.h \
     Headers/date.h \

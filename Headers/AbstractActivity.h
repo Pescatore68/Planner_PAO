@@ -3,6 +3,7 @@
 #include "tag.h"
 #include <string>
 
+class ActivityVisitor;
 class ActivityManager;
 
 using std::string;
@@ -28,7 +29,7 @@ public:
     virtual string summary() const = 0;
     virtual bool isExpired() const = 0;
     //virtual void display() const = 0; non so se serve
-
+    virtual void accept(ActivityVisitor& v) = 0;
 };
 
 #endif

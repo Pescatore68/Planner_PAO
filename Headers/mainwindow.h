@@ -2,20 +2,53 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
+#include <QStackedWidget>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QWidget>
+#include "Headers/ActivityManager.h"
+#include "Headers/tagManager.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-
 private:
-    Ui::MainWindow *ui;
+    ActivityManager& am;
+    tagManager& tm;
+
+    QWidget* centralWidget;
+    QHBoxLayout* mainLayout;
+
+    // Nav bar
+    QWidget* navBar;
+    QVBoxLayout* navLayout;
+    QPushButton* btnCalendar;
+    QPushButton* btnTaskProject;
+    QPushButton* btnSearch;
+    QPushButton* btnTags;
+
+    // Schermate
+    QStackedWidget* stackedWidget;
+    QWidget* calendarView;
+    QWidget* taskProjectView;
+    QWidget* searchView;
+    QWidget* detailView;
+    QWidget* formView;
+    QWidget* tagView;
+
+    void setupNavBar();
+    void setupStackedWidget();
+
+public:
+    MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
+    ~MainWindow() = default;
+
+    void showCalendar();
+    void showTaskProject();
+    void showSearch();
+    void showDetail(AbstractActivity* a);
+    void showForm(AbstractActivity* a = nullptr);
 };
 
-#endif // MAINWINDOW_H
+#endif

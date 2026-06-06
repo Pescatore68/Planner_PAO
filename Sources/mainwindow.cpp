@@ -1,37 +1,73 @@
 #include "Headers/mainwindow.h"
-#include "ui_mainwindow.h"
-#include "Headers/task.h"
-#include "Headers/date.h"
-#include "Headers/HourMinute.h"
-#include "Headers/routine.h"
-#include "Headers/tagManager.h"
-#include <QLabel>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
+MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
+    : QMainWindow(parent), am(am), tm(tm) {
 
-    tagManager tm;
-    tag* uni = tm.newTag("uni", QColor(128, 128, 128));
+    centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
 
-    // --- test task ---
-    task t("Comprare latte", "Al supermercato",
-           date(31, 12, 2025), HourMinute(9, 0));
+    mainLayout = new QHBoxLayout(centralWidget);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
 
-    //test routine
+    setupNavBar();
+    setupStackedWidget();
 
-    Routine r("palestra", "", uni, HourMinute(16, 0), HourMinute(18, 0), date(31, 12, 2025), date(31, 12, 2026), Routine::Frequency::Monthly);
+    mainLayout->addWidget(navBar);
+    mainLayout->addWidget(stackedWidget);
 
-    QLabel* label = new QLabel(this);
-    label->setText(QString::fromStdString(r.summary()));
-    label->setGeometry(120, 120, 500, 120);
-    label->setAlignment(Qt::AlignCenter | Qt::AlignCenter);
-    label->setWordWrap(true);
-    label->show();
+    resize(1200, 800);
+    setWindowTitle("Activity Manager");
+
+    showCalendar();
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
+void MainWindow::setupNavBar() {
+    navBar = new QWidget();
+    navBar->setFixedWidth(200);
+    navLayout = new QVBoxLayout(navBar);
+    navLayout->setAlignment(Qt::AlignTop);
+    navLayout->setSpacing(10);
+    navLayout->setContentsMargins(10, 20, 10, 20);
+
+    btnCalendar    = new QPushButton("Calendario", navBar);
+    btnTaskProject = new QPushButton("Task/Project", navBar);
+    btnSearch      = new QPushButton("Ricerca", navBar);
+    btnTags        = new QPushButton("Tag", navBar);
+
+    navLayout->addWidget(btnCalendar);
+    navLayout->addWidget(btnTaskProject);
+    navLayout->addWidget(btnSearch);
+    navLayout->addWidget(btnTags);
+    navLayout->addStretch();
+
+    connect(btnCalendar,    &QPushButton::clicked, this, &MainWindow::showCalendar);
+    connect(btnTaskProject, &QPushButton::clicked, this, &MainWindow::showTaskProject);
+    connect(btnSearch,      &QPushButton::clicked, this, &MainWindow::showSearch);
 }
+
+void MainWindow::setupStackedWidget() {
+    stackedWidget = new QStackedWidget();
+
+    calendarView    = new QWidget();
+    taskProjectView = new QWidget();
+    searchView      = new QWidget();
+    detailView      = new QWidget();
+    formView        = new QWidget();
+    tagView         = new QWidget();
+
+    stackedWidget->addWidget(calendarView);    // 0
+    stackedWidget->addWidget(taskProjectView); // 1
+    stackedWidget->addWidget(searchView);      // 2
+    stackedWidget->addWidget(detailView);      // 3
+    stackedWidget->addWidget(formView);        // 4
+    stackedWidget->addWidget(tagView);         // 5
+
+    showCalendar();
+}
+
+void MainWindow::showCalendar()     { stackedWidget->setCurrentWidget(calendarView); }
+void MainWindow::showTaskProject()  { stackedWidget->setCurrentWidget(taskProjectView); }
+void MainWindow::showSearch()       { stackedWidget->setCurrentWidget(searchView); }
+void MainWindow::showDetail(AbstractActivity* a) { stackedWidget->setCurrentWidget(detailView); }
+void MainWindow::showForm(AbstractActivity* a)   { stackedWidget->setCurrentWidget(formView); }

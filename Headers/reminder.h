@@ -25,5 +25,6 @@ public:
 
     bool isExpired() const override;
     std::string summary() const override;
+    void accept(ActivityVisitor& v) override;
 };
 #endif // REMAINDER_H

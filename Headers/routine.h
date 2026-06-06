@@ -35,6 +35,8 @@ public:
     std::string summary() const override;
 
     std::string FrequencyToString() const;
+    void accept(ActivityVisitor& v) override;
+
 
 
 private:

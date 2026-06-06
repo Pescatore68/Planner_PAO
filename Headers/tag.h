@@ -2,7 +2,8 @@
 #define TAG_H
 #include <string>
 #include <QColor>
-
+#include <QDomDocument>
+#include <QDomElement>
 
 class tag {
 private:
@@ -21,6 +22,9 @@ public:
     void setColor(const QColor& color);
     bool operator == (const tag& t) const; //use to filter by tag
 
+    //data persistence
+    void toXml(QDomElement& actOBj, QDomDocument& xmlDoc) const;
+    void fromXml(const QDomElement& actObj);
 };
 
 

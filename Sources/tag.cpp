@@ -12,3 +12,13 @@ void tag::setColor(const QColor& c) { color=c;}
 bool tag::operator==(const tag& t) const {
     return name == t.getName();
 }
+
+void tag::toXml(QDomElement& actObj, QDomDocument& xmlDoc) const{
+    actObj.setAttribute("name",  QString::fromStdString(name));
+    actObj.setAttribute("color",  color.name());
+}
+
+void tag::fromXml(const QDomElement& actObj){
+    name = actObj.attribute("name").toStdString();
+    color = QColor(actObj.attribute("color"));
+}

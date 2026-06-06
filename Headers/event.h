@@ -42,5 +42,9 @@ public:
     bool isExpired() const override;
     std::string summary() const override;
     void accept(ActivityVisitor& v) override;
+
+    //data persistence
+    void toXml(QDomElement& actObj, QDomDocument& xmlDoc) const override;
+    void fromXml(const QDomElement& actObj) override;
 };
 #endif // EVENT_H

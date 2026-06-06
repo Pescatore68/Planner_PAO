@@ -76,3 +76,90 @@ std::string Routine::FrequencyToString() const {
 }
 
 void Routine::accept(ActivityVisitor& v) { v.visit(*this); }
+
+// data persistence
+void Routine::toXml(QDomElement& routineObj, QDomDocument& xmlDoc) const {
+    routineObj.setAttribute("type",      "Routine");
+    routineObj.setAttribute("frequency", QString::fromStdString(FrequencyToString()));
+    routineObj.setAttribute("check",     check ? "true" : "false");
+
+    QDomElement name = xmlDoc.createElement("name");
+    name.appendChild(xmlDoc.createTextNode(QString::fromStdString(getName())));
+    routineObj.appendChild(name);
+
+    QDomElement desc = xmlDoc.createElement("description");
+    desc.appendChild(xmlDoc.createTextNode(QString::fromStdString(getDescription())));
+    routineObj.appendChild(desc);
+
+    QDomElement tagObj = xmlDoc.createElement("tag");
+    tagObj.appendChild(xmlDoc.createTextNode(
+        getTag() ? QString::fromStdString(getTag()->getName()) : ""));
+    routineObj.appendChild(tagObj);
+
+    QDomElement st = xmlDoc.createElement("startTime");
+    st.setAttribute("hour", static_cast<int>(startTime.getOre()));
+    st.setAttribute("min",  static_cast<int>(startTime.getMin()));
+    routineObj.appendChild(st);
+
+    QDomElement et = xmlDoc.createElement("endTime");
+    et.setAttribute("hour", static_cast<int>(endTime.getOre()));
+    et.setAttribute("min",  static_cast<int>(endTime.getMin()));
+    routineObj.appendChild(et);
+
+    QDomElement sd = xmlDoc.createElement("startDate");
+    sd.setAttribute("day",   static_cast<int>(startDate.getDay()));
+    sd.setAttribute("month", static_cast<int>(startDate.getMonth()));
+    sd.setAttribute("year",  static_cast<int>(startDate.getYear()));
+    routineObj.appendChild(st);
+
+    QDomElement ed = xmlDoc.createElement("endDate");
+    ed.setAttribute("day",   static_cast<int>(endDate.getDay()));
+    ed.setAttribute("month", static_cast<int>(endDate.getMonth()));
+    ed.setAttribute("year",  static_cast<int>(endDate.getYear()));
+    routineObj.appendChild(ed);
+
+    // history
+    QDomElement history = xmlDoc.createElement("history");
+    for (bool b : check_history) {
+        QDomElement day = xmlDoc.createElement("day");
+        day.setAttribute("completed", b ? "true" : "false");
+        history.appendChild(day);
+    }
+    routineObj.appendChild(history);
+}
+
+void Routine::fromXml(const QDomElement& routineObj) {
+    setName(routineObj.firstChildElement("name").text().toStdString());
+    setDesc(routineObj.firstChildElement("description").text().toStdString());
+    std::string freqStr = routineObj.attribute("frequency").toStdString();
+    if (freqStr == "Daily")        freq = Frequency::Daily;
+    else if (freqStr == "Weekly")  freq = Frequency::Weekly;
+    else if (freqStr == "Monthly") freq = Frequency::Monthly;
+    else if (freqStr == "Yearly")  freq = Frequency::Yearly;
+
+
+    check = routineObj.attribute("check") == "true";
+
+    QDomElement st = routineObj.firstChildElement("startTime");
+    startTime = HourMinute(st.attribute("hour").toUInt(), st.attribute("min").toUInt());
+
+    QDomElement et = routineObj.firstChildElement("endTime");
+    endTime = HourMinute(et.attribute("hour").toUInt(), et.attribute("min").toUInt());
+
+    QDomElement sd = routineObj.firstChildElement("startDate");
+    startDate.changeDate(sd.attribute("year").toUInt(), sd.attribute("month").toUInt(), sd.attribute("day").toUInt());
+
+    QDomElement ed = routineObj.firstChildElement("endDate");
+    endDate.changeDate(ed.attribute("year").toUInt(), ed.attribute("month").toUInt(), ed.attribute("day").toUInt());
+
+    check_history.clear();
+    QDomElement history = routineObj.firstChildElement("history");
+    QDomElement day  = history.firstChildElement("day");
+    while (!day.isNull()) {
+        check_history.push_back(day.attribute("completed") == "true");
+        day = day.nextSiblingElement("day");
+    }
+
+    //QDomElement frequency = routineObj.firstChildElement("frequency");
+
+}

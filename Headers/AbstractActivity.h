@@ -30,6 +30,9 @@ public:
     virtual bool isExpired() const = 0;
     //virtual void display() const = 0; non so se serve
     virtual void accept(ActivityVisitor& v) = 0;
+
+    virtual void toXml(QDomElement& actObj, QDomDocument& xmlDoc) const = 0;
+    virtual void fromXml(const QDomElement& actObj) = 0;
 };
 
 #endif

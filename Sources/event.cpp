@@ -71,3 +71,75 @@ std::string Event::summary() const {
 }
 
 void Event::accept(ActivityVisitor& v) { v.visit(*this); }
+
+void Event::toXml(QDomElement& evtObj, QDomDocument& xmlDoc) const {
+    evtObj.setAttribute("type", "Event");
+
+    QDomElement name = xmlDoc.createElement("name");
+    name.appendChild(xmlDoc.createTextNode(QString::fromStdString(getName())));
+    evtObj.appendChild(name);
+
+    QDomElement description = xmlDoc.createElement("description");
+    description.appendChild(xmlDoc.createTextNode(QString::fromStdString(getDescription())));
+    evtObj.appendChild(description);
+
+
+    QDomElement tagObj = xmlDoc.createElement("tag");
+    tagObj.appendChild(xmlDoc.createTextNode(
+        getTag() ? QString::fromStdString(getTag()->getName()) : ""));
+    evtObj.appendChild(tagObj);
+
+
+    QDomElement startDate = xmlDoc.createElement("startDate");
+    startDate.setAttribute("day",   static_cast<int>(StartDate.getDay()));
+    startDate.setAttribute("month", static_cast<int>(StartDate.getMonth()));
+    startDate.setAttribute("year",  static_cast<int>(StartDate.getYear()));
+    evtObj.appendChild(startDate);
+
+    QDomElement endDate = xmlDoc.createElement("endDate");
+    endDate.setAttribute("day",   static_cast<int>(EndDate.getDay()));
+    endDate.setAttribute("month", static_cast<int>(EndDate.getMonth()));
+    endDate.setAttribute("year",  static_cast<int>(EndDate.getYear()));
+    evtObj.appendChild(endDate);
+
+    if (hasTime()) {
+        QDomElement startTime = xmlDoc.createElement("startTime");
+        startTime.setAttribute("hour", static_cast<int>(StartTime.getOre()));
+        startTime.setAttribute("min",  static_cast<int>(StartTime.getMin()));
+        evtObj.appendChild(startTime);
+
+        QDomElement endTime = xmlDoc.createElement("endTime");
+        endTime.setAttribute("hour", static_cast<int>(EndTime.getOre()));
+        endTime.setAttribute("min",  static_cast<int>(EndTime.getMin()));
+        evtObj.appendChild(endTime);
+    }
+
+    QDomElement loc = xmlDoc.createElement("location");
+    loc.appendChild(xmlDoc.createTextNode(QString::fromStdString(location)));
+    evtObj.appendChild(loc);
+}
+
+void Event::fromXml(const QDomElement& evtObj) {
+    setName(evtObj.firstChildElement("name").text().toStdString());
+    setDesc(evtObj.firstChildElement("description").text().toStdString());
+
+    QDomElement startDate = evtObj.firstChildElement("startDate");
+    StartDate.changeDate(startDate.attribute("year").toUInt(),startDate.attribute("month").toUInt(),startDate.attribute("day").toUInt());
+
+    QDomElement endDate = evtObj.firstChildElement("endDate");
+    EndDate.changeDate(endDate.attribute("year").toUInt(),
+                       endDate.attribute("month").toUInt(),
+                       endDate.attribute("day").toUInt());
+    if(hasTime())
+    {
+        QDomElement startTime = evtObj.firstChildElement("StartTime");
+        StartTime = HourMinute(startTime.attribute("hour").toUInt(), startTime.attribute("min").toUInt());
+
+        QDomElement endTime = evtObj.firstChildElement("StartTime");
+        EndTime = HourMinute(startTime.attribute("hour").toUInt(), endTime.attribute("min").toUInt());
+
+    }
+
+    location = evtObj.firstChildElement("location").text().toStdString();
+
+}

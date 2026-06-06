@@ -26,5 +26,8 @@ public:
     bool isExpired() const override;
     std::string summary() const override;
     void accept(ActivityVisitor& v) override;
+
+    void toXml(QDomElement& reminderObj, QDomDocument& xmlDoc) const override;
+    void fromXml(const QDomElement& reminderObj) override;
 };
 #endif // REMAINDER_H

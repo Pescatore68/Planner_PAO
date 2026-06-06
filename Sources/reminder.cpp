@@ -31,3 +31,52 @@ std::string Reminder::summary() const {
 }
 
 void Reminder::accept(ActivityVisitor& v) { v.visit(*this); }
+
+//data persistence
+void Reminder::toXml(QDomElement& reminderObj, QDomDocument& xmlDoc) const {
+    reminderObj.setAttribute("type", "Reminder");
+
+    QDomElement name = xmlDoc.createElement("name");
+    name.appendChild(xmlDoc.createTextNode(QString::fromStdString(getName())));
+    reminderObj.appendChild(name);
+
+    QDomElement description = xmlDoc.createElement("description");
+    description.appendChild(xmlDoc.createTextNode(QString::fromStdString(getDescription())));
+    reminderObj.appendChild(description);
+
+    QDomElement tagObj = xmlDoc.createElement("tag");
+    tagObj.appendChild(xmlDoc.createTextNode(
+        getTag() ? QString::fromStdString(getTag()->getName()) : ""));
+    reminderObj.appendChild(tagObj);
+
+    QDomElement d = xmlDoc.createElement("date");
+    d.setAttribute("day",   static_cast<int>(day.getDay()));
+    d.setAttribute("month", static_cast<int>(day.getMonth()));
+    d.setAttribute("year",  static_cast<int>(day.getYear()));
+    reminderObj.appendChild(d);
+
+    QDomElement t = xmlDoc.createElement("time");
+    t.setAttribute("hour", static_cast<int>(time.getOre()));
+    t.setAttribute("min",  static_cast<int>(time.getMin()));
+    reminderObj.appendChild(t);
+
+    QDomElement loc = xmlDoc.createElement("location");
+    loc.appendChild(xmlDoc.createTextNode(QString::fromStdString(location)));
+    reminderObj.appendChild(loc);
+}
+
+void Reminder::fromXml(const QDomElement& reminderObj) {
+    setName(reminderObj.firstChildElement("name").text().toStdString());
+    setDesc(reminderObj.firstChildElement("description").text().toStdString());
+
+    QDomElement d = reminderObj.firstChildElement("date");
+    day.changeDate(d.attribute("year").toUInt(),
+                   d.attribute("month").toUInt(),
+                   d.attribute("day").toUInt());
+
+    QDomElement t = reminderObj.firstChildElement("time");
+    time = HourMinute(t.attribute("hour").toUInt(),
+                      t.attribute("min").toUInt());
+
+    location = reminderObj.firstChildElement("location").text().toStdString();
+}

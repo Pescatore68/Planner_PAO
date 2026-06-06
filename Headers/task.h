@@ -23,6 +23,9 @@ public:
     string summary() const override;
     void accept(ActivityVisitor& v) override;
 
+    void toXml(QDomElement& elem, QDomDocument& doc) const override;
+    void fromXml(const QDomElement& elem) override;
+
 };
 
 #endif // TASK_H

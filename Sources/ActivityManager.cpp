@@ -17,12 +17,12 @@ void ActivityManager::remove(unsigned int idx) {
     activities.erase(activities.begin() + idx);
 }
 
-AbstractActivity* ActivityManager::get(unsigned int idx) {
+AbstractActivity* ActivityManager::get(unsigned int idx) const {
     if (idx >= activities.size()) return nullptr;
     return activities[idx];
 }
 
-unsigned int ActivityManager::size() {
+unsigned int ActivityManager::size() const {
     return activities.size();
 }
 

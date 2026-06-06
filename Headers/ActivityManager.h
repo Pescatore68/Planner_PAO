@@ -14,8 +14,8 @@ public:
     ~ActivityManager();
     void add(AbstractActivity*);
     void remove(unsigned int);
-    AbstractActivity* get(unsigned int);
-    unsigned int size();
+    AbstractActivity* get(unsigned int) const;
+    unsigned int size() const;
     void fit();
 
 };

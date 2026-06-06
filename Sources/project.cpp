@@ -1,5 +1,30 @@
 #include <Headers/project.h>
 
+project::project(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd)
+    : task(name, description, Tag, end, oEnd) {};
+
+project::project(const string& name, const string& description,  const date& end, const HourMinute& oEnd)
+    : task(name, description, end, oEnd) {};
+
+project::project(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd, const std::vector<task*>& v)
+    : task(name, description, Tag, end, oEnd), subtasks(v) {};
+
+project::project(const string& name, const string& description,  const date& end, const HourMinute& oEnd,  const std::vector<task*>& v)
+    : task(name, description, end, oEnd), subtasks(v) {};
+
+
+project::~project() {
+    for (task* t : subtasks) {
+        delete t;
+    }
+}
+
+const std::vector<task*>& project::getSubtasks() const { return subtasks; }
+
+const task* project::getSubtask(unsigned int idx) const {
+    return subtasks[idx];
+}
+
 //metodo per barra di completamento
 unsigned int project::nCompleted() const {
     unsigned int i=0;
@@ -8,7 +33,7 @@ unsigned int project::nCompleted() const {
             i++;
     }
     return i;
-};
+}
 
 void project::add(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd) {
     subtasks.push_back(new task(name, description, Tag, end, oEnd));
@@ -36,7 +61,26 @@ void project::remove(unsigned int idx) {
     subtasks.erase(subtasks.begin()+idx);
 }
 
-//string project::summary() const;
+string project::summary() const {
+    std::string status = isCompleted() ? "[✓]" : "[ ]";
+    std::string result;
+
+    result += status + " " + getName() + "\n";
+
+    if (!getDescription().empty())
+        result += "  " + getDescription() + "\n";
+
+    result += "  Scadenza: " + getDeadline().toString()
+              + " ore " + getODeadline().toString() + "\n";
+
+    for (unsigned int i=0; i<size(); i++) {
+        const task* t = getSubtask(i);
+        std::string status = t->isCompleted() ? "[✓]" : "[ ]";
+        result += status + " " + t->getName() + "\n";
+
+    }
+    return result;
+}
 
 float project::completionPercentage() const {
     if (size() == 0) return 0.0f;                        // evita divisione per zero

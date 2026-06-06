@@ -12,6 +12,7 @@ SOURCES += \
     Sources/AbstractActivity.cpp \
     Sources/ActivityManager.cpp \
     Sources/HourMinute.cpp \
+    Sources/JSONformat.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
@@ -19,7 +20,7 @@ SOURCES += \
     Sources/tag.cpp \
     Sources/task.cpp \
     Sources/tagManager.cpp \
-    Sources/routine.cpp \
+    Sources/Routine.cpp \
     Sources/reminder.cpp \
     Sources/event.cpp \
 
@@ -27,6 +28,7 @@ HEADERS += \
     Headers/AbstractActivity.h \
     Headers/ActivityManager.h \
     Headers/HourMinute.h \
+    Headers/JSONformat.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \

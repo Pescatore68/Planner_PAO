@@ -8,6 +8,13 @@ private:
     std::vector<task*> subtasks;
 
 public:
+    project(const string&, const string&, const tag*, const date&, const HourMinute&);
+    project(const string&, const string&, const date&, const HourMinute&);
+    project(const string&, const string&, const tag*, const date&, const HourMinute&, const std::vector<task*>&);
+    project(const string&, const string&, const date&, const HourMinute&, const std::vector<task*>&);
+    ~project();
+    const std::vector<task*>& getSubtasks() const;
+    const task* getSubtask(unsigned int) const;
     unsigned int nCompleted() const;
     void add(const string&, const string&, const tag*, const date&, const HourMinute&);
     void add(const string&, const string&, const date&, const HourMinute&);

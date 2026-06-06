@@ -12,6 +12,7 @@ SOURCES += \
     Sources/AbstractActivity.cpp \
     Sources/ActivityManager.cpp \
     Sources/HourMinute.cpp \
+    Sources/JSONformat.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
@@ -28,6 +29,7 @@ HEADERS += \
     Headers/ActivityManager.h \
     Headers/ActivityVisitor.h \
     Headers/HourMinute.h \
+    Headers/JSONformat.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \

@@ -4,6 +4,7 @@
 #include "AbstractActivity.h"
 #include "date.h"
 #include "HourMinute.h"
+#include "tagManager.h"
 #include <vector>
 #include <string>
 
@@ -37,6 +38,11 @@ public:
     std::string FrequencyToString() const;
     void accept(ActivityVisitor& v) override;
 
+
+    QJsonObject toJson() const override;
+    static Routine* fromJson(const QJsonObject& obj, tagManager& );
+
+    static Frequency freqFromString(const std::string&);
 
 
 private:

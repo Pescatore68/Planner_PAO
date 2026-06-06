@@ -70,4 +70,32 @@ std::string Event::summary() const {
     return s;
 }
 
+QJsonObject Event::toJson() const {
+    QJsonObject obj;
+    obj["type"] = "event";
+    obj["name"] = QString::fromStdString(getName());
+    obj["description"] = QString::fromStdString(getDescription());
+    obj["tag"] = QString::fromStdString(getTag()->getName());
+    obj["tagColor"] = getTag()->getColor().name();
+    obj["startDate"] = QString::fromStdString(getStartDate().toString());
+    obj["endDate"] = QString::fromStdString(getEndDate().toString());
+    obj["startTime"] = QString::fromStdString(getStartTime().toString());
+    obj["endTime"] = QString::fromStdString(getEndTime().toString());
+    obj["location"] = QString::fromStdString(getLocation());
+    obj["allDay"] = !hasTime();
+    return obj;
+
+}
+
+Event* Event::fromJson(const QJsonObject& obj, tagManager& tm) {
+    auto* e = new Event(obj["name"].toString().toStdString(),
+                        obj["description"].toString().toStdString(),
+                        tm.newTag(obj["tag"].toString().toStdString(), QColor(obj["tagColor"].toString())),
+                        date::dateFromString(obj["startDate"].toString().toStdString()),
+                        date::dateFromString(obj["endDate"].toString().toStdString()),
+                        HourMinute::hmFromString(obj["startTime"].toString().toStdString()),
+                        HourMinute::hmFromString(obj["endTime"].toString().toStdString()));
+    e->setLocation(obj["location"].toString().toStdString());
+    return e;
+}
 void Event::accept(ActivityVisitor& v) { v.visit(*this); }

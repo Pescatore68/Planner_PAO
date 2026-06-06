@@ -2,8 +2,9 @@
 #define EVENT_H
 
 #include "AbstractActivity.h"
-#include "Headers/date.h"
-#include "Headers/HourMinute.h"
+#include "date.h"
+#include "HourMinute.h"
+#include "tagManager.h"
 #include <string>
 
 class Event : public AbstractActivity{
@@ -41,6 +42,10 @@ public:
     //bool current() const; non credo serva
     bool isExpired() const override;
     std::string summary() const override;
+
+    QJsonObject toJson() const override;
+    static Event* fromJson(const QJsonObject& , tagManager& );
+
     void accept(ActivityVisitor& v) override;
 };
 #endif // EVENT_H

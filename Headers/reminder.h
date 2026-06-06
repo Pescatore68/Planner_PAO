@@ -4,6 +4,7 @@
 #include "AbstractActivity.h"
 #include "date.h"
 #include "HourMinute.h"
+#include "tagManager.h"
 #include <string>
 
 class Reminder : public AbstractActivity {
@@ -25,6 +26,9 @@ public:
 
     bool isExpired() const override;
     std::string summary() const override;
+
+    QJsonObject toJson() const override;
+    static Reminder* fromJson(const QJsonObject& , tagManager& );
     void accept(ActivityVisitor& v) override;
 };
 #endif // REMAINDER_H

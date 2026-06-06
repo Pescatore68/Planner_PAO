@@ -11,8 +11,8 @@ private:
     HourMinute oDeadline;
     bool check;
 public:
-    task(const string&, const string&, const tag*, const date&, const HourMinute&);
-    task(const string&, const string&, const date&, const HourMinute&);
+    task(const string&, const string&, const tag*, const date&, const HourMinute&, const bool& = false);
+    //task(const string&, const string&, const date&, const HourMinute&);
     date getDeadline() const;
     HourMinute getODeadline() const;
     bool isCompleted() const;
@@ -21,6 +21,8 @@ public:
     void setODeadline (const HourMinute&);
     bool isExpired() const override;
     string summary() const override;
+    QJsonObject toJson() const override;
+    static task* fromJson(const QJsonObject&, tagManager&);
     void accept(ActivityVisitor& v) override;
 
 };

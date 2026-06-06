@@ -1,7 +1,7 @@
 #include "Headers/AbstractActivity.h"
 #include "Headers/ActivityManager.h"
 
-AbstractActivity::AbstractActivity(const string& n, const string& d) : name(n), description(d), t() {};
+//AbstractActivity::AbstractActivity(const string& n, const string& d, /*const tagManager& tm*/) : name(n), description(d), /*t(&(tm->getDefaultTag())*/) {};
 AbstractActivity::AbstractActivity(const string& n, const string& d, const tag* t) : name(n), description(d), t(t) {};
 AbstractActivity::AbstractActivity(const string& n, const string& d, ActivityManager& mgr) : name(n), description(d), t() {
     mgr.add(this);

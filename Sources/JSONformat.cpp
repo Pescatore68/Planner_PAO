@@ -1,5 +1,5 @@
 #include "Headers/JSONformat.h"
-#include "Headers/ActivityManager.h"
+#include "Headers/JSONformat.h"
 #include "Headers/tagManager.h"
 #include "Headers/task.h"
 #include "Headers/routine.h"
@@ -28,7 +28,7 @@ static Routine::Frequency freqFromString(const std::string& s) {
     return Routine::Frequency::Daily;
 }
 
-QJsonDocument JSONformat::toJson(const ActivityManager& am) {
+QJsonDocument JSONformat::toJson(const JSONformat& am) {
     QJsonArray arr;
 
     for (unsigned int i=0; i<am.size(); i++) {
@@ -43,13 +43,15 @@ QJsonDocument JSONformat::toJson(const ActivityManager& am) {
             obj["deadline"] = QString::fromStdString(p->getDeadline().toString());
             obj["oDeadline"] = QString::fromStdString(p->getODeadline().toString());
             obj["check"] = p->isCompleted();
-            //std::vector<task*> subtasks;
+            //std::vector<task*> subtasks;+
+            QJsonArray subtasks;
             for (unsigned int i=0; i<p->size(); i++) {
+                QJsonObject sub;
                 const task* t = p->getSubtask(i);
-                obj["taskNum"] = QString::fromStdString(std::to_string(i));
-                obj["deadline"] = QString::fromStdString(t->getDeadline().toString());
-                obj["oDeadline"] = QString::fromStdString(t->getODeadline().toString());
-                obj["check"] = t->isCompleted();
+                sub["taskNum"] = QString::fromStdString(std::to_string(i));
+                sub["deadline"] = QString::fromStdString(t->getDeadline().toString());
+                sub["oDeadline"] = QString::fromStdString(t->getODeadline().toString());
+                sub["check"] = t->isCompleted();
             }
         }
 
@@ -92,7 +94,7 @@ QJsonDocument JSONformat::toJson(const ActivityManager& am) {
 }
 
 
-void JSONformat::fromJson(const QJsonDocument& doc, ActivityManager& am, tagManager& tm) {
+void JSONformat::fromJson(const QJsonDocument& doc, JSONformat& am, tagManager& tm) {
     QJsonArray arr = doc.object()["activities"].toArray();
 
     for (const auto& val : arr) {
@@ -103,8 +105,22 @@ void JSONformat::fromJson(const QJsonDocument& doc, ActivityManager& am, tagMana
         tag* t           = tm.findTag(obj["tag"].toString().toStdString());
 
         if (type == "project") {
-            for (unsigned int )
-            auto* p = new project();
+            auto* p = new project(name, desc, t,
+                                  dateFromString(obj["deadline"].toString().toStdString()),
+                                  hmFromString(obj["oDeadline"].toString().toStdString()),
+                                  obj["check"].toBool()); //oggetto QT poi a string
+
+            QJsonArray subtasks = obj["subtasks"].toArray();
+            for (const auto& val : subtasks) {
+                QJsonObject sub = val.toObject();
+                p->add(sub["name"].toString().toStdString(),
+                       sub["description"].toString().toStdString(),
+
+                       dateFromString(sub["deadline"].toString().toStdString()),
+                       hmFromString(sub["oDeadline"].toString().toStdString()),
+                       sub["check"].toBool());
+            }
+            am.add(p);
         }
 
         else if (type == "task") {
@@ -142,14 +158,14 @@ void JSONformat::fromJson(const QJsonDocument& doc, ActivityManager& am, tagMana
     }
 }
 
-bool ActivityManager::saveJson(const QString& path, const ActivityManager& am) const {
+bool JSONformat::saveJson(const QString& path, const ActivityManager& am) const {
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly)) return false;
     f.write(toJson(am).toJson(QJsonDocument::Indented));
     return true;
 }
 
-bool ActivityManager::loadJson(const QString& path, tagManager& tm) {
+bool JSONformat::loadJson(const QString& path, tagManager& tm) {
     QFile f(path);
     if (!f.open(QIODevice::ReadOnly)) return false;
     QJsonParseError err;

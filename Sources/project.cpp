@@ -1,16 +1,7 @@
 #include <Headers/project.h>
 
-project::project(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd)
-    : task(name, description, Tag, end, oEnd) {};
-
-project::project(const string& name, const string& description,  const date& end, const HourMinute& oEnd)
-    : task(name, description, end, oEnd) {};
-
-project::project(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd, const std::vector<task*>& v)
-    : task(name, description, Tag, end, oEnd), subtasks(v) {};
-
-project::project(const string& name, const string& description,  const date& end, const HourMinute& oEnd,  const std::vector<task*>& v)
-    : task(name, description, end, oEnd), subtasks(v) {};
+project::project(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd, const bool& b)
+    : task(name, description, Tag, end, oEnd, b) {};
 
 
 project::~project() {
@@ -35,11 +26,8 @@ unsigned int project::nCompleted() const {
     return i;
 }
 
-void project::add(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd) {
-    subtasks.push_back(new task(name, description, Tag, end, oEnd));
-}
-void project::add(const string& name, const string& description, const date& end, const HourMinute& oEnd) {
-    subtasks.push_back(new task(name, description, end, oEnd));
+void project::add(const string& name, const string& description, const date& end, const HourMinute& oEnd, const bool& b) {
+    subtasks.push_back(new task(name, description, this->getTag(), end, oEnd, b));
 }
 
 unsigned int project::size() const {

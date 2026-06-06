@@ -3,6 +3,7 @@
 #include "tag.h"
 #include <string>
 
+class tagManager;
 class ActivityManager;
 
 using std::string;
@@ -14,7 +15,7 @@ private:
     const tag* t;
 
 public:
-    AbstractActivity(const string&, const string&);
+    AbstractActivity(const string&, const string&, const tagManager&);
     AbstractActivity(const string& n, const string& d, const tag* t);
     AbstractActivity(const string&, const string&, ActivityManager& mgr);
     AbstractActivity(const string& n, const string& d, const tag* t, ActivityManager& mgr);

@@ -1,31 +1,30 @@
 name: Qt6 CI
 
 on:
-push:
-branches: [ "main" ]
-pull_request:
-branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+      - name: Install Qt6
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            qt6-base-dev \
+            qt6-base-dev-tools \
+            qmake6 \
+            build-essential
 
-  - name: Install Qt6
-    run: |
-      sudo apt update
-      sudo apt install -y \
-        qt6-base-dev \
-        qt6-base-dev-tools \
-        qmake6 \
-        build-essential
+      - name: Generate Makefile
+        run: qmake6 Planner_PAO.pro
 
-  - name: Generate Makefile
-    run: qmake6 Planner_PAO.pro
-
-  - name: Build
-    run: make -j$(nproc)
+      - name: Build
+        run: make -j$(nproc)
 

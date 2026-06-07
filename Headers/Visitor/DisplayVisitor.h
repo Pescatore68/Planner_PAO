@@ -1,0 +1,4 @@
+#ifndef DISPLAYVISITOR_H
+#define DISPLAYVISITOR_H
+
+#endif // DISPLAYVISITOR_H

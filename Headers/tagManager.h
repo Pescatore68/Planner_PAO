@@ -25,6 +25,7 @@ public:
     void removeTag( const std::string& name, ActivityManager& am);
     const std::vector<tag*>& getTags() const;
     tag* getDefaultTag() const;
+    toJson
 };
 
 

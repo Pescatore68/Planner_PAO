@@ -9,46 +9,24 @@
 #include <QWidget>
 #include "Headers/ActivityManager.h"
 #include "Headers/tagManager.h"
+#include "Headers/AbstractActivity.h"
+#include <QMainWindow>
+#include <QStackedWidget>
+
+class DetailWidget;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-private:
-    ActivityManager& am;
-    tagManager& tm;
-
-    QWidget* centralWidget;
-    QHBoxLayout* mainLayout;
-
-    // Nav bar
-    QWidget* navBar;
-    QVBoxLayout* navLayout;
-    QPushButton* btnCalendar;
-    QPushButton* btnTaskProject;
-    QPushButton* btnSearch;
-    QPushButton* btnTags;
-
-    // Schermate
-    QStackedWidget* stackedWidget;
-    QWidget* calendarView;
-    QWidget* taskProjectView;
-    QWidget* searchView;
-    QWidget* detailView;
-    QWidget* formView;
-    QWidget* tagView;
-
-    void setupNavBar();
-    void setupStackedWidget();
+    QStackedWidget* stack;
+    DetailWidget*   detailWidget;
+    // aggiungeremo listWidget ecc.
 
 public:
-    MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
-    ~MainWindow() = default;
+    explicit MainWindow(QWidget* parent = nullptr);
 
-    void showCalendar();
-    void showTaskProject();
-    void showSearch();
-    void showDetail(AbstractActivity* a);
-    void showForm(AbstractActivity* a = nullptr);
+    void showDetail( AbstractActivity* a);
+    void showList();
 };
 
 #endif

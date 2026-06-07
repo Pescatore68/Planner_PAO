@@ -98,4 +98,71 @@ Event* Event::fromJson(const QJsonObject& obj, tagManager& tm) {
     e->setLocation(obj["location"].toString().toStdString());
     return e;
 }
+
+QDomElement Event::toXml(QDomDocument& xmlDoc) const {
+    QDomElement eventObj = xmlDoc.createElement("activity");
+    eventObj.setAttribute("type",   "Event");
+    eventObj.setAttribute("allDay", !hasTime() ? "true" : "false");
+
+    QDomElement nameObj = xmlDoc.createElement("name");
+    nameObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getName())));
+    eventObj.appendChild(nameObj);
+
+    QDomElement descObj = xmlDoc.createElement("description");
+    descObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getDescription())));
+    eventObj.appendChild(descObj);
+
+    QDomElement tagObj = xmlDoc.createElement("tag");
+    tagObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getTag()->getName())));
+    eventObj.appendChild(tagObj);
+
+    QDomElement tagColorObj = xmlDoc.createElement("tagColor");
+    tagColorObj.appendChild(xmlDoc.createTextNode(getTag()->getColor().name()));
+    eventObj.appendChild(tagColorObj);
+
+    QDomElement locObj = xmlDoc.createElement("location");
+    locObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getLocation())));
+    eventObj.appendChild(locObj);
+
+    QDomElement startDateObj = xmlDoc.createElement("startDate");
+    startDateObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getStartDate().toString())));
+    eventObj.appendChild(startDateObj);
+
+    QDomElement endDateObj = xmlDoc.createElement("endDate");
+    endDateObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getEndDate().toString())));
+    eventObj.appendChild(endDateObj);
+
+    if (hasTime()) {
+        QDomElement startTimeObj = xmlDoc.createElement("startTime");
+        startTimeObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getStartTime().toString())));
+        eventObj.appendChild(startTimeObj);
+
+        QDomElement endTimeObj = xmlDoc.createElement("endTime");
+        endTimeObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getEndTime().toString())));
+        eventObj.appendChild(endTimeObj);
+    }
+
+    return eventObj;
+}
+
+Event* Event::fromXml(const QDomElement& obj, tagManager& tm) {
+    std::string name = obj.firstChildElement("name").text().toStdString();
+    std::string desc = obj.firstChildElement("description").text().toStdString();
+    std::string loc  = obj.firstChildElement("location").text().toStdString();
+
+    tag* t = tm.newTag(obj.firstChildElement("tag").text().toStdString(), QColor(obj.firstChildElement("tagColor").text()));
+
+    date startDate = date::dateFromString(obj.firstChildElement("startDate").text().toStdString());
+    date endDate   = date::dateFromString(obj.firstChildElement("endDate").text().toStdString());
+
+    bool allDay = obj.attribute("allDay") == "true";
+    if (!allDay) {
+        HourMinute startTime = HourMinute::hmFromString(obj.firstChildElement("startTime").text().toStdString());
+        HourMinute endTime   = HourMinute::hmFromString(obj.firstChildElement("endTime").text().toStdString());
+        return new Event(name, desc, t, startDate, endDate, startTime, endTime, loc);
+    }
+
+    return new Event(name, desc, t, startDate, endDate, loc);
+}
+
 void Event::accept(ActivityVisitor& v) { v.visit(*this); }

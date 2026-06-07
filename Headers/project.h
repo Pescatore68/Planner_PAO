@@ -23,8 +23,13 @@ public:
     void remove(unsigned int i);
     string summary() const override;
     float completionPercentage() const; // nCompleted() / size() * 100 → per la barra
+
+    //data persistence
     QJsonObject toJson() const override;
     static project* fromJson(const QJsonObject& obj, tagManager& tm);
+
+    QDomElement toXml(QDomDocument& xmlDoc) const override;
+    static project* fromXml(const QDomElement& obj, tagManager& tm);
 
     void accept(ActivityVisitor& v) override;
 

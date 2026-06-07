@@ -27,8 +27,13 @@ public:
     bool isExpired() const override;
     std::string summary() const override;
 
+    //data persistence
     QJsonObject toJson() const override;
     static Reminder* fromJson(const QJsonObject& , tagManager& );
+
+    QDomElement toXml(QDomDocument& xmlDoc) const override;
+    static Reminder* fromXml(const QDomElement& obj, tagManager& tm);
+
     void accept(ActivityVisitor& v) override;
 };
 #endif // REMAINDER_H

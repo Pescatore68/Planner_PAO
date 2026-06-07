@@ -120,4 +120,57 @@ project* project::fromJson(const QJsonObject& obj, tagManager& tm) {
     }
     return p;
 }
+
+QDomElement project::toXml(QDomDocument& xmlDoc) const {
+    QDomElement projectObj = xmlDoc.createElement("activity");
+    projectObj.setAttribute("type",  "Project");
+    projectObj.setAttribute("check", isCompleted() ? "true" : "false");
+
+    QDomElement nameObj = xmlDoc.createElement("name");
+    nameObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getName())));
+    projectObj.appendChild(nameObj);
+
+    QDomElement descObj = xmlDoc.createElement("description");
+    descObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getDescription())));
+    projectObj.appendChild(descObj);
+
+    QDomElement tagObj = xmlDoc.createElement("tag");
+    tagObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getTag()->getName())));
+    projectObj.appendChild(tagObj);
+
+    QDomElement tagColorObj = xmlDoc.createElement("tagColor");
+    tagColorObj.appendChild(xmlDoc.createTextNode(getTag()->getColor().name()));
+    projectObj.appendChild(tagColorObj);
+
+    QDomElement deadlineObj = xmlDoc.createElement("deadline");
+    deadlineObj.appendChild(xmlDoc.createTextNode(
+        QString::fromStdString(getDeadline().toString())));
+    projectObj.appendChild(deadlineObj);
+
+    QDomElement oDeadlineObj = xmlDoc.createElement("oDeadline");
+    oDeadlineObj.appendChild(xmlDoc.createTextNode(
+        QString::fromStdString(getODeadline().toString())));
+    projectObj.appendChild(oDeadlineObj);
+
+    QDomElement subtasksObj = xmlDoc.createElement("subtasks");
+    for (task* t : subtasks) {
+        subtasksObj.appendChild(t->toXml(xmlDoc));
+    }
+    projectObj.appendChild(subtasksObj);
+
+    return projectObj;
+}
+
+project* project::fromXml(const QDomElement& obj, tagManager& tm) {
+    auto* p = new project(obj.firstChildElement("name").text().toStdString(), obj.firstChildElement("description").text().toStdString(), tm.newTag(obj.firstChildElement("tag").text().toStdString(), QColor(obj.firstChildElement("tagColor").text())), date::dateFromString(obj.firstChildElement("deadline").text().toStdString()), HourMinute::hmFromString(obj.firstChildElement("oDeadline").text().toStdString()), obj.attribute("check") == "true");
+
+    QDomElement subtasksObj = obj.firstChildElement("subtasks");
+    QDomElement subtaskObj  = subtasksObj.firstChildElement("activity");
+    while (!subtaskObj.isNull()) {
+        p->add(subtaskObj.firstChildElement("name").text().toStdString(),subtaskObj.firstChildElement("description").text().toStdString(), date::dateFromString(subtaskObj.firstChildElement("deadline").text().toStdString()), HourMinute::hmFromString(subtaskObj.firstChildElement("oDeadline").text().toStdString()), subtaskObj.attribute("check") == "true"); subtaskObj = subtaskObj.nextSiblingElement("activity");
+    }
+
+    return p;
+}
+
 void project::accept(ActivityVisitor& v) { v.visit(*this); }

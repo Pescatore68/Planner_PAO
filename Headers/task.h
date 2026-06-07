@@ -21,8 +21,14 @@ public:
     void setODeadline (const HourMinute&);
     bool isExpired() const override;
     string summary() const override;
+
+    //data persistence
     QJsonObject toJson() const override;
     static task* fromJson(const QJsonObject&, tagManager&);
+
+    QDomElement toXml(QDomDocument& xmlDoc) const override;
+    static task* fromXml(const QDomElement& obj, tagManager& tm);
+
     void accept(ActivityVisitor& v) override;
 
 };

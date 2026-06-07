@@ -27,6 +27,7 @@ public:
     void setEndDate(const date& endDate);
     void setFrequency(Frequency freq);
     void setCheck(bool check);
+    void setCheckHistory(const std::vector<bool>& h);
 
     void closeCheck();
     bool isActive(const date& d) const;
@@ -38,9 +39,12 @@ public:
     std::string FrequencyToString() const;
     void accept(ActivityVisitor& v) override;
 
-
+    //data persistence
     QJsonObject toJson() const override;
     static Routine* fromJson(const QJsonObject& obj, tagManager& );
+
+    QDomElement toXml(QDomDocument& xmlDoc) const override;
+    static Routine* fromXml(const QDomElement& obj, tagManager& tm);
 
     static Frequency freqFromString(const std::string&);
 

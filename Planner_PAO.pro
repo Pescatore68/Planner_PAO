@@ -1,4 +1,5 @@
 QT       += core gui
+QT += core gui xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -23,6 +24,7 @@ SOURCES += \
     Sources/Routine.cpp \
     Sources/reminder.cpp \
     Sources/event.cpp \
+    Sources/xmlFormat.cpp
 
 HEADERS += \
     Headers/AbstractActivity.h \
@@ -39,7 +41,8 @@ HEADERS += \
     Headers/routine.h \
     Headers/tag.h \
     Headers/tagManager.h \
-    Headers/task.h
+    Headers/task.h \
+    Headers/xmlFormat.h
 
 FORMS += \
     Forms/mainwindow.ui

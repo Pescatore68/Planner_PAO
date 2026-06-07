@@ -33,6 +33,10 @@ void Routine::setFrequency(Frequency f) { freq = f; }
 
 void Routine::setCheck(bool b) { check = b; }
 
+void Routine::setCheckHistory(const std::vector<bool>& h) {
+    check_history = h;
+}
+
 void Routine::closeCheck() {
     check_history.push_back(check);
     check = false;
@@ -75,6 +79,14 @@ std::string Routine::FrequencyToString() const {
 	return "Not implemented";
 }
 
+Routine::Frequency Routine::freqFromString(const std::string& s) {
+    if (s == "Daily") return Routine::Frequency::Daily;
+    if (s == "Weekly") return Routine::Frequency::Weekly;
+    if (s == "Monthly") return Routine::Frequency::Monthly;
+    if (s == "Yearly") return Routine::Frequency::Yearly;
+    return Routine::Frequency::Daily;
+}
+
 QJsonObject Routine::toJson() const {
     QJsonObject obj;
     obj["type"] = "routine";
@@ -103,11 +115,79 @@ Routine* Routine::fromJson(const QJsonObject& obj, tagManager& tm) {
     return r;
 }
 
-Routine::Frequency Routine::freqFromString(const std::string& s) {
-    if (s == "Daily") return Routine::Frequency::Daily;
-    if (s == "Weekly") return Routine::Frequency::Weekly;
-    if (s == "Monthly") return Routine::Frequency::Monthly;
-    if (s == "Yearly") return Routine::Frequency::Yearly;
-    return Routine::Frequency::Daily;
+
+QDomElement Routine::toXml(QDomDocument& xmlDoc) const {
+    QDomElement routineObj = xmlDoc.createElement("activity");
+    routineObj.setAttribute("type",      "Routine");
+    routineObj.setAttribute("frequency", QString::fromStdString(FrequencyToString()));
+    routineObj.setAttribute("check",     getCheck() ? "true" : "false");
+
+    QDomElement nameObj = xmlDoc.createElement("name");
+    nameObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getName())));
+    routineObj.appendChild(nameObj);
+
+    QDomElement descObj = xmlDoc.createElement("description");
+    descObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getDescription())));
+    routineObj.appendChild(descObj);
+
+    QDomElement tagObj = xmlDoc.createElement("tag");
+    tagObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getTag()->getName())));
+    routineObj.appendChild(tagObj);
+
+    QDomElement tagColorObj = xmlDoc.createElement("tagColor");
+    tagColorObj.appendChild(xmlDoc.createTextNode(getTag()->getColor().name()));
+    routineObj.appendChild(tagColorObj);
+
+    QDomElement startDateObj = xmlDoc.createElement("startDate");
+    startDateObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getStartDate().toString())));
+    routineObj.appendChild(startDateObj);
+
+    QDomElement endDateObj = xmlDoc.createElement("endDate");
+    endDateObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getEndDate().toString())));
+    routineObj.appendChild(endDateObj);
+
+    QDomElement startTimeObj = xmlDoc.createElement("startTime");
+    startTimeObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getStartTime().toString())));
+    routineObj.appendChild(startTimeObj);
+
+    QDomElement endTimeObj = xmlDoc.createElement("endTime");
+    endTimeObj.appendChild(xmlDoc.createTextNode(QString::fromStdString(getEndTime().toString())));
+    routineObj.appendChild(endTimeObj);
+
+    // history
+    QDomElement historyObj = xmlDoc.createElement("history");
+    for (bool b : check_history) {
+        QDomElement dayObj = xmlDoc.createElement("day");
+        dayObj.setAttribute("completed", b ? "true" : "false");
+        historyObj.appendChild(dayObj);
+    }
+    routineObj.appendChild(historyObj);
+
+    return routineObj;
 }
+
+Routine* Routine::fromXml(const QDomElement& obj, tagManager& tm) {
+    auto* r = new Routine(obj.firstChildElement("name").text().toStdString(),obj.firstChildElement("description").text().toStdString(),
+                        tm.newTag(obj.firstChildElement("tag").text().toStdString(), QColor(obj.firstChildElement("tagColor").text())),
+                        HourMinute::hmFromString(obj.firstChildElement("startTime").text().toStdString()),
+                        HourMinute::hmFromString(obj.firstChildElement("endTime").text().toStdString()),
+                        date::dateFromString(obj.firstChildElement("startDate").text().toStdString()),
+                        date::dateFromString(obj.firstChildElement("endDate").text().toStdString()),
+                        freqFromString(obj.attribute("frequency").toStdString()));
+
+    r->setCheck(obj.attribute("check") == "true");
+
+    // carica history
+    std::vector<bool> history;
+    QDomElement historyObj = obj.firstChildElement("history");
+    QDomElement dayObj     = historyObj.firstChildElement("day");
+    while (!dayObj.isNull()) {
+        history.push_back(dayObj.attribute("completed") == "true");
+        dayObj = dayObj.nextSiblingElement("day");
+    }
+    r->setCheckHistory(history);
+
+    return r;
+}
+
 void Routine::accept(ActivityVisitor& v) { v.visit(*this); }

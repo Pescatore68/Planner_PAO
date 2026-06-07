@@ -43,8 +43,12 @@ public:
     bool isExpired() const override;
     std::string summary() const override;
 
+    //data persistence
     QJsonObject toJson() const override;
     static Event* fromJson(const QJsonObject& , tagManager& );
+
+    QDomElement toXml(QDomDocument& xmlDoc) const override;
+    static Event* fromXml(const QDomElement& obj, tagManager& tm);
 
     void accept(ActivityVisitor& v) override;
 };

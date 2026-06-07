@@ -3,6 +3,7 @@
 #include "tag.h"
 #include <string>
 #include <QJsonObject>
+#include <QDomDocument>
 
 class tagManager;
 class ActivityVisitor;
@@ -31,6 +32,7 @@ public:
     virtual string summary() const = 0;
     virtual bool isExpired() const = 0;
     virtual QJsonObject toJson() const = 0;
+    virtual QDomElement toXml(QDomDocument& doc) const = 0;
     //virtual void display() const = 0; non so se serve
     virtual void accept(ActivityVisitor& v) = 0;
 };

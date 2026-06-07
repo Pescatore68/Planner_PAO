@@ -1,5 +1,6 @@
 #include "Headers/routine.h"
 #include "Headers/ActivityVisitor.h"
+#include <QJsonArray>
 
 Routine::Routine(const std::string& name, const std::string& description, const tag* t, const HourMinute& startTime, const HourMinute& endTime, const date& startDate, const date& endDate, Frequency freq)
     : AbstractActivity(name, description, t),
@@ -100,6 +101,12 @@ QJsonObject Routine::toJson() const {
     obj["endTime"] = QString::fromStdString(getEndTime().toString());
     obj["frequency"] = QString::fromStdString(FrequencyToString());
     obj["check"] = getCheck();
+
+    QJsonArray historyArray;
+    for (bool value : getcheckHistory()) {
+        historyArray.append(value);
+    }
+    obj["history"] = historyArray;
     return obj;
 }
 
@@ -112,6 +119,16 @@ Routine* Routine::fromJson(const QJsonObject& obj, tagManager& tm) {
                           date::dateFromString(obj["startDate"].toString().toStdString()),
                           date::dateFromString(obj["endDate"].toString().toStdString()),
                           freqFromString(obj["frequency"].toString().toStdString()));
+
+    r->setCheck(obj["check"].toBool());
+    QJsonArray historyArray = obj["history"].toArray();
+
+    std::vector<bool> history;
+    for (const auto& value : historyArray) {
+        history.push_back(value.toBool());
+    }
+
+    r->setCheckHistory(history);
     return r;
 }
 

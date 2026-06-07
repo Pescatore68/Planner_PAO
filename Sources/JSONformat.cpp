@@ -9,8 +9,6 @@
 
 AbstractActivity* JSONformat::fromJson(const QJsonObject& obj, tagManager& tm) {
     std::string type = obj["type"].toString().toStdString();
-    std::string name = obj["name"].toString().toStdString();
-    std::string desc = obj["description"].toString().toStdString();
 
     if (type == "task")     return task::fromJson(obj, tm);
     if (type == "routine")  return Routine::fromJson(obj, tm);
@@ -20,12 +18,22 @@ AbstractActivity* JSONformat::fromJson(const QJsonObject& obj, tagManager& tm) {
     return nullptr;
 }
 
-bool JSONformat::saveJson(const ActivityManager& am, const std::string& path) {
+bool JSONformat::saveJson(const ActivityManager& am, const tagManager& tm, const std::string& path) {
+    QJsonObject root;
+    QJsonArray tagsArray;
+    for (tag* t : tm.getTags()) {
+            QJsonObject tagObj;
+            tagObj["name"]  = QString::fromStdString(t->getName());
+            tagObj["color"] = t->getColor().name();
+            tagsArray.append(tagObj);
+    }
+    root["tags"] = tagsArray;
+
     QJsonArray arr;
     for (unsigned int i = 0; i < am.size(); i++)
-        arr.append(am.get(i)->toJson());  // ← polimorfismo
+        arr.append(am.get(i)->toJson());
 
-    QJsonObject root;
+
     root["activities"] = arr;
     QFile f(QString::fromStdString(path));
     if (!f.open(QIODevice::WriteOnly)) return false;

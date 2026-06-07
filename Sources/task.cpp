@@ -52,7 +52,7 @@ QJsonObject task::toJson() const {
 task* task::fromJson(const QJsonObject& obj, tagManager& tm) {
     auto* tk = new task(obj["name"].toString().toStdString(),
                         obj["description"].toString().toStdString(),
-                        tm.newTag(obj["tag"].toString().toStdString(), QColor(obj["tagColor"].toString())),
+                        tm.findTag(obj["tag"].toString().toStdString()),
                         date::dateFromString(obj["deadline"].toString().toStdString()),
                         HourMinute::hmFromString(obj["oDeadline"].toString().toStdString()));
     tk->setCompleted(obj["check"].toBool());

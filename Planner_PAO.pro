@@ -48,7 +48,7 @@ HEADERS += \
     Headers/xmlFormat.h \
     Headers/Visitor/ActivityVisitor.h \
     Headers/Visitor/DisplayVisitor.h \
-    Headers/UI/TaskWidget.h
+    Headers/UI/TaskWidget.h \
 
 
 FORMS += \

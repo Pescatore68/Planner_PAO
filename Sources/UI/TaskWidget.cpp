@@ -1,4 +1,4 @@
-#include "Headers/TaskWidget.h"
+#include "Headers/UI/TaskWidget.h"
 #include "Headers/AbstractActivity.h"
 #include "Headers/task.h"
 #include "Headers/project.h"

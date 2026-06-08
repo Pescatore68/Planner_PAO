@@ -1,5 +1,5 @@
 #include "Headers/routine.h"
-#include "Headers/ActivityVisitor.h"
+#include "Headers/Visitor/ActivityVisitor.h"
 #include <QJsonArray>
 
 Routine::Routine(const std::string& name, const std::string& description, const tag* t, const HourMinute& startTime, const HourMinute& endTime, const date& startDate, const date& endDate, Frequency freq)

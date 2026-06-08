@@ -1,5 +1,5 @@
 #include "Headers/event.h"
-#include "Headers/ActivityVisitor.h"
+#include "Headers/Visitor/ActivityVisitor.h"
 
 
 Event::Event(const std::string& name, const std::string& description, const tag* Tag, const date& StartDate, const date& EndDate, const HourMinute& StartTime, const HourMinute& EndTime, const std::string& location)

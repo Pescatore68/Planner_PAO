@@ -1,5 +1,5 @@
-#ifndef DETAILWIDGET_H
-#define DETAILWIDGET_H
+#ifndef TASKWIDGET_H
+#define TASKWIDGET_H
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -12,15 +12,16 @@ class AbstractActivity; // forward declaration
 class task;             // forward declaration
 class project;          // forward declaration
 
-class DetailWidget : public QWidget {
+class TaskWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit DetailWidget(QWidget* parent = nullptr);
+    explicit TaskWidget(QWidget* parent = nullptr);
     void setActivity(AbstractActivity* a);
 
 signals:
     void backRequested();
+    void deleteRequested(AbstractActivity* a);
 
 private slots:
     void onCompleteClicked();

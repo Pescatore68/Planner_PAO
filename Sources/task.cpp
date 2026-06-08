@@ -37,7 +37,7 @@ std::string task::summary() const {
 }
 
 bool task::isActive(const date& d) const{
-    return d==getDeadline();
+    return d == deadline;
 }
 
 QJsonObject task::toJson() const {

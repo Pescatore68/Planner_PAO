@@ -31,7 +31,7 @@ std::string Reminder::summary() const {
 }
 
 bool Reminder::isActive(const date& d) const{
-    return d==getDate();
+    return d==day;
 }
 
 QJsonObject Reminder::toJson() const {

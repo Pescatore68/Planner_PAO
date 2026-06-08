@@ -36,6 +36,10 @@ std::string task::summary() const {
     return result;
 }
 
+bool task::isActive(const date& d) const{
+    return d == deadline;
+}
+
 QJsonObject task::toJson() const {
     QJsonObject obj;
     obj["type"] = "task";

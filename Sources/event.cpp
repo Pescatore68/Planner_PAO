@@ -70,6 +70,10 @@ std::string Event::summary() const {
     return s;
 }
 
+bool Event::isActive(const date& d) const{
+    return !(StartDate > d || d > EndDate);
+}
+
 QJsonObject Event::toJson() const {
     QJsonObject obj;
     obj["type"] = "event";

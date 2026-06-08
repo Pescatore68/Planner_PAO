@@ -28,10 +28,10 @@ unsigned int date::dayOfWeek() const {
     return (d + (13*(m+1))/5 + y + y/4 - y/100 + y/400) % 7;
 }
 
-bool operator==(const date& n, const date& m) {
-    return n.getDay() == m.getDay() &&
-           n.getMonth() == m.getMonth() &&
-           n.getYear() == m.getYear();
+bool date::operator==(const date& other) const {
+    return getDay() == other.getDay() &&
+           getMonth() == other.getMonth() &&
+           getYear() == other.getYear();
 }
 
 bool operator>(const date& n, const date& m) {

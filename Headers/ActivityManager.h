@@ -1,6 +1,7 @@
 #ifndef ACTIVITYMANAGER_H
 #define ACTIVITYMANAGER_H
 
+#include "Headers/date.h"
 class tagManager;
 
 #include "AbstractActivity.h"
@@ -17,7 +18,8 @@ public:
     AbstractActivity* get(unsigned int) const;
     unsigned int size() const;
     void fit();
-
+    //activity on a specific day
+    std::vector<AbstractActivity*> getOnDate(const date& d) const;
 };
 
 #endif // ACTIVITYMANAGER_H

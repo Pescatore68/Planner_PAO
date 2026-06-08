@@ -7,21 +7,23 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QWidget>
-#include "Headers/ActivityManager.h"
-#include "Headers/tagManager.h"
+#include "ActivityManager.h"
+#include "tagManager.h"
+
+class AbstractActivity;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
     ActivityManager& am;
-    tagManager& tm;
+    tagManager&      tm;
 
-    QWidget* centralWidget;
+    QWidget*     centralWidget;
     QHBoxLayout* mainLayout;
 
     // Nav bar
-    QWidget* navBar;
+    QWidget*     navBar;
     QVBoxLayout* navLayout;
     QPushButton* btnCalendar;
     QPushButton* btnTaskProject;
@@ -41,14 +43,17 @@ private:
     void setupStackedWidget();
 
 public:
-    MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
-    ~MainWindow() = default;
+    // BUG FIX 3-4: rimosso il secondo costruttore MainWindow(QWidget*)
+    // che non era dichiarato qui ma era implementato in mainwindow.cpp
+    // causando un errore di compilazione e due corpi di ctor annidati.
+    explicit MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
+    ~MainWindow() override = default;
 
     void showCalendar();
     void showTaskProject();
     void showSearch();
     void showDetail(AbstractActivity* a);
-    void showForm(AbstractActivity* a = nullptr);
+    void showForm  (AbstractActivity* a = nullptr);
 };
 
-#endif
+#endif // MAINWINDOW_H

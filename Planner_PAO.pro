@@ -14,6 +14,7 @@ SOURCES += \
     Sources/ActivityManager.cpp \
     Sources/HourMinute.cpp \
     Sources/JSONformat.cpp \
+    Sources/UI/TaskWidget.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
@@ -30,8 +31,10 @@ HEADERS += \
     Headers/AbstractActivity.h \
     Headers/ActivityManager.h \
     Headers/ActivityVisitor.h \
+    Headers/DisplayVisitor.h \
     Headers/HourMinute.h \
     Headers/JSONformat.h \
+    Headers/TaskWidget.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \
@@ -42,7 +45,11 @@ HEADERS += \
     Headers/tag.h \
     Headers/tagManager.h \
     Headers/task.h \
-    Headers/xmlFormat.h
+    Headers/xmlFormat.h \
+    Headers/Visitor/ActivityVisitor.h \
+    Headers/Visitor/DisplayVisitor.h \
+    Headers/UI/TaskWidget.h \
+
 
 FORMS += \
     Forms/mainwindow.ui

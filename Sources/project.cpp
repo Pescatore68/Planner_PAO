@@ -1,4 +1,4 @@
-#include "Headers/ActivityVisitor.h"
+#include "Headers/Visitor/ActivityVisitor.h"
 #include <Headers/project.h>
 
 project::project(const string& name, const string& description, const tag* Tag, const date& end, const HourMinute& oEnd, const bool& b)

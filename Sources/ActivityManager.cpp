@@ -1,4 +1,5 @@
 #include "Headers/ActivityManager.h"
+#include "Headers/routine.h"
 #include "Headers/tagManager.h"
 
 ActivityManager::~ActivityManager() {
@@ -30,3 +31,11 @@ void ActivityManager::fit() {
     activities.shrink_to_fit();
 }
 
+std::vector<AbstractActivity*> ActivityManager::getOnDate(const date& d) const {
+    std::vector<AbstractActivity*> result;
+    for (auto a : activities) {
+        for (auto a : activities) {
+            if (a->isActive(d)) result.push_back(a);
+        }
+        return result;
+    }

@@ -1,5 +1,6 @@
 #ifndef ABSTRACTACTIVITY_H
 #define ABSTRACTACTIVITY_H
+#include "Headers/date.h"
 #include "tag.h"
 #include <string>
 #include <QJsonObject>
@@ -31,6 +32,7 @@ public:
     void setTag(const tag*);
     virtual string summary() const = 0;
     virtual bool isExpired() const = 0;
+    virtual bool isActive(const date&) const = 0;
     virtual QJsonObject toJson() const = 0;
     virtual QDomElement toXml(QDomDocument& doc) const = 0;
     //virtual void display() const = 0; non so se serve

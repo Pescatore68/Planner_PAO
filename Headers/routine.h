@@ -30,7 +30,7 @@ public:
     void setCheckHistory(const std::vector<bool>& h);
 
     void closeCheck();
-    bool isActive(const date& d) const;
+    bool isActive(const date& d) const override;
 
 
     bool isExpired() const override;

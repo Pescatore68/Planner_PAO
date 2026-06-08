@@ -21,6 +21,7 @@ public:
     void setODeadline (const HourMinute&);
     bool isExpired() const override;
     string summary() const override;
+    bool isActive(const date& d) const override;
 
     //data persistence
     QJsonObject toJson() const override;

@@ -30,6 +30,10 @@ std::string Reminder::summary() const {
     return s;
 }
 
+bool Reminder::isActive(const date& d) const{
+    return d==getDate();
+}
+
 QJsonObject Reminder::toJson() const {
     QJsonObject obj;
     obj["type"] = "reminder";

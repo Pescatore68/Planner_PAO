@@ -1,6 +1,12 @@
+#include <QMainWindow>
+#include <QStackedWidget>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include "Headers/UI/TaskWidget.h"
 #include "Headers/mainwindow.h"
 #include "Headers/AbstractActivity.h"
-#include "Headers/UI/addDialog.h"
+//#include "Headers/UI/addDialog.h"
 #include "Headers/UI/navBar.h"
 #include <QLabel>
 
@@ -22,6 +28,20 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
 
     resize(1200, 800);
     setWindowTitle("Activity Manager");
+
+    taskWidget = new TaskWidget(am, this);
+
+    stackedWidget->addWidget(taskWidget);
+
+    connect(taskWidget,
+            &TaskWidget::newTaskRequested,
+            this,
+            &MainWindow::onNewTaskRequested);
+
+    connect(taskWidget,
+            &TaskWidget::activitySelected,
+            this,
+            &MainWindow::onActivitySelected);
 }
 
 void MainWindow::setupNavBar() {
@@ -60,14 +80,95 @@ void MainWindow::setupStackedWidget() {
             });
 
     showCalendar();
-    connect(navigationBar, &navBar::addClicked, this, [this]() {
+/*    connect(navigationBar, &navBar::addClicked, this, [this]() {
         addDialog dialog(am, tm, this);
         dialog.exec();
-    });
+    });*/
 }
 
+
 void MainWindow::showCalendar()    { stackedWidget->setCurrentWidget(calendarView); }
-void MainWindow::showTaskProject() { stackedWidget->setCurrentWidget(taskProjectView); }
 void MainWindow::showSearch()      { stackedWidget->setCurrentWidget(searchView); }
 void MainWindow::showDetail(AbstractActivity* a) { stackedWidget->setCurrentWidget(detailView); }
 void MainWindow::showForm(AbstractActivity* a)   { stackedWidget->setCurrentWidget(formView); }
+
+
+void MainWindow::showTaskProject()
+{
+    stackedWidget->setCurrentWidget(taskWidget);
+}
+
+
+void MainWindow::onNewTaskRequested()
+{
+    TaskDialog dialog(this);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    QString title = dialog.getTitle();
+    QString desc  = dialog.getDescription();
+
+    if (title.isEmpty())
+        return;
+
+    // 🔷 CONVERSIONE QT → TUO MODELLO
+
+    QDate qd = dialog.getDate();
+    QTime qt = dialog.getTime();
+
+    date d(qd.day(), qd.month(), qd.year());
+    HourMinute hm(qt.hour(), qt.minute());
+
+    tag* t = tm.getDefaultTag();
+
+    task* newTask = new task(
+        title.toStdString(),
+        desc.toStdString(),
+        t,
+        d,
+        hm,
+        false
+        );
+
+    am.add(newTask);
+    taskWidget->refresh();
+}
+
+void MainWindow::onActivitySelected(AbstractActivity* a)
+{
+    selectedActivity = a;
+}
+
+/*void MainWindow::onNewSubtaskRequested()
+{
+    if (!selectedActivity)
+        return;
+
+    TaskDialog dialog(this);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    date d(
+        dialog.getDate().day(),
+        dialog.getDate().month(),
+        dialog.getDate().year()
+        );
+
+    HourMinute hm(
+        dialog.getTime().hour(),
+        dialog.getTime().minute()
+        );
+
+    AddSubtaskVisitor visitor(
+        dialog.getTitle().toStdString(),
+        dialog.getDescription().toStdString(),
+        d,
+        hm
+        );
+
+    selectedActivity->accept(visitor);
+
+    taskWidget->refresh();
+}*/

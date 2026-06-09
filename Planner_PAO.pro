@@ -15,6 +15,11 @@ SOURCES += \
     Sources/HourMinute.cpp \
     Sources/JSONformat.cpp \
     Sources/UI/TaskWidget.cpp \
+    Sources/UI/addDialog.cpp \
+    Sources/UI/calendar.cpp \
+    Sources/UI/month.cpp \
+    Sources/UI/navBar.cpp \
+    Sources/UI/week.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
@@ -35,6 +40,11 @@ HEADERS += \
     Headers/HourMinute.h \
     Headers/JSONformat.h \
     Headers/TaskWidget.h \
+    Headers/UI/addDialog.h \
+    Headers/UI/calendar.h \
+    Headers/UI/month.h \
+    Headers/UI/navBar.h \
+    Headers/UI/week.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \
@@ -48,7 +58,7 @@ HEADERS += \
     Headers/xmlFormat.h \
     Headers/Visitor/ActivityVisitor.h \
     Headers/Visitor/DisplayVisitor.h \
-    Headers/UI/TaskWidget.h \
+    Headers/UI/TaskWidget.h
 
 
 FORMS += \

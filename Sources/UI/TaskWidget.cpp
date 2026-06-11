@@ -28,14 +28,10 @@ TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
 
     // ── toolbar (bottoni in alto) ────────────
     toolbarLayout = new QHBoxLayout();
-    btnNewTask    = new QPushButton("+ Task",    this);
-    btnNewProject = new QPushButton("+ Project", this);
     btnDelete     = new QPushButton("Elimina",   this);
 
     btnDelete->setEnabled(false); // disabilitato finché non si seleziona qualcosa
 
-    toolbarLayout->addWidget(btnNewTask);
-    toolbarLayout->addWidget(btnNewProject);
     toolbarLayout->addStretch();
     toolbarLayout->addWidget(btnDelete);
 
@@ -54,8 +50,6 @@ TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
     mainLayout->addWidget(tree);
 
     // ── connessioni ─────────────────────────
-    connect(btnNewTask,    &QPushButton::clicked, this, &TaskWidget::onNewTaskClicked);
-    connect(btnNewProject, &QPushButton::clicked, this, &TaskWidget::onNewProjectClicked);
     connect(btnDelete,     &QPushButton::clicked, this, &TaskWidget::onDeleteClicked);
 
     connect(tree, &QTreeWidget::itemClicked,
@@ -187,7 +181,7 @@ AbstractActivity* TaskWidget::activityFromItem(QTreeWidgetItem* item) const {
 // ─────────────────────────────────────────────
 //  Slot privati
 // ─────────────────────────────────────────────
-void TaskWidget::onItemClicked(QTreeWidgetItem* item, int /*column*/) {
+void TaskWidget::onItemClicked(QTreeWidgetItem* item, int) {
     AbstractActivity* a = activityFromItem(item);
     current = a;
     btnDelete->setEnabled(a != nullptr);
@@ -235,6 +229,3 @@ void TaskWidget::onDeleteClicked() {
     emit deleteRequested(toDelete);
     // MainWindow rimuove da ActivityManager e chiama refresh()
 }
-
-void TaskWidget::onNewTaskClicked()    { emit newTaskRequested();    }
-void TaskWidget::onNewProjectClicked() { emit newProjectRequested(); }

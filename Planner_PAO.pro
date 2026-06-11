@@ -12,8 +12,14 @@ CONFIG += c++17
 SOURCES += \
     Sources/AbstractActivity.cpp \
     Sources/ActivityManager.cpp \
+    Sources/Dialog/AddDialog.cpp \
     Sources/HourMinute.cpp \
     Sources/JSONformat.cpp \
+    Sources/UI/Forms/EventForm.cpp \
+    Sources/UI/Forms/ProjectForm.cpp \
+    Sources/UI/Forms/ReminderForm.cpp \
+    Sources/UI/Forms/RoutineForm.cpp \
+    Sources/UI/Forms/TaskForm.cpp \
     Sources/UI/TaskWidget.cpp \
     #Sources/UI/addDialog.cpp \
     Sources/UI/calendar.cpp \
@@ -32,15 +38,23 @@ SOURCES += \
     Sources/event.cpp \
     Sources/xmlFormat.cpp \
     Sources/Dialog/TaskDialog.cpp \
+    Sources/UI/Forms/ActivityForm.cpp \
+    Sources/UI/TagComboBox.cpp
 
 HEADERS += \
     Headers/AbstractActivity.h \
     Headers/ActivityManager.h \
     Headers/ActivityVisitor.h \
+    Headers/Dialog/AddDialog.h \
     Headers/DisplayVisitor.h \
     Headers/HourMinute.h \
     Headers/JSONformat.h \
     #Headers/UI/addDialog.h \
+    Headers/UI/Forms/EventForm.h \
+    Headers/UI/Forms/ProjectForm.h \
+    Headers/UI/Forms/ReminderForm.h \
+    Headers/UI/Forms/RoutineForm.h \
+    Headers/UI/Forms/TaskForm.h \
     Headers/UI/calendar.h \
     Headers/UI/month.h \
     Headers/UI/navBar.h \
@@ -61,11 +75,13 @@ HEADERS += \
     Headers/Visitor/ActivityVisitor.h \
     Headers/Visitor/DisplayVisitor.h \
     Headers/UI/TaskWidget.h \
-    Headers/Dialog/TaskDialog.h
+    Headers/Dialog/TaskDialog.h \
+    Headers/UI/Forms/ActivityForm.h \
+    Headers/UI/TagComboBox.h \
 
 
-FORMS += \
-    Forms/mainwindow.ui
+
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

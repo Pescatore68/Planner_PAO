@@ -22,9 +22,9 @@
    <widget class="QColumnView" name="columnView">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>160</x>
       <y>0</y>
-      <width>661</width>
+      <width>641</width>
       <height>601</height>
      </rect>
     </property>
@@ -34,18 +34,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>141</width>
+      <width>161</width>
       <height>601</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QWidget" name="widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>339</x>
-      <y>199</y>
-      <width>251</width>
-      <height>221</height>
      </rect>
     </property>
    </widget>

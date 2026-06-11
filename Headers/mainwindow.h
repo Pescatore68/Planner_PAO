@@ -51,8 +51,6 @@ private:
     void setupNavBar();
     void setupStackedWidget();
 
-private slots:
-    void onNewTaskRequested();
 
 public:
     MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
@@ -64,7 +62,6 @@ public:
     void showDetail(AbstractActivity* a);
     void showForm(AbstractActivity* a = nullptr);
     void onActivitySelected(AbstractActivity* a);
-    void onNewSubtaskRequested();
 };
 
 #endif

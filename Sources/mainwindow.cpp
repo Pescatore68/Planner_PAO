@@ -33,7 +33,7 @@ void MainWindow::setupStackedWidget()
 {
     stackedWidget = new QStackedWidget(this);
 
-    calendarView = new calendar(this);
+    calendarView = new calendar(am, this);
     taskWidget   = new TaskWidget(am, this);
     searchView   = new QWidget(this);
     tagView      = new QWidget(this);
@@ -84,6 +84,7 @@ void MainWindow::setupNavBar()
 
         am.add(a);
         taskWidget->refresh();
+        calendarView->refresh();
     });
 }
 

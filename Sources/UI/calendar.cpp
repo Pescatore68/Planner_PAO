@@ -2,8 +2,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-calendar::calendar(QWidget* parent)
-    : QWidget(parent), selected(1, 1, 2026)
+calendar::calendar(ActivityManager& am, QWidget* parent)
+    : QWidget(parent), selected(1, 1, 2026), am(am)
 {
     setTopBar();
     setWidgets();
@@ -38,7 +38,7 @@ void calendar::setWidgets()
 {
     wStack = new QStackedWidget(this);
 
-    wMonth = new MonthWidget(this);
+    wMonth = new MonthWidget(am, this);
     wWeek  = new WeekWidget(this);
     wDay   = new QWidget(this); // placeholder
 
@@ -65,7 +65,7 @@ void calendar::ShowDay()
 
 void calendar::onMonthDateClicked(const QDate& d)
 {
-    selected = date(d.year(), d.month(), d.day());
+    selected = date(d.day(), d.month(), d.year());
 
     // aggiorna week automaticamente
     wWeek->setWeek(selected);
@@ -73,4 +73,8 @@ void calendar::onMonthDateClicked(const QDate& d)
     emit dateSelected(selected);
 
     wStack->setCurrentWidget(wWeek);
+}
+
+void calendar::refresh() {
+    wMonth->updateCalendarView();
 }

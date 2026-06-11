@@ -31,12 +31,14 @@ private:
     QWidget* wDay;
 
     date selected;
+    ActivityManager& am;
 
     void setTopBar();
     void setWidgets();
 
 public:
-    calendar(QWidget* parent = nullptr);
+    explicit calendar(ActivityManager& am, QWidget* parent = nullptr);
+    void refresh();
 
 signals:
     void dateSelected(const date& d);

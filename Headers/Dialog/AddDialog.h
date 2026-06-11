@@ -1,7 +1,7 @@
 #ifndef ADDDIALOG_H
 #define ADDDIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QStackedWidget>
@@ -19,15 +19,17 @@ class RoutineForm;
 class TaskForm;
 class ProjectForm;
 
-class AddDialog : public QDialog {
+class AddDialog : public QWidget {
     Q_OBJECT
 
 public:
     explicit AddDialog(tagManager& tm, QWidget* parent = nullptr);
 
-    // Chiamare solo dopo exec() == QDialog::Accepted.
-    // Restituisce l'oggetto allocato; la ownership passa al chiamante (ActivityManager).
     AbstractActivity* createActivity();
+
+signals:
+    void activityCreated(AbstractActivity* a);
+    void onCancelClicked();
 
 private slots:
     void onTypeSelected(int index);
@@ -36,47 +38,44 @@ private slots:
 private:
     tagManager& tm;
 
-    QVBoxLayout*    mainLayout;
+    QVBoxLayout* mainLayout;
 
-    // ── Toolbar chip ──────────────────────────────────────────────────────
-    QHBoxLayout*    toolbarLayout;
-    QButtonGroup*   typeGroup;
-    QPushButton*    btnEvent;
-    QPushButton*    btnReminder;
-    QPushButton*    btnRoutine;
-    QPushButton*    btnTask;
-    QPushButton*    btnProject;
+    // toolbar
+    QHBoxLayout* toolbarLayout;
+    QButtonGroup* typeGroup;
+    QPushButton* btnEvent;
+    QPushButton* btnReminder;
+    QPushButton* btnRoutine;
+    QPushButton* btnTask;
+    QPushButton* btnProject;
 
-    // ── Separatore ────────────────────────────────────────────────────────
-    QFrame*         separator;
+    QFrame* separator;
 
-    // ── Form stack ────────────────────────────────────────────────────────
+    // stack forms
     QStackedWidget* stack;
-    EventForm*      eventForm;
-    ReminderForm*   reminderForm;
-    RoutineForm*    routineForm;
-    TaskForm*       taskForm;
-    ProjectForm*    projectForm;
+    EventForm* eventForm;
+    ReminderForm* reminderForm;
+    RoutineForm* routineForm;
+    TaskForm* taskForm;
+    ProjectForm* projectForm;
 
-    // ── Bottoni azione ────────────────────────────────────────────────────
-    QHBoxLayout*    actionLayout;
-    QPushButton*    btnAdd;
-    QPushButton*    btnCancel;
+    // actions
+    QHBoxLayout* actionLayout;
+    QPushButton* btnAdd;
+    QPushButton* btnCancel;
 
-    // helpers
     QPushButton* makeChip(const QString& label);
     void setupToolbar();
     void setupStack();
     void setupActions();
 };
 
-// Indici stack — usati sia nell'header che nell'implementazione
 namespace AddDialogIdx {
-constexpr int Event    = 0;
-constexpr int Reminder = 1;
-constexpr int Routine  = 2;
-constexpr int Task     = 3;
-constexpr int Project  = 4;
+const int Event    = 0;
+const int Reminder = 1;
+const int Routine  = 2;
+const int Task     = 3;
+const int Project  = 4;
 }
 
 #endif // ADDDIALOG_H

@@ -9,20 +9,15 @@ using namespace AddDialogIdx;
 
 // ─────────────────────────────────────────────────────────────────────────────
 AddDialog::AddDialog(tagManager& tm, QWidget* parent)
-    : QDialog(parent), tm(tm)
+    : QWidget(parent), tm(tm)
 {
-    setWindowTitle("Nuova attività");
-    setMinimumWidth(440);
-
     mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(12, 12, 12, 12);
-    mainLayout->setSpacing(8);
+    mainLayout->setContentsMargins(16, 16, 16, 16);
+    mainLayout->setSpacing(16);
 
     setupToolbar();
     setupStack();
     setupActions();
-
-    setLayout(mainLayout);
 }
 
 // ─── Toolbar con chip ─────────────────────────────────────────────────────────
@@ -89,10 +84,9 @@ void AddDialog::setupStack() {
 // ─── Bottoni Aggiungi / Annulla ───────────────────────────────────────────────
 void AddDialog::setupActions() {
     actionLayout = new QHBoxLayout();
-    actionLayout->setSpacing(8);
 
     btnAdd    = new QPushButton("Aggiungi", this);
-    btnCancel = new QPushButton("Annulla",  this);
+    btnCancel = new QPushButton("Annulla", this);
 
     actionLayout->addStretch();
     actionLayout->addWidget(btnCancel);
@@ -100,8 +94,11 @@ void AddDialog::setupActions() {
 
     mainLayout->addLayout(actionLayout);
 
-    connect(btnAdd,    &QPushButton::clicked, this, &AddDialog::onAddClicked);
-    connect(btnCancel, &QPushButton::clicked, this, &QDialog::reject);
+    connect(btnAdd, &QPushButton::clicked,
+            this, &AddDialog::onAddClicked);
+
+    connect(btnCancel, &QPushButton::clicked,
+            this, &AddDialog::onCancelClicked);
 }
 
 // ─── Helper chip ─────────────────────────────────────────────────────────────
@@ -119,10 +116,13 @@ void AddDialog::onTypeSelected(int index) {
 
 // ─── Slot: Aggiungi premuto — valida prima di chiudere ────────────────────────
 void AddDialog::onAddClicked() {
-    ActivityForm* current = qobject_cast<ActivityForm*>(stack->currentWidget());
-    if (current && current->validate())
-        accept();
-    // se validate() fallisce il dialog rimane aperto (il warning lo mostra il form)
+    ActivityForm* current =
+        qobject_cast<ActivityForm*>(stack->currentWidget());
+
+    if (!current || !current->validate())
+        return;
+
+    emit activityCreated(current->createActivity(tm));
 }
 
 // ─── Restituisce l'attività creata dal form attivo ────────────────────────────
@@ -131,3 +131,4 @@ AbstractActivity* AddDialog::createActivity() {
     if (!current) return nullptr;
     return current->createActivity(tm);
 }
+

@@ -15,7 +15,7 @@ EventForm::EventForm(tagManager& tm, QWidget* parent)
     endDateEdit->setCalendarPopup(true);
     endDateEdit->setDisplayFormat("dd/MM/yyyy");
 
-    allDayCheck = new QCheckBox("Tutto il giorno", this);
+    allDayCheck = new QCheckBox("All Day", this);
 
     startTimeEdit = new QTimeEdit(QTime(9, 0), this);
     startTimeEdit->setDisplayFormat("HH:mm");
@@ -24,14 +24,11 @@ EventForm::EventForm(tagManager& tm, QWidget* parent)
     endTimeEdit->setDisplayFormat("HH:mm");
 
     locationEdit = new QLineEdit(this);
-    locationEdit->setPlaceholderText("Luogo (opzionale)");
-
-    addRow("Data inizio",  startDateEdit);
-    addRow("Data fine",    endDateEdit);
-    addRow("",             allDayCheck);
-    addRow("Ora inizio",   startTimeEdit);
-    addRow("Ora fine",     endTimeEdit);
-    addRow("Luogo",        locationEdit);
+    locationEdit->setPlaceholderText("Location (optional)");
+    addTimeRow("Starts",  startDateEdit, startTimeEdit);
+    addTimeRow("Ends",    endDateEdit, endTimeEdit);
+    addRow("", allDayCheck);
+    addRow("Location", locationEdit);
 
     mainLayout->addStretch();
 

@@ -8,7 +8,7 @@ ReminderForm::ReminderForm(tagManager& tm, QWidget* parent)
     buildCommonFields(tm);
 
     dateEdit = new QDateEdit(QDate::currentDate(), this);
-    dateEdit->setCalendarPopup(true);
+    dateEdit->setCalendarPopup(false);
     dateEdit->setDisplayFormat("dd/MM/yyyy");
 
     timeEdit = new QTimeEdit(QTime(9, 0), this);
@@ -17,9 +17,8 @@ ReminderForm::ReminderForm(tagManager& tm, QWidget* parent)
     locationEdit = new QLineEdit(this);
     locationEdit->setPlaceholderText("Luogo (opzionale)");
 
-    addRow("Data",  dateEdit);
-    addRow("Ora",   timeEdit);
-    addRow("Luogo", locationEdit);
+    addTimeRow("Date",  dateEdit, timeEdit);
+    addRow("Location", locationEdit);
 
     mainLayout->addStretch();
 }

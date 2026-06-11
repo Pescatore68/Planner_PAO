@@ -37,7 +37,6 @@ SOURCES += \
     Sources/reminder.cpp \
     Sources/event.cpp \
     Sources/xmlFormat.cpp \
-    Sources/Dialog/TaskDialog.cpp \
     Sources/UI/Forms/ActivityForm.cpp \
     Sources/UI/TagComboBox.cpp
 
@@ -75,7 +74,6 @@ HEADERS += \
     Headers/Visitor/ActivityVisitor.h \
     Headers/Visitor/DisplayVisitor.h \
     Headers/UI/TaskWidget.h \
-    Headers/Dialog/TaskDialog.h \
     Headers/UI/Forms/ActivityForm.h \
     Headers/UI/TagComboBox.h \
 

@@ -4,24 +4,17 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
 #include <QWidget>
+
 #include "Headers/ActivityManager.h"
-#include "Headers/UI/navBar.h"
 #include "Headers/tagManager.h"
+#include "Headers/UI/navBar.h"
 #include "Headers/UI/calendar.h"
-#include <QString>
-#include <QLineEdit>
-#include <QInputDialog>
-#include <QDate>
-#include <QTime>
-#include "ActivityManager.h"
-#include "tagManager.h"
-#include "Dialog/TaskDialog.h"
 
 class TaskWidget;
 class AbstractActivity;
+class AddDialog;
+class QStackedLayout;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -29,28 +22,29 @@ class MainWindow : public QMainWindow {
 private:
     ActivityManager& am;
     tagManager& tm;
-    TaskWidget* taskWidget;
 
-    QWidget* centralWidget;
-    QHBoxLayout* mainLayout;
+    // ── CORE WIDGETS ─────────────────────────────────────────────
+    TaskWidget* taskWidget = nullptr;
+    AddDialog* addView = nullptr;
+
+    QWidget* centralWidget = nullptr;
+    QHBoxLayout* mainLayout = nullptr;
 
     AbstractActivity* selectedActivity = nullptr;
 
-    // Nav bar
-     navBar* navigationBar;
+    // ── NAV AREA (navbar swap) ───────────────────────────────────
+    navBar* navigationBar = nullptr;
+    QWidget* navContainer = nullptr;
+    QStackedLayout* navStack = nullptr;
 
-    // Schermate
-    QStackedWidget* stackedWidget;
-    calendar* calendarView;
-    QWidget* taskProjectView;
-    QWidget* searchView;
-    QWidget* detailView;
-    QWidget* formView;
-    QWidget* tagView;
+    // ── CONTENT AREA ─────────────────────────────────────────────
+    QStackedWidget* stackedWidget = nullptr;
 
+    calendar* calendarView = nullptr;
+    QWidget* searchView = nullptr;
+    QWidget* tagView = nullptr;
     void setupNavBar();
     void setupStackedWidget();
-
 
 public:
     MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
@@ -64,4 +58,4 @@ public:
     void onActivitySelected(AbstractActivity* a);
 };
 
-#endif
+#endif // MAINWINDOW_H

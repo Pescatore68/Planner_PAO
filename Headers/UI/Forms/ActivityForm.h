@@ -27,10 +27,12 @@ protected:
 
     // Helper: crea una riga label + widget e la appende a mainLayout
     void addRow(const QString& labelText, QWidget* field);
+    void addTimeRow(const QString& labelText, QWidget* dateField, QWidget* timeField);
 
 public:
     explicit ActivityForm(QWidget* parent = nullptr);
     virtual ~ActivityForm() = default;
+    QVBoxLayout* getMainLayout();
 
     virtual AbstractActivity* createActivity(tagManager& tm) = 0;
     virtual bool validate() = 0;

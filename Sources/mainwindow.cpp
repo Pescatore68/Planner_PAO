@@ -1,95 +1,94 @@
 #include <QMainWindow>
 #include <QStackedWidget>
+#include <QStackedLayout>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 
 #include "Headers/mainwindow.h"
-#include "Headers/AbstractActivity.h"
 #include "Headers/UI/navBar.h"
 #include "Headers/UI/TaskWidget.h"
 #include "Headers/Dialog/AddDialog.h"
 #include "Headers/routine.h"
+#include "Headers/UI/calendar.h"
 
 MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QMainWindow(parent), am(am), tm(tm)
 {
     centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
-
     mainLayout = new QHBoxLayout(centralWidget);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
+    // 1️⃣ Prima crea i widget (addView nasce qui)
     setupStackedWidget();
+    // 2️⃣ Poi la navbar (usa addView già esistente)
     setupNavBar();
 
-    mainLayout->addWidget(navigationBar);
+    // 3️⃣ navContainer/navStack creati UNA SOLA VOLTA
+    navContainer = new QWidget(this);
+    navContainer->setFixedWidth(300);
+    navStack = new QStackedLayout(navContainer);
+    navStack->addWidget(navigationBar); // index 0
+    navStack->addWidget(addView);       // index 1  ← stesso oggetto di setupStackedWidget
+
+    mainLayout->addWidget(navContainer);
     mainLayout->addWidget(stackedWidget);
 
     resize(1200, 800);
     setWindowTitle("Activity Manager");
 
+    showCalendar();
 }
 
 void MainWindow::setupStackedWidget()
 {
     stackedWidget = new QStackedWidget(this);
 
-    calendarView = new calendar(am, this);
-    taskWidget   = new TaskWidget(am, this);
-    searchView   = new QWidget(this);
-    tagView      = new QWidget(this);
+    calendarView  = new calendar(am, this);
+    taskWidget    = new TaskWidget(am, this);
+    searchView    = new QWidget(this);
+    tagView       = new QWidget(this);
+    addView       = new AddDialog(tm, this); // ✅ creato UNA SOLA VOLTA
 
-    stackedWidget->addWidget(calendarView);
-    stackedWidget->addWidget(taskWidget);
-    stackedWidget->addWidget(searchView);
-    stackedWidget->addWidget(tagView);
+    stackedWidget->addWidget(calendarView); // 0
+    stackedWidget->addWidget(taskWidget);   // 1
+    stackedWidget->addWidget(searchView);   // 2
+    stackedWidget->addWidget(tagView);      // 3
+    stackedWidget->addWidget(addView);      // 4
 
     connect(calendarView, &calendar::dateSelected,
             this, [this](const date& d) {
-                qDebug() << "Data selezionata:"
-                         << QString::fromStdString(d.toString());
+                qDebug() << QString::fromStdString(d.toString());
             });
-
-    showCalendar();
 }
 
 void MainWindow::setupNavBar()
 {
     navigationBar = new navBar(this);
 
-    connect(navigationBar, &navBar::calendarClicked,
-            this, &MainWindow::showCalendar);
+    // ✅ Navigazione tra le viste
+    connect(navigationBar, &navBar::calendarClicked,     this, &MainWindow::showCalendar);
+    connect(navigationBar, &navBar::taskProjectClicked,  this, &MainWindow::showTaskProject);
+    connect(navigationBar, &navBar::searchClicked,       this, &MainWindow::showSearch);
+    // connect(navigationBar, &navBar::tagsClicked,      this, &MainWindow::showTags); // quando avrai la vista
 
-    connect(navigationBar, &navBar::taskProjectClicked,
-            this, &MainWindow::showTaskProject);
+    // ✅ Apri form aggiunta (swappa navbar con addView)
+    connect(navigationBar, &navBar::addClicked, this, [this]{
+        navStack->setCurrentIndex(1);
+    });
 
-    connect(navigationBar, &navBar::searchClicked,
-            this, &MainWindow::showSearch);
-
-    connect(navigationBar, &navBar::tagsClicked,
-            this, [this]{
-                stackedWidget->setCurrentWidget(tagView);
+    // ✅ Dopo creazione attività, torna alla navbar
+    connect(addView, &AddDialog::activityCreated,
+            this, [this](AbstractActivity* a){
+                if (!a) return;
+                am.add(a);
+                taskWidget->refresh();
+                navStack->setCurrentIndex(0);
+                calendarView->refresh();
+                //showTaskProject();
             });
 
-    connect(navigationBar, &navBar::addClicked, this, [this](){
-
-        AddDialog dialog(tm, this);
-
-        if (dialog.exec() != QDialog::Accepted)
-            return;
-
-        AbstractActivity* a = dialog.createActivity();
-
-        if (!a)
-            return;
-
-        am.add(a);
-        taskWidget->refresh();
-        calendarView->refresh();
-    });
 }
-
 void MainWindow::showCalendar()
 {
     stackedWidget->setCurrentWidget(calendarView);
@@ -103,9 +102,4 @@ void MainWindow::showSearch()
 void MainWindow::showTaskProject()
 {
     stackedWidget->setCurrentWidget(taskWidget);
-}
-
-void MainWindow::onActivitySelected(AbstractActivity* a)
-{
-    selectedActivity = a;
 }

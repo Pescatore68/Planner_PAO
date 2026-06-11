@@ -15,9 +15,7 @@ static constexpr int ActivityPtrRole = Qt::UserRole;
 // Per i subtask salviamo anche il puntatore al project padre
 static constexpr int ParentProjectRole = Qt::UserRole + 1;
 
-// ─────────────────────────────────────────────
-//  Costruttore
-// ─────────────────────────────────────────────
+
 TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
     : QWidget(parent), am(am)
 {
@@ -62,9 +60,7 @@ TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
     buildTree();
 }
 
-// ─────────────────────────────────────────────
-//  Interfaccia pubblica
-// ─────────────────────────────────────────────
+
 void TaskWidget::refresh() {
     // blocca temporaneamente itemChanged mentre ricostruiamo l'albero
     // per evitare che il completamento venga scritto due volte
@@ -76,9 +72,6 @@ void TaskWidget::refresh() {
     btnDelete->setEnabled(false);
 }
 
-// ─────────────────────────────────────────────
-//  buildTree — ricostruisce l'intero albero
-// ─────────────────────────────────────────────
 void TaskWidget::buildTree() {
     tree->clear();
 

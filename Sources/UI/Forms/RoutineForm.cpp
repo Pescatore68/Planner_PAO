@@ -27,11 +27,9 @@ RoutineForm::RoutineForm(tagManager& tm, QWidget* parent)
     endTimeEdit = new QTimeEdit(QTime(8, 0), this);
     endTimeEdit->setDisplayFormat("HH:mm");
 
-    addRow("Frequenza",   freqCombo);
-    addRow("Data inizio", startDateEdit);
-    addRow("Data fine",   endDateEdit);
-    addRow("Ora inizio",  startTimeEdit);
-    addRow("Ora fine",    endTimeEdit);
+    addRow("Frequency",   freqCombo);
+    addTimeRow("Starts", startDateEdit, startTimeEdit);
+    addTimeRow("Ends",   endDateEdit, endTimeEdit);
 
     mainLayout->addStretch();
 }

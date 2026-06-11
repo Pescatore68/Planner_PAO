@@ -8,14 +8,13 @@ TaskForm::TaskForm(tagManager& tm, QWidget* parent)
     buildCommonFields(tm);
 
     deadlineEdit = new QDateEdit(QDate::currentDate(), this);
-    deadlineEdit->setCalendarPopup(true);
+    deadlineEdit->setCalendarPopup(false);
     deadlineEdit->setDisplayFormat("dd/MM/yyyy");
 
     oDeadlineEdit = new QTimeEdit(QTime(23, 59), this);
     oDeadlineEdit->setDisplayFormat("HH:mm");
 
-    addRow("Scadenza",     deadlineEdit);
-    addRow("Ora scadenza", oDeadlineEdit);
+    addTimeRow("Scadenza", deadlineEdit, oDeadlineEdit);
 
     mainLayout->addStretch();
 }

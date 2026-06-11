@@ -5,7 +5,7 @@ navBar::navBar(QWidget* parent) : QWidget(parent) {
 }
 
 void navBar::setup() {
-    setFixedWidth(200);
+    setFixedWidth(300);
     layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignTop);
     layout->setSpacing(10);

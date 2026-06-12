@@ -17,17 +17,34 @@ private:
     bool hasCheckableStatus;
     bool isChecked;
 
-public:
-    DisplayVisitor() : textSummary(""), isRoutineType(false), hasCheckableStatus(false), isChecked(false) {}
+    // Variabili interne per gestire la modalità "Scrittura"
+    bool isWriteMode;
+    bool newValueToSet;
 
+public:
+    // Il costruttore di base lavora in modalità LETTURA (passiva)
+    DisplayVisitor()
+        : textSummary(""), isRoutineType(false), hasCheckableStatus(false),
+        isChecked(false), isWriteMode(false), newValueToSet(false) {}
+
+    // Funzione speciale da chiamare prima di fare .accept() se vogliamo SCRIVERE (cambiare il check)
+    void setWriteMode(bool value) {
+        isWriteMode = true;
+        newValueToSet = value;
+    }
+
+    // Getter per la GUI
     std::string getSummary() const { return textSummary; }
     bool isRoutine() const { return isRoutineType; }
     bool isCheckable() const { return hasCheckableStatus; }
     bool getCheckedState() const { return isChecked; }
 
+    // ─── IMPLEMENTAZIONE DEI VISIT CON DOPPIA LOGICA ─────────────────────
+
     void visit(Event& e) override {
         isRoutineType = false;
         hasCheckableStatus = false;
+        // Gli eventi non si spuntano, quindi ignoriamo la modalità scrittura
 
         textSummary = e.getName() + " — " + e.getDescription() + "\n";
         textSummary += e.getStartDate().toString();
@@ -42,6 +59,7 @@ public:
     void visit(Reminder& r) override {
         isRoutineType = false;
         hasCheckableStatus = false;
+        // I reminder non si spuntano
 
         textSummary = r.getName() + " — " + r.getDescription() + "\n";
         textSummary += r.getDate().toString() + " " + r.getTime().toString();
@@ -52,6 +70,12 @@ public:
     void visit(task& t) override {
         isRoutineType = false;
         hasCheckableStatus = true;
+
+        // Se siamo in modalità scrittura, modifichiamo l'oggetto reale!
+        if (isWriteMode) {
+            t.setCompleted(newValueToSet);
+        }
+
         isChecked = t.isCompleted();
 
         std::string status = isChecked ? "[✓]" : "[ ]";
@@ -64,6 +88,12 @@ public:
     void visit(project& p) override {
         isRoutineType = false;
         hasCheckableStatus = true;
+
+        // Se siamo in modalità scrittura, modifichiamo il progetto
+        if (isWriteMode) {
+            p.setCompleted(newValueToSet);
+        }
+
         isChecked = p.isCompleted();
 
         std::string status = isChecked ? "[✓]" : "[ ]";
@@ -72,7 +102,6 @@ public:
             textSummary += "  " + p.getDescription() + "\n";
         textSummary += "  Scadenza: " + p.getDeadline().toString() + " ore " + p.getODeadline().toString() + "\n";
 
-        // Il visitor cicla sulle sotto-task del progetto
         for (unsigned int i = 0; i < p.size(); i++) {
             const task* t = p.getSubtask(i);
             std::string subStatus = t->isCompleted() ? "[✓]" : "[ ]";
@@ -83,6 +112,12 @@ public:
     void visit(Routine& r) override {
         isRoutineType = true;
         hasCheckableStatus = true;
+
+        // Se siamo in modalità scrittura, modifichiamo la routine
+        if (isWriteMode) {
+            r.setCheck(newValueToSet);
+        }
+
         isChecked = r.getCheck();
 
         textSummary = r.getName() + " — " + r.FrequencyToString() + " - " + r.getDescription() + "\n";

@@ -49,7 +49,7 @@ void MonthWidget::setup()
 
     onDateChanged(calendar->selectedDate());
 
-    // Connessione al CLICK della riga per mostrare i dettagli col Visitor
+
     connect(activityList, &QListWidget::itemClicked, this, [this](QListWidgetItem* item) {
         if (!item) return;
 
@@ -58,18 +58,14 @@ void MonthWidget::setup()
         QWidget* rowContainer = static_cast<QWidget*>(item->data(Qt::UserRole + 1).value<void*>());
 
         if (expansionWidget && rowContainer) {
-            // Invertiamo lo stato di visibilità: se era aperto si chiude, se era chiuso si apre
+
             bool isCurrentlyVisible = expansionWidget->isVisible();
             expansionWidget->setVisible(!isCurrentlyVisible);
 
-            // Chiediamo a Qt di ricalcolare immediatamente lo spazio occupato dal widget modificato
             rowContainer->adjustSize();
 
-            // AGGIORNAMENTO CRITICO: Diciamo alla QListWidget di aggiornare la dimensione della riga
-            // altrimenti il widget si espanderebbe ma verrebbe tagliato visivamente!
             item->setSizeHint(rowContainer->sizeHint());
 
-            // Forza il ridisegno grafico immediato della lista
             activityList->update();
         }
     });
@@ -105,38 +101,31 @@ void MonthWidget::onDateChanged(const QDate& qd)
         DisplayVisitor visitor;
         act->accept(visitor);
 
-        // Label del Summary (La mettiamo dentro un puntatore così possiamo aggiornarla al click del check!)
+
         QLabel* summaryLabel = new QLabel(QString::fromStdString(visitor.getSummary()), this);
         summaryLabel->setWordWrap(true);
         summaryLabel->setStyleSheet("QLabel { color: #555; background-color: #fcfcfc; padding: 5px; border-radius: 4px; }");
         expansionLayout->addWidget(summaryLabel);
 
-        // PROBLEMA 1 RISOLTO: Se l'attività è checkabile (Task, Project, Routine), mostra la checkbox
+
         if (visitor.isCheckable()) {
-            QCheckBox* statusCheck = new QCheckBox("Completata", this);
+            QCheckBox* statusCheck = new QCheckBox("Complete", this);
             statusCheck->setChecked(visitor.getCheckedState());
             expansionLayout->addWidget(statusCheck);
 
-            // Salvataggio polimorfico del check quando viene cliccato
             connect(statusCheck, &QCheckBox::toggled, this, [act, summaryLabel, this](bool checked) {
-                // Proviamo a vedere se è un Task/Project
-                task* t = dynamic_cast<task*>(act);
-                if (t) {
-                    t->setCompleted(checked);
-                } else {
-                    // Altrimenti è una Routine
-                    Routine* r = dynamic_cast<Routine*>(act);
-                    if (r) {
-                        r->setCheck(checked);
-                    }
-                }
 
-                // Aggiorna il testo del summary al volo per mostrare [✓] o ● senza dover ricaricare tutto
-                DisplayVisitor v;
-                act->accept(v);
-                summaryLabel->setText(QString::fromStdString(v.getSummary()));
+                // 1. Creiamo il visitor, ma lo attiviamo in modalità SCRITTURA
+                DisplayVisitor writeVisitor;
+                writeVisitor.setWriteMode(checked);
 
-                // Rinfresca i quadratini del calendario (se un task completato cambia colore)
+                // 2. Il doppio dispacciamento applicherà la modifica corretta senza cast!
+                act->accept(writeVisitor);
+
+                // 3. Aggiorniamo subito l'interfaccia con la nuova stringa generata
+                summaryLabel->setText(QString::fromStdString(writeVisitor.getSummary()));
+
+                // 4. Rinfreschiamo il calendario
                 this->updateCalendarView();
             });
         }

@@ -117,6 +117,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
                 writeVisitor.setWriteMode(checked);
                 act->accept(writeVisitor);
                 summaryLabel->setText(QString::fromStdString(writeVisitor.getSummary()));
+                emit activityUpdated();
                 this->updateCalendarView();
             });
         }

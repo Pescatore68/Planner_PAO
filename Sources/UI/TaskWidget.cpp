@@ -17,7 +17,7 @@ static constexpr int ParentProjectRole = Qt::UserRole + 1;
 
 
 TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
-    : QWidget(parent), am(am)
+    : QWidget(parent), am(am), activityDelete(am)
 {
     // ── layout principale ────────────────────
     mainLayout = new QVBoxLayout(this);
@@ -210,15 +210,19 @@ void TaskWidget::onItemChanged(QTreeWidgetItem* item, int column) {
     item->setForeground(0, color);
     item->setForeground(1, color);
     item->setText(2, checked ? "✓" : "");
+    emit activityUpdated();
 }
 
 void TaskWidget::onDeleteClicked() {
     if (!current) return;
 
     AbstractActivity* toDelete = current;
-    current = nullptr;
-    btnDelete->setEnabled(false);
+    if (activityDelete.execute(toDelete, this)) {
 
-    emit deleteRequested(toDelete);
-    // MainWindow rimuove da ActivityManager e chiama refresh()
+        current = nullptr;
+        btnDelete->setEnabled(false);
+
+        // Chiamiamo il refresh interno per ridisegnare l'albero senza l'elemento
+        this->refresh();
+    }
 }

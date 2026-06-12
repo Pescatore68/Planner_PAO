@@ -35,10 +35,26 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     mainLayout->addWidget(navContainer);
     mainLayout->addWidget(stackedWidget);
 
+    connect(calendarView->getMonthWidget(), &MonthWidget::activityUpdated,
+            this, [this]() {
+                taskWidget->refresh();
+            });
+
+    connect(taskWidget, &TaskWidget::activityUpdated,
+            this, [this]() {
+                calendarView->refresh();
+                calendarView->getMonthWidget()->updateCalendarView();
+            });
+
     connect(&(calendarView->getMonthWidget()->getActivityDelete()), &ActivityDelete::activityDeleted,
             this, [this]() {
                 taskWidget->refresh(); // Rinfresca la lista dei Task e Progetti!
                 calendarView->refresh(); // Rinfresca anche i pallini del calendario se serve
+            });
+    connect(&(taskWidget->getActivityDelete()), &ActivityDelete::activityDeleted,
+            this, [this]() {
+                calendarView->refresh();
+                calendarView->getMonthWidget()->updateCalendarView();
             });
 
     resize(1200, 800);

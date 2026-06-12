@@ -9,6 +9,7 @@
 
 #include "Headers/ActivityManager.h"
 #include "Headers/AbstractActivity.h"
+#include "Headers/UI/ActivityDelete.h"
 
 class task;
 class project;
@@ -18,7 +19,7 @@ class TaskWidget : public QWidget {
 
 public:
     explicit TaskWidget(ActivityManager& am, QWidget* parent = nullptr);
-
+    ActivityDelete& getActivityDelete() { return activityDelete; }
     void refresh();
 
 signals:
@@ -32,6 +33,7 @@ private slots:
 
 private:
     ActivityManager& am;
+    ActivityDelete activityDelete;
 
     QVBoxLayout* mainLayout;
     QHBoxLayout* toolbarLayout;
@@ -46,6 +48,8 @@ private:
     void addProjectItem(QTreeWidget* tree, project* p, unsigned int amIndex);
 
     AbstractActivity* activityFromItem(QTreeWidgetItem* item) const;
+signals:
+    void activityUpdated();
 };
 
 #endif // TASKWIDGET_H

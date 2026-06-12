@@ -23,7 +23,7 @@ private:
     ActivityManager& am;
     tagManager& tm;
 
-    // ── CORE WIDGETS ─────────────────────────────────────────────
+
     TaskWidget* taskWidget = nullptr;
     AddDialog* addView = nullptr;
 
@@ -32,12 +32,12 @@ private:
 
     AbstractActivity* selectedActivity = nullptr;
 
-    // ── NAV AREA (navbar swap) ───────────────────────────────────
+    //navbar
     navBar* navigationBar = nullptr;
     QWidget* navContainer = nullptr;
     QStackedLayout* navStack = nullptr;
 
-    // ── CONTENT AREA ─────────────────────────────────────────────
+
     QStackedWidget* stackedWidget = nullptr;
 
     calendar* calendarView = nullptr;

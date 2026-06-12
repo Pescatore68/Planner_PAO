@@ -12,7 +12,6 @@ private:
     ActivityManager& am;
 
 public:
-    // Costruttore
     explicit ActivityDelete(ActivityManager& activityMgr, QObject* parent = nullptr);
 
     bool execute(AbstractActivity* act, QWidget* parent);

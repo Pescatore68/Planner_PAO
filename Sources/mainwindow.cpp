@@ -48,8 +48,8 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
 
     connect(&(calendarView->getMonthWidget()->getActivityDelete()), &ActivityDelete::activityDeleted,
             this, [this]() {
-                taskWidget->refresh(); // Rinfresca la lista dei Task e Progetti!
-                calendarView->refresh(); // Rinfresca anche i pallini del calendario se serve
+                taskWidget->refresh();
+                calendarView->refresh();
             });
     connect(&(taskWidget->getActivityDelete()), &ActivityDelete::activityDeleted,
             this, [this]() {
@@ -71,13 +71,13 @@ void MainWindow::setupStackedWidget()
     taskWidget    = new TaskWidget(am, this);
     searchView    = new QWidget(this);
     tagView       = new QWidget(this);
-    addView       = new AddDialog(tm, this); // ✅ creato UNA SOLA VOLTA
+    addView       = new AddDialog(tm, this);
 
-    stackedWidget->addWidget(calendarView); // 0
-    stackedWidget->addWidget(taskWidget);   // 1
-    stackedWidget->addWidget(searchView);   // 2
-    stackedWidget->addWidget(tagView);      // 3
-    stackedWidget->addWidget(addView);      // 4
+    stackedWidget->addWidget(calendarView);
+    stackedWidget->addWidget(taskWidget);
+    stackedWidget->addWidget(searchView);
+    stackedWidget->addWidget(tagView);
+    stackedWidget->addWidget(addView);
 
     connect(calendarView, &calendar::dateSelected,
             this, [this](const date& d) {
@@ -90,18 +90,17 @@ void MainWindow::setupNavBar()
 {
     navigationBar = new navBar(this);
 
-    // ✅ Navigazione tra le viste
+    // view navigation
     connect(navigationBar, &navBar::calendarClicked,     this, &MainWindow::showCalendar);
     connect(navigationBar, &navBar::taskProjectClicked,  this, &MainWindow::showTaskProject);
     connect(navigationBar, &navBar::searchClicked,       this, &MainWindow::showSearch);
     // connect(navigationBar, &navBar::tagsClicked,      this, &MainWindow::showTags); // quando avrai la vista
 
-    // ✅ Apri form aggiunta (swappa navbar con addView)
     connect(navigationBar, &navBar::addClicked, this, [this]{
         navStack->setCurrentIndex(1);
     });
 
-    // ✅ Dopo creazione attività, torna alla navbar
+    // back to navbar
     connect(addView, &AddDialog::activityCreated,
             this, [this](AbstractActivity* a){
                 if (!a) return;

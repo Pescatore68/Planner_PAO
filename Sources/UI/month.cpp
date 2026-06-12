@@ -87,12 +87,12 @@ void MonthWidget::onDateChanged(const QDate& qd)
         rowLayout->setContentsMargins(5, 5, 5, 5);
         rowLayout->setSpacing(0);
 
-        // Intestazione
+
         QLabel* titleLabel = new QLabel("• " + QString::fromStdString(act->getName()), this);
         titleLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 13px; padding: 4px; }");
         rowLayout->addWidget(titleLabel);
 
-        // AREA DETTAGLI
+        //expan activity
         QWidget* expansionWidget = new QWidget(this);
         QVBoxLayout* expansionLayout = new QVBoxLayout(expansionWidget);
         expansionLayout->setContentsMargins(15, 5, 5, 5);
@@ -106,7 +106,6 @@ void MonthWidget::onDateChanged(const QDate& qd)
         summaryLabel->setStyleSheet("QLabel { color: #555; background-color: #fcfcfc; padding: 5px; border-radius: 4px; }");
         expansionLayout->addWidget(summaryLabel);
 
-        // Checkbox di completamento (Se applicabile)
         if (visitor.isCheckable()) {
             QCheckBox* statusCheck = new QCheckBox("Complete", this);
             statusCheck->setChecked(visitor.getCheckedState());
@@ -122,7 +121,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
             });
         }
 
-        // ─── AGGIUNTA DEI PULSANTI DI AZIONE ─────────────────────────────
+
         QWidget* actionButtonsWidget = new QWidget(this);
         QHBoxLayout* actionLayout = new QHBoxLayout(actionButtonsWidget);
         actionLayout->setContentsMargins(0, 5, 0, 0);
@@ -140,9 +139,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
         actionLayout->addWidget(deleteBtn);
 
         expansionLayout->addWidget(actionButtonsWidget);
-        // ─────────────────────────────────────────────────────────────────
 
-        // ─── I CONNECT DEI PULSANTI ──────────────────────────────────────
         connect(deleteBtn, &QPushButton::clicked, this, [this, act, qd]() {
             // Chiamata alla classe a parte ActivityDelete
             if (activityDelete.execute(act, this)) {
@@ -164,7 +161,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
         item->setSizeHint(rowContainer->sizeHint());
 
-        // Salviamo i riferimenti per il click alternato (Accordion)
+
         item->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(expansionWidget)));
         item->setData(Qt::UserRole + 1, QVariant::fromValue(static_cast<void*>(rowContainer)));
     }

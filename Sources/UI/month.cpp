@@ -93,7 +93,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
         // Intestazione
         QLabel* titleLabel = new QLabel("• " + QString::fromStdString(act->getName()), this);
-        titleLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 13px; padding: 4px; }");
+        titleLabel->setStyleSheet("QLabe l { font-weight: bold; font-size: 13px; padding: 4px; }");
         rowLayout->addWidget(titleLabel);
 
         // AREA DETTAGLI

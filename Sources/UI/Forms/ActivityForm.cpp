@@ -47,3 +47,9 @@ void ActivityForm::buildCommonFields(tagManager& tm) {
 QVBoxLayout* ActivityForm::getMainLayout() {
     return mainLayout;
 }
+
+void ActivityForm::reset() {
+    nameEdit->clear();
+    descEdit->clear();
+    tagCombo->setCurrentIndex(0);
+}

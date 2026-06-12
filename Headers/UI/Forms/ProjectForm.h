@@ -13,8 +13,9 @@ class ProjectForm : public ActivityForm {
     Q_OBJECT
 public:
     explicit ProjectForm(tagManager& tm, QWidget* parent = nullptr);
-    AbstractActivity* createActivity(tagManager& tm) override;
+    AbstractActivity* createActivity() override;
     bool validate() override;
+    void reset() override;
 
 private:
     // deadline progetto
@@ -29,7 +30,7 @@ private:
     tagManager*         tmPtr;          // serve per creare nuovi TaskForm
     QScrollArea* scroll = nullptr;
 
-    void setupSubtaskPanel(tagManager& tm);
+    void setupSubtaskPanel();
     void addSubtaskForm();
 };
 #endif

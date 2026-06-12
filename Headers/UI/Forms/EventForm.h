@@ -12,8 +12,9 @@ class EventForm : public ActivityForm {
 public:
     explicit EventForm(tagManager& tm, QWidget* parent = nullptr);
 
-    AbstractActivity* createActivity(tagManager& tm) override;
+    AbstractActivity* createActivity() override;
     bool validate() override;
+    void reset() override;
 
 private slots:
     void onAllDayToggled(bool checked);

@@ -12,8 +12,9 @@ class RoutineForm : public ActivityForm {
 public:
     explicit RoutineForm(tagManager& tm, QWidget* parent = nullptr);
 
-    AbstractActivity* createActivity(tagManager& tm) override;
+    AbstractActivity* createActivity() override;
     bool validate() override;
+    void reset() override;
 
 private:
     QComboBox* freqCombo;

@@ -99,6 +99,7 @@ void AddDialog::setupActions() {
 
     connect(btnCancel, &QPushButton::clicked,
             this, &AddDialog::onCancelClicked);
+
 }
 
 // ─── Helper chip ─────────────────────────────────────────────────────────────
@@ -122,13 +123,23 @@ void AddDialog::onAddClicked() {
     if (!current || !current->validate())
         return;
 
-    emit activityCreated(current->createActivity(tm));
+    emit activityCreated(current->createActivity());
+    static_cast<ActivityForm*>(stack->currentWidget())->reset();
+}
+
+void AddDialog::onCancelClicked()
+{
+    static_cast<ActivityForm*>(stack->currentWidget())->reset();
+    emit activityCancelled(); // o un segnale dedicato
 }
 
 // ─── Restituisce l'attività creata dal form attivo ────────────────────────────
 AbstractActivity* AddDialog::createActivity() {
     ActivityForm* current = qobject_cast<ActivityForm*>(stack->currentWidget());
     if (!current) return nullptr;
-    return current->createActivity(tm);
+    return current->createActivity();
 }
+
+
+
 

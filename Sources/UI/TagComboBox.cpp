@@ -82,3 +82,8 @@ void TagComboBox::onAddTag() {
 
     dialog.exec();
 }
+
+
+void TagComboBox::setCurrentIndex(const unsigned int& idx) const {
+    combo->setCurrentIndex(idx);
+}

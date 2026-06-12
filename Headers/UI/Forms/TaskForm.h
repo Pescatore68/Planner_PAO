@@ -11,8 +11,9 @@ class TaskForm : public ActivityForm {
 public:
     explicit TaskForm(tagManager& tm, QWidget* parent = nullptr);
 
-    AbstractActivity* createActivity(tagManager& tm) override;
+    AbstractActivity* createActivity() override;
     bool validate() override;
+    void reset() override;
 
 private:
     QDateEdit* deadlineEdit;

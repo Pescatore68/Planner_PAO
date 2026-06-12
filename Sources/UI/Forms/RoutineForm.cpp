@@ -21,10 +21,10 @@ RoutineForm::RoutineForm(tagManager& tm, QWidget* parent)
     endDateEdit->setCalendarPopup(true);
     endDateEdit->setDisplayFormat("dd/MM/yyyy");
 
-    startTimeEdit = new QTimeEdit(QTime(7, 0), this);
+    startTimeEdit = new QTimeEdit(QTime::currentTime(), this);
     startTimeEdit->setDisplayFormat("HH:mm");
 
-    endTimeEdit = new QTimeEdit(QTime(8, 0), this);
+    endTimeEdit = new QTimeEdit(QTime::currentTime().addSecs(3600), this);
     endTimeEdit->setDisplayFormat("HH:mm");
 
     addRow("Frequency",   freqCombo);
@@ -49,7 +49,7 @@ bool RoutineForm::validate() {
     return true;
 }
 
-AbstractActivity* RoutineForm::createActivity(tagManager& tm) {
+AbstractActivity* RoutineForm::createActivity() {
     const std::string name = nameEdit->text().trimmed().toStdString();
     const std::string desc = descEdit->text().trimmed().toStdString();
     const tag* t           = tagCombo->getSelectedTag();
@@ -67,4 +67,13 @@ AbstractActivity* RoutineForm::createActivity(tagManager& tm) {
                        date(qsd.day(), qsd.month(), qsd.year()),
                        date(qed.day(), qed.month(), qed.year()),
                        freq);
+}
+
+void RoutineForm::reset() {
+    ActivityForm::reset();
+    freqCombo->setCurrentIndex(0);
+    startDateEdit->setDate(QDate::currentDate());
+    endDateEdit->setDate(QDate::currentDate());
+    startTimeEdit->setTime(QTime::currentTime());
+    endTimeEdit->setTime(QTime::currentTime().addSecs(3600));
 }

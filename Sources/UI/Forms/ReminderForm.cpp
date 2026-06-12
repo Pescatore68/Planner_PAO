@@ -11,7 +11,7 @@ ReminderForm::ReminderForm(tagManager& tm, QWidget* parent)
     dateEdit->setCalendarPopup(false);
     dateEdit->setDisplayFormat("dd/MM/yyyy");
 
-    timeEdit = new QTimeEdit(QTime(9, 0), this);
+    timeEdit = new QTimeEdit(QTime::currentTime(), this);
     timeEdit->setDisplayFormat("HH:mm");
 
     locationEdit = new QLineEdit(this);
@@ -32,7 +32,7 @@ bool ReminderForm::validate() {
     return true;
 }
 
-AbstractActivity* ReminderForm::createActivity(tagManager& tm) {
+AbstractActivity* ReminderForm::createActivity() {
     const std::string name = nameEdit->text().trimmed().toStdString();
     const std::string desc = descEdit->text().trimmed().toStdString();
     const std::string loc  = locationEdit->text().trimmed().toStdString();
@@ -44,4 +44,11 @@ AbstractActivity* ReminderForm::createActivity(tagManager& tm) {
                         date(qd.day(), qd.month(), qd.year()),
                         HourMinute(qt.hour(), qt.minute()),
                         loc);
+}
+
+void ReminderForm::reset() {
+    ActivityForm::reset();
+    dateEdit->setDate(QDate::currentDate());
+    timeEdit->setTime(QTime::currentTime());
+    locationEdit->clear();
 }

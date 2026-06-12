@@ -29,11 +29,12 @@ public:
 
 signals:
     void activityCreated(AbstractActivity* a);
-    void onCancelClicked();
+    void activityCancelled();
 
 private slots:
     void onTypeSelected(int index);
     void onAddClicked();
+    void onCancelClicked();
 
 private:
     tagManager& tm;

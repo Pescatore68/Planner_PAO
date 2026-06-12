@@ -19,6 +19,7 @@ private:
 public:
     explicit TagComboBox(tagManager& tm, QWidget* parent = nullptr);
     tag* getSelectedTag() const;
+    void setCurrentIndex(const unsigned int&) const;
 
 private slots:
 void onAddTag();

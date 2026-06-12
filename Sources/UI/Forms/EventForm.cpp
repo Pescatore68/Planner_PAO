@@ -55,7 +55,7 @@ bool EventForm::validate() {
     return true;
 }
 
-AbstractActivity* EventForm::createActivity(tagManager& tm) {
+AbstractActivity* EventForm::createActivity() {
     const std::string name = nameEdit->text().trimmed().toStdString();
     const std::string desc = descEdit->text().trimmed().toStdString();
     const std::string loc  = locationEdit->text().trimmed().toStdString();
@@ -75,4 +75,14 @@ AbstractActivity* EventForm::createActivity(tagManager& tm) {
                      HourMinute(qst.hour(), qst.minute()),
                      HourMinute(qet.hour(), qet.minute()),
                      loc);
+}
+
+void EventForm::reset() {
+    ActivityForm::reset();
+    startDateEdit->setDate(QDate::currentDate());
+    endDateEdit->setDate(QDate::currentDate());
+    startTimeEdit->setTime(QTime::currentTime());
+    endTimeEdit->setTime(QTime::currentTime().addSecs(3600));
+    allDayCheck->setChecked(false);
+    locationEdit->clear();
 }

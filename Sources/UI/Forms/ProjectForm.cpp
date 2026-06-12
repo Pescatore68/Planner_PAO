@@ -18,12 +18,12 @@ ProjectForm::ProjectForm(tagManager& tm, QWidget* parent)
 
     addTimeRow("Deadline", deadlineEdit, oDeadlineEdit);
 
-    setupSubtaskPanel(tm);
+    setupSubtaskPanel();
 
     mainLayout->addStretch();
 }
 
-void ProjectForm::setupSubtaskPanel(tagManager& tm)
+void ProjectForm::setupSubtaskPanel()
 {
     // bottone per mostrare/aggiungere subtask
     btnAddSubtask = new QPushButton("+ Aggiungi Subtask", this);
@@ -41,7 +41,7 @@ void ProjectForm::setupSubtaskPanel(tagManager& tm)
     subtaskLayout->setContentsMargins(8, 8, 8, 8);
     subtaskLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
-    auto* scroll = new QScrollArea(this);
+    scroll = new QScrollArea(this);
     scroll->setWidget(subtaskPanel);
     scroll->setWidgetResizable(true);
     mainLayout->setStretchFactor(scroll, 1);
@@ -77,7 +77,7 @@ void ProjectForm::setupSubtaskPanel(tagManager& tm)
 
     mainLayout->addWidget(scroll, 1);
 
-    connect(btnAddSubtask, &QPushButton::clicked, this, [this, scroll]{
+    connect(btnAddSubtask, &QPushButton::clicked, this, [this]{
         if (!subtaskPanel->isVisible()) {
             subtaskPanel->setVisible(true);
             scroll->setVisible(true);
@@ -89,7 +89,6 @@ void ProjectForm::setupSubtaskPanel(tagManager& tm)
 void ProjectForm::addSubtaskForm()
 {
     auto* container = new QFrame(subtaskPanel);
-    //container->setFrameShape(QFrame::NoFrame);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     auto* vl = new QVBoxLayout(container);
@@ -137,13 +136,13 @@ bool ProjectForm::validate()
         return false;
     }
     // valida ogni subtask
-    for (auto* f : subtaskForms) {
-        if (!f->validate()) return false;
+    for (QList<TaskForm*>::const_iterator it = subtaskForms.cbegin(); it != subtaskForms.cend(); ++it) {
+        if (!(*it)->validate()) return false;
     }
     return true;
 }
 
-AbstractActivity* ProjectForm::createActivity(tagManager& tm)
+AbstractActivity* ProjectForm::createActivity()
 {
     const std::string name = nameEdit->text().trimmed().toStdString();
     const std::string desc = descEdit->text().trimmed().toStdString();
@@ -157,18 +156,27 @@ AbstractActivity* ProjectForm::createActivity(tagManager& tm)
         HourMinute(qt.hour(), qt.minute())
         );
 
-    for (auto* f : subtaskForms) {
-        if (!f->validate()) continue;
-        auto* sub = static_cast<task*>(f->createActivity(tm));
-        p->add(
-            sub->getName(),
-            sub->getDescription(),
-            sub->getDeadline(),
-            sub->getODeadline()
-            );
+    for (QList<TaskForm*>::const_iterator it = subtaskForms.cbegin(); it != subtaskForms.cend(); ++it) {
+        if (!(*it)->validate()) continue;
+        auto* sub = static_cast<task*>((*it)->createActivity());
+        p->add(sub->getName(), sub->getDescription(),
+               sub->getDeadline(), sub->getODeadline());
         delete sub;
     }
 
     return p;
 }
 
+void ProjectForm::reset() {
+    ActivityForm::reset();
+    deadlineEdit->setDate(QDate::currentDate());
+    oDeadlineEdit->setTime(QTime(23, 59));
+
+    // rimuovi tutti i container delle subtask
+    for (QList<TaskForm*>::const_iterator it = subtaskForms.cbegin(); it != subtaskForms.cend(); ++it)
+        (*it)->parentWidget()->deleteLater(); // elimina il container
+
+    subtaskForms.clear();
+    subtaskPanel->setVisible(false);
+    scroll->setVisible(false);
+}

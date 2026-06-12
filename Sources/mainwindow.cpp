@@ -87,7 +87,9 @@ void MainWindow::setupNavBar()
                 calendarView->refresh();
                 //showTaskProject();
             });
-
+    connect(addView, &AddDialog::activityCancelled, this, [this]{
+        navStack->setCurrentIndex(0);
+    });
 }
 void MainWindow::showCalendar()
 {

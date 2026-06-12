@@ -11,8 +11,9 @@ class ReminderForm : public ActivityForm {
 public:
     explicit ReminderForm(tagManager& tm, QWidget* parent = nullptr);
 
-    AbstractActivity* createActivity(tagManager& tm) override;
+    AbstractActivity* createActivity() override;
     bool validate() override;
+    void reset() override;
 
 private:
     QDateEdit* dateEdit;

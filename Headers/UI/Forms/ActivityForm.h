@@ -34,8 +34,9 @@ public:
     virtual ~ActivityForm() = default;
     QVBoxLayout* getMainLayout();
 
-    virtual AbstractActivity* createActivity(tagManager& tm) = 0;
+    virtual AbstractActivity* createActivity() = 0;
     virtual bool validate() = 0;
+    virtual void reset();
 };
 
 #endif // ACTIVITYFORM_H

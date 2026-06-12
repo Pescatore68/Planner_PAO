@@ -28,10 +28,10 @@ bool TaskForm::validate() {
     return true;
 }
 
-AbstractActivity* TaskForm::createActivity(tagManager& tm) {
+AbstractActivity* TaskForm::createActivity() {
     const std::string name = nameEdit->text().trimmed().toStdString();
     const std::string desc = descEdit->text().trimmed().toStdString();
-    const tag* t           = tagCombo->getSelectedTag();
+    const tag* t = tagCombo->getSelectedTag();
 
     const QDate qd = deadlineEdit->date();
     const QTime qt = oDeadlineEdit->time();
@@ -39,4 +39,10 @@ AbstractActivity* TaskForm::createActivity(tagManager& tm) {
     return new task(name, desc, t,
                     date(qd.day(), qd.month(), qd.year()),
                     HourMinute(qt.hour(), qt.minute()));
+}
+
+void TaskForm::reset() {
+    ActivityForm::reset();
+    deadlineEdit->setDate(QDate::currentDate());
+    oDeadlineEdit->setTime(QTime(23, 59));
 }

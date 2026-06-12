@@ -34,12 +34,13 @@ bool date::operator==(const date& other) const {
            getYear() == other.getYear();
 }
 
-bool operator>(const date& n, const date& m) {
-    if (n.getYear() != m.getYear())
-        return n.getYear() > m.getYear();
-    if (n.getMonth() != m.getMonth())
-        return n.getMonth() > m.getMonth();
-    return n.getDay() > m.getDay();
+
+bool date::operator>(const date& m) const {
+    if (getYear() != m.getYear())
+        return getYear() > m.getYear();
+    if (getMonth() != m.getMonth())
+        return getMonth() > m.getMonth();
+    return getDay() > m.getDay();
 }
 
 std::string date::toString() const {

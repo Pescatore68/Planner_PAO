@@ -4,56 +4,58 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
 #include <QWidget>
-#include "ActivityManager.h"
-#include "tagManager.h"
 
+#include "Headers/ActivityManager.h"
+#include "Headers/tagManager.h"
+#include "Headers/UI/navBar.h"
+#include "Headers/UI/calendar.h"
+
+class TaskWidget;
 class AbstractActivity;
+class AddDialog;
+class QStackedLayout;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
     ActivityManager& am;
-    tagManager&      tm;
+    tagManager& tm;
 
-    QWidget*     centralWidget;
-    QHBoxLayout* mainLayout;
+    // ── CORE WIDGETS ─────────────────────────────────────────────
+    TaskWidget* taskWidget = nullptr;
+    AddDialog* addView = nullptr;
 
-    // Nav bar
-    QWidget*     navBar;
-    QVBoxLayout* navLayout;
-    QPushButton* btnCalendar;
-    QPushButton* btnTaskProject;
-    QPushButton* btnSearch;
-    QPushButton* btnTags;
+    QWidget* centralWidget = nullptr;
+    QHBoxLayout* mainLayout = nullptr;
 
-    // Schermate
-    QStackedWidget* stackedWidget;
-    QWidget* calendarView;
-    QWidget* taskProjectView;
-    QWidget* searchView;
-    QWidget* detailView;
-    QWidget* formView;
-    QWidget* tagView;
+    AbstractActivity* selectedActivity = nullptr;
 
+    // ── NAV AREA (navbar swap) ───────────────────────────────────
+    navBar* navigationBar = nullptr;
+    QWidget* navContainer = nullptr;
+    QStackedLayout* navStack = nullptr;
+
+    // ── CONTENT AREA ─────────────────────────────────────────────
+    QStackedWidget* stackedWidget = nullptr;
+
+    calendar* calendarView = nullptr;
+    QWidget* searchView = nullptr;
+    QWidget* tagView = nullptr;
     void setupNavBar();
     void setupStackedWidget();
 
 public:
-    // BUG FIX 3-4: rimosso il secondo costruttore MainWindow(QWidget*)
-    // che non era dichiarato qui ma era implementato in mainwindow.cpp
-    // causando un errore di compilazione e due corpi di ctor annidati.
-    explicit MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
-    ~MainWindow() override = default;
+    MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
+    ~MainWindow() = default;
 
     void showCalendar();
     void showTaskProject();
     void showSearch();
     void showDetail(AbstractActivity* a);
-    void showForm  (AbstractActivity* a = nullptr);
+    void showForm(AbstractActivity* a = nullptr);
+    void onActivitySelected(AbstractActivity* a);
 };
 
 #endif // MAINWINDOW_H

@@ -20,7 +20,7 @@ public:
     static date today();
     unsigned int dayOfWeek() const;
     bool operator==(const date& other) const;
-    friend bool operator>(const date&, const date&);
+    bool operator>(const date&) const;
     string toString() const;
     static date dateFromString(const std::string& s);
 };

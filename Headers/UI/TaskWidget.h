@@ -2,45 +2,50 @@
 #define TASKWIDGET_H
 
 #include <QWidget>
+#include <QTreeWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QPushButton>
-#include <QProgressBar>
 
-class AbstractActivity; // forward declaration
-class task;             // forward declaration
-class project;          // forward declaration
+#include "Headers/ActivityManager.h"
+#include "Headers/AbstractActivity.h"
+
+class task;
+class project;
 
 class TaskWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit TaskWidget(QWidget* parent = nullptr);
-    void setActivity(AbstractActivity* a);
+    explicit TaskWidget(ActivityManager& am, QWidget* parent = nullptr);
+
+    void refresh();
 
 signals:
-    void backRequested();
+    void activitySelected(AbstractActivity* a);
     void deleteRequested(AbstractActivity* a);
 
 private slots:
-    void onCompleteClicked();
+    void onItemClicked(QTreeWidgetItem* item, int column);
+    void onItemChanged(QTreeWidgetItem* item, int column);
     void onDeleteClicked();
 
 private:
+    ActivityManager& am;
+
     QVBoxLayout* mainLayout;
-    QHBoxLayout* headerLayout;
+    QHBoxLayout* toolbarLayout;
+    QTreeWidget* tree;
 
-    QLabel*       labelType;
-    QLabel*       labelTitle;
-    QLabel*       labelDescription;
-    QLabel*       labelDeadline;
-    QProgressBar* progressBar;
-    QPushButton*  btnComplete;
-    QPushButton*  btnDelete;
-    QPushButton*  btnBack;
+    QPushButton* btnDelete;
 
-    AbstractActivity* current;
+    AbstractActivity* current = nullptr;
+
+    void buildTree();
+    void addTaskItem(QTreeWidgetItem* parent, const task* t, AbstractActivity* owner);
+    void addProjectItem(QTreeWidget* tree, project* p, unsigned int amIndex);
+
+    AbstractActivity* activityFromItem(QTreeWidgetItem* item) const;
 };
 
-#endif
+#endif // TASKWIDGET_H

@@ -18,7 +18,7 @@ bool task::isCompleted() const { return check; }
 void task::setCompleted (const bool& b) { check = b; }
 
 bool task::isExpired() const {
-    return (deadline > date::today() && oDeadline > HourMinute::now() ) ? true : false;
+    return date::today() > deadline || (date::today() == deadline && HourMinute::now() > oDeadline);
 }
 
 std::string task::summary() const {

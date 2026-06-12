@@ -3,97 +3,222 @@
 #include "Headers/task.h"
 #include "Headers/project.h"
 
-TaskWidget::TaskWidget(QWidget* parent) : QWidget(parent) {
-    mainLayout   = new QVBoxLayout(this);
-    headerLayout = new QHBoxLayout();
+#include <QHeaderView>
+#include <QMessageBox>
 
-    labelType        = new QLabel(this);
-    labelTitle       = new QLabel(this);
-    labelDescription = new QLabel(this);
-    labelDeadline    = new QLabel(this);
-    progressBar      = new QProgressBar(this);
-    btnComplete      = new QPushButton("Completa",   this);
-    btnDelete        = new QPushButton("Elimina",    this);
-    btnBack          = new QPushButton("← Indietro", this);
+// ─────────────────────────────────────────────
+//  Ruoli custom per i dati nascosti nelle voci
+// ─────────────────────────────────────────────
+// Salviamo il puntatore all'AbstractActivity direttamente nell'item
+// così non dobbiamo cercare per indice ogni volta.
+static constexpr int ActivityPtrRole = Qt::UserRole;
+// Per i subtask salviamo anche il puntatore al project padre
+static constexpr int ParentProjectRole = Qt::UserRole + 1;
 
-    headerLayout->addWidget(labelType);
-    headerLayout->addWidget(labelTitle);
 
-    mainLayout->addWidget(btnBack);
-    mainLayout->addLayout(headerLayout);
-    mainLayout->addWidget(labelDescription);
-    mainLayout->addWidget(labelDeadline);
-    mainLayout->addWidget(progressBar);
-    mainLayout->addWidget(btnComplete);
-    mainLayout->addWidget(btnDelete);
+TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
+    : QWidget(parent), am(am)
+{
+    // ── layout principale ────────────────────
+    mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(8, 8, 8, 8);
+    mainLayout->setSpacing(6);
 
-    progressBar->setVisible(false);
-    labelDeadline->setVisible(false);
-    btnComplete->setVisible(false);
+    // ── toolbar (bottoni in alto) ────────────
+    toolbarLayout = new QHBoxLayout();
+    btnDelete     = new QPushButton("Elimina",   this);
 
-    setLayout(mainLayout);
+    btnDelete->setEnabled(false); // disabilitato finché non si seleziona qualcosa
 
-    // BUG FIX 13: rimosso connect(btnBack) duplicato (era presente due volte)
-    connect(btnBack,     &QPushButton::clicked, this, &TaskWidget::backRequested);
-    connect(btnComplete, &QPushButton::clicked, this, &TaskWidget::onCompleteClicked);
-    connect(btnDelete,   &QPushButton::clicked, this, &TaskWidget::onDeleteClicked);
+    toolbarLayout->addStretch();
+    toolbarLayout->addWidget(btnDelete);
+
+    // ── albero ──────────────────────────────
+    tree = new QTreeWidget(this);
+    tree->setColumnCount(3);
+    tree->setHeaderLabels({"Nome", "Scadenza", "Stato"});
+    tree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    tree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    tree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    tree->setSelectionMode(QAbstractItemView::SingleSelection);
+    tree->setAnimated(true);
+
+    // ── assembla ────────────────────────────
+    mainLayout->addLayout(toolbarLayout);
+    mainLayout->addWidget(tree);
+
+    // ── connessioni ─────────────────────────
+    connect(btnDelete,     &QPushButton::clicked, this, &TaskWidget::onDeleteClicked);
+
+    connect(tree, &QTreeWidget::itemClicked,
+            this, &TaskWidget::onItemClicked);
+
+    // itemChanged scatta quando l'utente spunta/de-spunta un checkbox
+    connect(tree, &QTreeWidget::itemChanged,
+            this, &TaskWidget::onItemChanged);
+
+    buildTree();
 }
 
-void TaskWidget::setActivity(AbstractActivity* a) {
+
+void TaskWidget::refresh() {
+    // blocca temporaneamente itemChanged mentre ricostruiamo l'albero
+    // per evitare che il completamento venga scritto due volte
+    tree->blockSignals(true);
+    buildTree();
+    tree->blockSignals(false);
+
+    current = nullptr;
+    btnDelete->setEnabled(false);
+}
+
+void TaskWidget::buildTree() {
+    tree->clear();
+
+    // nodi radice fissi per separare task e project visivamente
+    auto* rootTasks    = new QTreeWidgetItem(tree, {"Task",     "", ""});
+    auto* rootProjects = new QTreeWidgetItem(tree, {"Progetti", "", ""});
+
+    // stile grassetto per le sezioni
+    QFont boldFont = rootTasks->font(0);
+    boldFont.setBold(true);
+    rootTasks->setFont(0, boldFont);
+    rootProjects->setFont(0, boldFont);
+
+    // rende le sezioni non selezionabili
+    rootTasks->setFlags(Qt::ItemIsEnabled);
+    rootProjects->setFlags(Qt::ItemIsEnabled);
+
+    for (unsigned int i = 0; i < am.size(); ++i) {
+        AbstractActivity* a = am.get(i);
+
+        if (project* p = dynamic_cast<project*>(a)) {
+            auto* projItem = new QTreeWidgetItem(rootProjects);
+            projItem->setText(0, QString::fromStdString(p->getName()));
+            projItem->setText(1, QString::fromStdString(p->getDeadline().toString()));
+
+            // barra di completamento testuale nella colonna Stato
+            float pct = p->completionPercentage();
+            projItem->setText(2, QString("%1%").arg(static_cast<int>(pct)));
+
+            // checkbox sul progetto stesso (completato = tutti i subtask fatti)
+            projItem->setCheckState(0, p->isCompleted() ? Qt::Checked : Qt::Unchecked);
+
+            // salva il puntatore
+            projItem->setData(0, ActivityPtrRole, QVariant::fromValue(static_cast<void*>(p)));
+
+            // aggiungi i subtask come figli
+            for (unsigned int j = 0; j < p->size(); ++j) {
+                const task* sub = p->getSubtask(j);
+                auto* subItem = new QTreeWidgetItem(projItem);
+                subItem->setText(0, QString::fromStdString(sub->getName()));
+                subItem->setText(1, QString::fromStdString(sub->getDeadline().toString()));
+                subItem->setText(2, sub->isCompleted() ? "✓" : "");
+
+                // checkbox interattiva sul subtask
+                subItem->setCheckState(0, sub->isCompleted() ? Qt::Checked : Qt::Unchecked);
+
+                // salva puntatori (subtask e project padre)
+                subItem->setData(0, ActivityPtrRole,    QVariant::fromValue(static_cast<void*>(const_cast<task*>(sub))));
+                subItem->setData(0, ParentProjectRole,  QVariant::fromValue(static_cast<void*>(p)));
+
+                // subtask completati in grigio
+                if (sub->isCompleted()) {
+                    subItem->setForeground(0, QColor(150, 150, 150));
+                    subItem->setForeground(1, QColor(150, 150, 150));
+                }
+            }
+            projItem->setExpanded(true);
+
+        } else if (task* t = dynamic_cast<task*>(a)) {
+            // task semplice
+            auto* taskItem = new QTreeWidgetItem(rootTasks);
+            taskItem->setText(0, QString::fromStdString(t->getName()));
+            taskItem->setText(1, QString::fromStdString(t->getDeadline().toString()));
+            taskItem->setText(2, t->isCompleted() ? "✓" : "");
+
+            // checkbox interattiva
+            taskItem->setCheckState(0, t->isCompleted() ? Qt::Checked : Qt::Unchecked);
+
+            // salva il puntatore
+            taskItem->setData(0, ActivityPtrRole, QVariant::fromValue(static_cast<void*>(t)));
+
+            // task scaduto → testo rosso
+            if (t->isExpired() && !t->isCompleted()) {
+                taskItem->setForeground(0, QColor(200, 50, 50));
+                taskItem->setForeground(1, QColor(200, 50, 50));
+            }
+            // task completato → grigio
+            if (t->isCompleted()) {
+                taskItem->setForeground(0, QColor(150, 150, 150));
+                taskItem->setForeground(1, QColor(150, 150, 150));
+            }
+        }
+        // Event, Reminder, Routine vengono ignorati automaticamente
+    }
+
+    rootTasks->setExpanded(true);
+    rootProjects->setExpanded(true);
+}
+
+// ─────────────────────────────────────────────
+//  Helpers
+// ─────────────────────────────────────────────
+AbstractActivity* TaskWidget::activityFromItem(QTreeWidgetItem* item) const {
+    if (!item) return nullptr;
+    QVariant v = item->data(0, ActivityPtrRole);
+    if (!v.isValid()) return nullptr;
+    return static_cast<AbstractActivity*>(v.value<void*>());
+}
+
+// ─────────────────────────────────────────────
+//  Slot privati
+// ─────────────────────────────────────────────
+void TaskWidget::onItemClicked(QTreeWidgetItem* item, int) {
+    AbstractActivity* a = activityFromItem(item);
     current = a;
+    btnDelete->setEnabled(a != nullptr);
+    if (a)
+        emit activitySelected(a);
+}
+
+void TaskWidget::onItemChanged(QTreeWidgetItem* item, int column) {
+    if (column != 0) return;   // ci interessa solo la colonna con il checkbox
+
+    AbstractActivity* a = activityFromItem(item);
     if (!a) return;
 
-    // BUG FIX 15: getName() restituisce il nome dell'attività (non il tipo).
-    // labelType mostra il nome, labelTitle la descrizione breve (invertiti nell'originale).
-    // Riassegnati in modo semanticamente corretto:
-    //   labelType  → nome dell'attività
-    //   labelTitle → (lasciato per uso futuro con getType(), ora vuoto)
-    // BUG FIX 14: labelDescription ora viene effettivamente popolato
-    labelType->setText(QString::fromStdString(a->getName()));
-    labelTitle->setText("");  // placeholder: da riempire con getType() quando implementato
-    labelDescription->setText(QString::fromStdString(a->getDescription()));
+    task* t = dynamic_cast<task*>(a);
+    if (!t) return;
 
-    if (task* t = dynamic_cast<task*>(a)) {
-        labelDeadline->setVisible(true);
-        labelDeadline->setText(
-            QString::fromStdString(t->getDeadline().toString())
-            );
+    bool checked = (item->checkState(0) == Qt::Checked);
+    t->setCompleted(checked);
 
-        btnComplete->setVisible(true);
-        btnComplete->setText(t->isCompleted() ? "✓ Completato" : "Completa");
-
-        if (project* p = dynamic_cast<project*>(t)) {
-            progressBar->setVisible(true);
-            progressBar->setValue(static_cast<int>(p->completionPercentage()));
-        } else {
-            progressBar->setVisible(false);
-        }
-    } else {
-        labelDeadline->setVisible(false);
-        btnComplete->setVisible(false);
-        progressBar->setVisible(false);
-    }
-}
-
-void TaskWidget::onCompleteClicked() {
-    if (!current) return;
-    if (task* t = dynamic_cast<task*>(current)) {
-        t->setCompleted(true);
-        btnComplete->setText("✓ Completato");
-
-        // Aggiorna progress bar se è un project
-        if (project* p = dynamic_cast<project*>(t)) {
-            progressBar->setValue(static_cast<int>(p->completionPercentage()));
+    // se è un subtask, aggiorna la percentuale del project padre
+    QVariant vp = item->data(0, ParentProjectRole);
+    if (vp.isValid()) {
+        project* p = static_cast<project*>(vp.value<void*>());
+        if (p && item->parent()) {
+            float pct = p->completionPercentage();
+            item->parent()->setText(2, QString("%1%").arg(static_cast<int>(pct)));
+            item->parent()->setCheckState(0, p->isCompleted() ? Qt::Checked : Qt::Unchecked);
         }
     }
+
+    // aggiorna il colore della riga
+    QColor color = checked ? QColor(150, 150, 150) : QColor();
+    item->setForeground(0, color);
+    item->setForeground(1, color);
+    item->setText(2, checked ? "✓" : "");
 }
 
 void TaskWidget::onDeleteClicked() {
     if (!current) return;
-    // BUG FIX 4 (TaskWidget): emette deleteRequested con il puntatore all'activity,
-    // così MainWindow sa cosa eliminare prima di tornare alla lista.
+
     AbstractActivity* toDelete = current;
     current = nullptr;
+    btnDelete->setEnabled(false);
+
     emit deleteRequested(toDelete);
-    emit backRequested();
+    // MainWindow rimuove da ActivityManager e chiama refresh()
 }

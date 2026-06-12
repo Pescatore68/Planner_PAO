@@ -115,17 +115,10 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
             connect(statusCheck, &QCheckBox::toggled, this, [act, summaryLabel, this](bool checked) {
 
-                // 1. Creiamo il visitor, ma lo attiviamo in modalità SCRITTURA
                 DisplayVisitor writeVisitor;
                 writeVisitor.setWriteMode(checked);
-
-                // 2. Il doppio dispacciamento applicherà la modifica corretta senza cast!
                 act->accept(writeVisitor);
-
-                // 3. Aggiorniamo subito l'interfaccia con la nuova stringa generata
                 summaryLabel->setText(QString::fromStdString(writeVisitor.getSummary()));
-
-                // 4. Rinfreschiamo il calendario
                 this->updateCalendarView();
             });
         }

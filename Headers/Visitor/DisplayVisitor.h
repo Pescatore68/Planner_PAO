@@ -22,30 +22,21 @@ private:
     bool newValueToSet;
 
 public:
-    // Il costruttore di base lavora in modalità LETTURA (passiva)
-    DisplayVisitor()
-        : textSummary(""), isRoutineType(false), hasCheckableStatus(false),
-        isChecked(false), isWriteMode(false), newValueToSet(false) {}
+    DisplayVisitor() : textSummary(""), isRoutineType(false), hasCheckableStatus(false), isChecked(false), isWriteMode(false), newValueToSet(false) {}
 
-    // Funzione speciale da chiamare prima di fare .accept() se vogliamo SCRIVERE (cambiare il check)
     void setWriteMode(bool value) {
         isWriteMode = true;
         newValueToSet = value;
     }
 
-    // Getter per la GUI
     std::string getSummary() const { return textSummary; }
     bool isRoutine() const { return isRoutineType; }
     bool isCheckable() const { return hasCheckableStatus; }
     bool getCheckedState() const { return isChecked; }
 
-    // ─── IMPLEMENTAZIONE DEI VISIT CON DOPPIA LOGICA ─────────────────────
-
     void visit(Event& e) override {
         isRoutineType = false;
         hasCheckableStatus = false;
-        // Gli eventi non si spuntano, quindi ignoriamo la modalità scrittura
-
         textSummary = e.getName() + " — " + e.getDescription() + "\n";
         textSummary += e.getStartDate().toString();
         if (e.hasTime())
@@ -59,8 +50,6 @@ public:
     void visit(Reminder& r) override {
         isRoutineType = false;
         hasCheckableStatus = false;
-        // I reminder non si spuntano
-
         textSummary = r.getName() + " — " + r.getDescription() + "\n";
         textSummary += r.getDate().toString() + " " + r.getTime().toString();
         if (!r.getLocation().empty())
@@ -71,7 +60,6 @@ public:
         isRoutineType = false;
         hasCheckableStatus = true;
 
-        // Se siamo in modalità scrittura, modifichiamo l'oggetto reale!
         if (isWriteMode) {
             t.setCompleted(newValueToSet);
         }
@@ -89,7 +77,6 @@ public:
         isRoutineType = false;
         hasCheckableStatus = true;
 
-        // Se siamo in modalità scrittura, modifichiamo il progetto
         if (isWriteMode) {
             p.setCompleted(newValueToSet);
         }
@@ -113,7 +100,6 @@ public:
         isRoutineType = true;
         hasCheckableStatus = true;
 
-        // Se siamo in modalità scrittura, modifichiamo la routine
         if (isWriteMode) {
             r.setCheck(newValueToSet);
         }

@@ -8,6 +8,7 @@
 #include "Headers/UI/navBar.h"
 #include "Headers/UI/TaskWidget.h"
 #include "Headers/Dialog/AddDialog.h"
+#include "Headers/routine.h"
 
 MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QMainWindow(parent), am(am), tm(tm)
@@ -27,6 +28,7 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
 
     resize(1200, 800);
     setWindowTitle("Activity Manager");
+
 }
 
 void MainWindow::setupStackedWidget()
@@ -38,10 +40,10 @@ void MainWindow::setupStackedWidget()
     searchView   = new QWidget(this);
     tagView      = new QWidget(this);
 
-    stackedWidget->addWidget(calendarView); // 0
-    stackedWidget->addWidget(taskWidget);   // 1
-    stackedWidget->addWidget(searchView);   // 2
-    stackedWidget->addWidget(tagView);      // 3
+    stackedWidget->addWidget(calendarView);
+    stackedWidget->addWidget(taskWidget);
+    stackedWidget->addWidget(searchView);
+    stackedWidget->addWidget(tagView);
 
     connect(calendarView, &calendar::dateSelected,
             this, [this](const date& d) {

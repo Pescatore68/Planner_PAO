@@ -13,6 +13,7 @@ private:
     QListWidget* activityList;
     ActivityManager& am;
 
+
 public:
 
     explicit MonthWidget(ActivityManager& am, QWidget* parent = nullptr);

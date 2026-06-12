@@ -2,87 +2,166 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
+#include "Headers/Visitor/DisplayVisitor.h"
 #include "Headers/date.h"
 #include "Headers/AbstractActivity.h"
+#include "qcheckbox.h"
 #include "qtextformat.h"
 
 MonthWidget::MonthWidget(ActivityManager& am, QWidget* parent)
-    : QWidget(parent), am(am) // Inizializza il riferimento al backend
+    : QWidget(parent), am(am)
 {
     setup();
 }
 
 void MonthWidget::setup()
 {
-    // Layout principale ORIZZONTALE (divide la finestra in sinistra e destra)
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(10, 10, 10, 10);
     mainLayout->setSpacing(15);
 
-    // 1. SINISTRA: Il calendario standard di Qt
-    calendar = new QCalendarWidget(this);
-    mainLayout->addWidget(calendar, 2); // Il numero '2' lo fa apparire più largo
 
-    // 2. DESTRA: Pannello con il titolo e la lista dei task
+    calendar = new QCalendarWidget(this);
+    mainLayout->addWidget(calendar, 2);
+
     QWidget* sidePanel = new QWidget(this);
     QVBoxLayout* sideLayout = new QVBoxLayout(sidePanel);
     sideLayout->setContentsMargins(0, 0, 0, 0);
 
     QLabel* titleLabel = new QLabel("Attività del giorno:", this);
-    // Opzionale: rendiamo il titolo un po' più carino ed evidente
+
     QFont titleFont = titleLabel->font();
     titleFont.setBold(true);
     titleLabel->setFont(titleFont);
 
-    activityList = new QListWidget(this); // La lista visiva
+    activityList = new QListWidget(this);
 
     sideLayout->addWidget(titleLabel);
     sideLayout->addWidget(activityList);
 
-    mainLayout->addWidget(sidePanel, 1); // Il numero '1' lo fa apparire più stretto
+    mainLayout->addWidget(sidePanel, 1);
 
-    // 3. CONNESSIONI
-    // Quando l'utente clicca una data, aggiorna la lista interna
+
     connect(calendar, &QCalendarWidget::clicked, this, &MonthWidget::onDateChanged);
 
-    // Mantiene la tua connessione originale verso il widget padre (calendar)
+
     connect(calendar, &QCalendarWidget::clicked, this, &MonthWidget::dateClicked);
 
-    // Mostra subito le attività del giorno selezionato all'avvio dell'app
     onDateChanged(calendar->selectedDate());
-}
 
-// Questo slot viene chiamato ogni volta che l'utente clicca sul calendario
+    // Connessione al CLICK della riga per mostrare i dettagli col Visitor
+    connect(activityList, &QListWidget::itemClicked, this, [this](QListWidgetItem* item) {
+        if (!item) return;
+
+        // Recuperiamo i puntatori grafici che abbiamo salvato nell'item
+        QWidget* expansionWidget = static_cast<QWidget*>(item->data(Qt::UserRole).value<void*>());
+        QWidget* rowContainer = static_cast<QWidget*>(item->data(Qt::UserRole + 1).value<void*>());
+
+        if (expansionWidget && rowContainer) {
+            // Invertiamo lo stato di visibilità: se era aperto si chiude, se era chiuso si apre
+            bool isCurrentlyVisible = expansionWidget->isVisible();
+            expansionWidget->setVisible(!isCurrentlyVisible);
+
+            // Chiediamo a Qt di ricalcolare immediatamente lo spazio occupato dal widget modificato
+            rowContainer->adjustSize();
+
+            // AGGIORNAMENTO CRITICO: Diciamo alla QListWidget di aggiornare la dimensione della riga
+            // altrimenti il widget si espanderebbe ma verrebbe tagliato visivamente!
+            item->setSizeHint(rowContainer->sizeHint());
+
+            // Forza il ridisegno grafico immediato della lista
+            activityList->update();
+        }
+    });
+}
 void MonthWidget::onDateChanged(const QDate& qd)
 {
-    activityList->clear(); // Svuota la lista precedente
+    activityList->clear();
 
     date backendDate(qd.day(), qd.month(), qd.year());
     auto activities = am.getOnDate(backendDate);
 
-    // Se non ci sono attività, lasciamo la lista pulita e vuota (oppure un messaggio discreto)
-    if (activities.empty()) {
-        return;
-    }
-
-    // Popoliamo la lista con i nomi reali delle attività
     for (AbstractActivity* act : activities) {
-        if (act) {
-            QString name = QString::fromStdString(act->getName());
+        if (!act) continue;
 
-            // Usiamo un piccolo pallino o un prefisso elegante per ogni attività
-            // Questo assicura che Qt disegni correttamente la riga nel widget!
-            activityList->addItem("• " + name);
+        QListWidgetItem* item = new QListWidgetItem(activityList);
+
+        QWidget* rowContainer = new QWidget(this);
+        QVBoxLayout* rowLayout = new QVBoxLayout(rowContainer);
+        rowLayout->setContentsMargins(5, 5, 5, 5);
+        rowLayout->setSpacing(0);
+
+        // Intestazione
+        QLabel* titleLabel = new QLabel("• " + QString::fromStdString(act->getName()), this);
+        titleLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 13px; padding: 4px; }");
+        rowLayout->addWidget(titleLabel);
+
+        // AREA DETTAGLI
+        QWidget* expansionWidget = new QWidget(this);
+        QVBoxLayout* expansionLayout = new QVBoxLayout(expansionWidget);
+        expansionLayout->setContentsMargins(15, 5, 5, 5);
+        expansionLayout->setSpacing(5);
+
+        DisplayVisitor visitor;
+        act->accept(visitor);
+
+        // Label del Summary (La mettiamo dentro un puntatore così possiamo aggiornarla al click del check!)
+        QLabel* summaryLabel = new QLabel(QString::fromStdString(visitor.getSummary()), this);
+        summaryLabel->setWordWrap(true);
+        summaryLabel->setStyleSheet("QLabel { color: #555; background-color: #fcfcfc; padding: 5px; border-radius: 4px; }");
+        expansionLayout->addWidget(summaryLabel);
+
+        // PROBLEMA 1 RISOLTO: Se l'attività è checkabile (Task, Project, Routine), mostra la checkbox
+        if (visitor.isCheckable()) {
+            QCheckBox* statusCheck = new QCheckBox("Completata", this);
+            statusCheck->setChecked(visitor.getCheckedState());
+            expansionLayout->addWidget(statusCheck);
+
+            // Salvataggio polimorfico del check quando viene cliccato
+            connect(statusCheck, &QCheckBox::toggled, this, [act, summaryLabel, this](bool checked) {
+                // Proviamo a vedere se è un Task/Project
+                task* t = dynamic_cast<task*>(act);
+                if (t) {
+                    t->setCompleted(checked);
+                } else {
+                    // Altrimenti è una Routine
+                    Routine* r = dynamic_cast<Routine*>(act);
+                    if (r) {
+                        r->setCheck(checked);
+                    }
+                }
+
+                // Aggiorna il testo del summary al volo per mostrare [✓] o ● senza dover ricaricare tutto
+                DisplayVisitor v;
+                act->accept(v);
+                summaryLabel->setText(QString::fromStdString(v.getSummary()));
+
+                // Rinfresca i quadratini del calendario (se un task completato cambia colore)
+                this->updateCalendarView();
+            });
         }
+
+
+
+        expansionWidget->setVisible(false);
+        rowLayout->addWidget(expansionWidget);
+
+        activityList->addItem(item);
+        activityList->setItemWidget(item, rowContainer);
+
+        item->setSizeHint(rowContainer->sizeHint());
+
+        // Salviamo i riferimenti per il click alternato (Accordion)
+        item->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(expansionWidget)));
+        item->setData(Qt::UserRole + 1, QVariant::fromValue(static_cast<void*>(rowContainer)));
     }
 }
 void MonthWidget::updateCalendarView()
 {
-    // 1. Resetta i vecchi formati accumulati
+
     calendar->setDateTextFormat(QDate(), QTextCharFormat());
 
     QTextCharFormat impegnatoFormat;
-    impegnatoFormat.setBackground(QColor(230, 242, 255));
     impegnatoFormat.setForeground(Qt::blue);
     impegnatoFormat.setFontWeight(QFont::Bold);
 
@@ -92,10 +171,9 @@ void MonthWidget::updateCalendarView()
     QDate firstDay(year, month, 1);
     int daysInMonth = firstDay.daysInMonth();
 
-    // 2. Ricoloriamo tutti i giorni del mese corrente
     for (int day = 1; day <= daysInMonth; ++day) {
         QDate qd(year, month, day);
-        date backendDate(qd.day(), qd.month(), qd.year()); // Ordine (Giorno, Mese, Anno) del tuo backend
+        date backendDate(qd.day(), qd.month(), qd.year());
 
         auto activities = am.getOnDate(backendDate);
 
@@ -106,12 +184,8 @@ void MonthWidget::updateCalendarView()
         }
     }
 
-    // ─── IL TRUCCO RISOLUTIVO È QUI ──────────────────────────────────────────
-    // Prendiamo la data che l'utente sta visualizzando selezionata nel calendario
-    QDate dataSelezionata = calendar->selectedDate();
+    QDate dataClick = calendar->selectedDate();
 
-    // Forziamo manualmente la chiamata a onDateChanged passandogli la data corrente.
-    // Questo costringe la QListWidget a svuotarsi, interrogare il backend e
-    // ripopolarsi immediatamente con i nuovi dati appena creati!
-    this->onDateChanged(dataSelezionata);
+
+    this->onDateChanged(dataClick);
 }

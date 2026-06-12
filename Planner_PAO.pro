@@ -15,6 +15,7 @@ SOURCES += \
     Sources/Dialog/AddDialog.cpp \
     Sources/HourMinute.cpp \
     Sources/JSONformat.cpp \
+    Sources/UI/ActivityDelete.cpp \
     Sources/UI/Forms/EventForm.cpp \
     Sources/UI/Forms/ProjectForm.cpp \
     Sources/UI/Forms/ReminderForm.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     Headers/HourMinute.h \
     Headers/JSONformat.h \
     #Headers/UI/addDialog.h \
+    Headers/UI/ActivityDelete.h \
     Headers/UI/Forms/EventForm.h \
     Headers/UI/Forms/ProjectForm.h \
     Headers/UI/Forms/ReminderForm.h \

@@ -6,14 +6,14 @@
 #include "Headers/date.h"
 #include "Headers/AbstractActivity.h"
 #include "qcheckbox.h"
+#include "qpushbutton.h"
 #include "qtextformat.h"
 
 MonthWidget::MonthWidget(ActivityManager& am, QWidget* parent)
-    : QWidget(parent), am(am)
+    : QWidget(parent), am(am), activityDelete(am) // Inizializzazione rapida
 {
     setup();
 }
-
 void MonthWidget::setup()
 {
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
@@ -89,7 +89,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
         // Intestazione
         QLabel* titleLabel = new QLabel("• " + QString::fromStdString(act->getName()), this);
-        titleLabel->setStyleSheet("QLabe l { font-weight: bold; font-size: 13px; padding: 4px; }");
+        titleLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 13px; padding: 4px; }");
         rowLayout->addWidget(titleLabel);
 
         // AREA DETTAGLI
@@ -101,20 +101,18 @@ void MonthWidget::onDateChanged(const QDate& qd)
         DisplayVisitor visitor;
         act->accept(visitor);
 
-
         QLabel* summaryLabel = new QLabel(QString::fromStdString(visitor.getSummary()), this);
         summaryLabel->setWordWrap(true);
         summaryLabel->setStyleSheet("QLabel { color: #555; background-color: #fcfcfc; padding: 5px; border-radius: 4px; }");
         expansionLayout->addWidget(summaryLabel);
 
-
+        // Checkbox di completamento (Se applicabile)
         if (visitor.isCheckable()) {
             QCheckBox* statusCheck = new QCheckBox("Complete", this);
             statusCheck->setChecked(visitor.getCheckedState());
             expansionLayout->addWidget(statusCheck);
 
             connect(statusCheck, &QCheckBox::toggled, this, [act, summaryLabel, this](bool checked) {
-
                 DisplayVisitor writeVisitor;
                 writeVisitor.setWriteMode(checked);
                 act->accept(writeVisitor);
@@ -123,7 +121,39 @@ void MonthWidget::onDateChanged(const QDate& qd)
             });
         }
 
+        // ─── AGGIUNTA DEI PULSANTI DI AZIONE ─────────────────────────────
+        QWidget* actionButtonsWidget = new QWidget(this);
+        QHBoxLayout* actionLayout = new QHBoxLayout(actionButtonsWidget);
+        actionLayout->setContentsMargins(0, 5, 0, 0);
+        actionLayout->setSpacing(10);
+        actionLayout->addStretch(); // Spinge i bottoni a destra
 
+        /*QPushButton* editBtn = new QPushButton("Modifica", this);
+        editBtn->setCursor(Qt::PointingHandCursor);
+        actionLayout->addWidget(editBtn);*/
+
+        QPushButton* deleteBtn = new QPushButton("Delete", this);
+        deleteBtn->setCursor(Qt::PointingHandCursor);
+        deleteBtn->setStyleSheet("QPushButton { color: white; background-color: #d9534f; border-radius: 3px; padding: 4px 8px; }"
+                                 "QPushButton:hover { background-color: #c9302c; }");
+        actionLayout->addWidget(deleteBtn);
+
+        expansionLayout->addWidget(actionButtonsWidget);
+        // ─────────────────────────────────────────────────────────────────
+
+        // ─── I CONNECT DEI PULSANTI ──────────────────────────────────────
+        connect(deleteBtn, &QPushButton::clicked, this, [this, act, qd]() {
+            // Chiamata alla classe a parte ActivityDelete
+            if (activityDelete.execute(act, this)) {
+                this->onDateChanged(qd);      // Rinfresca la lista del giorno corrente
+                this->updateCalendarView();   // Rinfresca il calendario grafico
+            }
+        });
+
+        /*connect(editBtn, &QPushButton::clicked, this, [this, act]() {
+            // Logica futura per la modifica dell'attività
+        });*/
+        // ─────────────────────────────────────────────────────────────────
 
         expansionWidget->setVisible(false);
         rowLayout->addWidget(expansionWidget);

@@ -39,6 +39,7 @@ private:
 public:
     explicit calendar(ActivityManager& am, QWidget* parent = nullptr);
     void refresh();
+    MonthWidget* getMonthWidget() const { return wMonth; }
 
 signals:
     void dateSelected(const date& d);

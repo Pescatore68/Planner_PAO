@@ -9,6 +9,7 @@
 #include "Headers/Dialog/AddDialog.h"
 #include "Headers/routine.h"
 #include "Headers/UI/calendar.h"
+#include "Headers/UI/ActivityDelete.h"
 
 MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QMainWindow(parent), am(am), tm(tm)
@@ -33,6 +34,12 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
 
     mainLayout->addWidget(navContainer);
     mainLayout->addWidget(stackedWidget);
+
+    connect(&(calendarView->getMonthWidget()->getActivityDelete()), &ActivityDelete::activityDeleted,
+            this, [this]() {
+                taskWidget->refresh(); // Rinfresca la lista dei Task e Progetti!
+                calendarView->refresh(); // Rinfresca anche i pallini del calendario se serve
+            });
 
     resize(1200, 800);
     setWindowTitle("Activity Manager");
@@ -60,6 +67,7 @@ void MainWindow::setupStackedWidget()
             this, [this](const date& d) {
                 qDebug() << QString::fromStdString(d.toString());
             });
+
 }
 
 void MainWindow::setupNavBar()

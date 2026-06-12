@@ -46,3 +46,7 @@ void TaskForm::reset() {
     deadlineEdit->setDate(QDate::currentDate());
     oDeadlineEdit->setTime(QTime(23, 59));
 }
+
+QDate TaskForm::getDeadlineDate() const {
+    return deadlineEdit->date();
+}

@@ -17,10 +17,10 @@ EventForm::EventForm(tagManager& tm, QWidget* parent)
 
     allDayCheck = new QCheckBox("All Day", this);
 
-    startTimeEdit = new QTimeEdit(QTime(9, 0), this);
+    startTimeEdit = new QTimeEdit(QTime::currentTime(), this);
     startTimeEdit->setDisplayFormat("HH:mm");
 
-    endTimeEdit = new QTimeEdit(QTime(10, 0), this);
+    endTimeEdit = new QTimeEdit(QTime::currentTime().addSecs(3600), this);
     endTimeEdit->setDisplayFormat("HH:mm");
 
     locationEdit = new QLineEdit(this);

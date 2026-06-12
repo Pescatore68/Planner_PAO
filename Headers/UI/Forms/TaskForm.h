@@ -14,6 +14,7 @@ public:
     AbstractActivity* createActivity() override;
     bool validate() override;
     void reset() override;
+    QDate getDeadlineDate() const;
 
 private:
     QDateEdit* deadlineEdit;

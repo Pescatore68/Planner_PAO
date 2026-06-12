@@ -135,9 +135,17 @@ bool ProjectForm::validate()
         nameEdit->setFocus();
         return false;
     }
-    // valida ogni subtask
+
+    const QDate projectDeadline = deadlineEdit->date();
+
     for (QList<TaskForm*>::const_iterator it = subtaskForms.cbegin(); it != subtaskForms.cend(); ++it) {
         if (!(*it)->validate()) return false;
+
+        if ((*it)->getDeadlineDate() > projectDeadline) {
+            QMessageBox::warning(this, "Data non valida",
+                                 "La scadenza di una subtask non può superare quella del progetto.");
+            return false;
+        }
     }
     return true;
 }

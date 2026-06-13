@@ -53,3 +53,8 @@ void ActivityForm::reset() {
     descEdit->clear();
     tagCombo->setCurrentIndex(0);
 }
+void ActivityForm::refreshTags() {
+    if (tagCombo) {
+        tagCombo->tagPopulation();
+    }
+}

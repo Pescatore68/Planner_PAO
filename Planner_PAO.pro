@@ -21,6 +21,7 @@ SOURCES += \
     Sources/UI/Forms/ReminderForm.cpp \
     Sources/UI/Forms/RoutineForm.cpp \
     Sources/UI/Forms/TaskForm.cpp \
+    Sources/UI/TagWidget.cpp \
     Sources/UI/TaskWidget.cpp \
     #Sources/UI/addDialog.cpp \
     Sources/UI/calendar.cpp \
@@ -56,6 +57,7 @@ HEADERS += \
     Headers/UI/Forms/ReminderForm.h \
     Headers/UI/Forms/RoutineForm.h \
     Headers/UI/Forms/TaskForm.h \
+    Headers/UI/TagWidget.h \
     Headers/UI/calendar.h \
     Headers/UI/month.h \
     Headers/UI/navBar.h \
@@ -77,7 +79,7 @@ HEADERS += \
     Headers/Visitor/DisplayVisitor.h \
     Headers/UI/TaskWidget.h \
     Headers/UI/Forms/ActivityForm.h \
-    Headers/UI/TagComboBox.h \
+    Headers/UI/TagComboBox.h
 
 
 

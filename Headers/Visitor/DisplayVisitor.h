@@ -7,22 +7,34 @@
 #include "Headers/routine.h"
 #include "Headers/task.h"
 #include "Headers/project.h"
+#include "qboxlayout.h"
+#include "qlabel.h"
 #include <string>
 #include <vector>
 
 class DisplayVisitor : public ActivityVisitor {
 private:
     std::string textSummary;
+    std::string tagText;
     bool isRoutineType;
     bool hasCheckableStatus;
     bool isChecked;
-
+    QColor tagColor;
     // Variabili interne per gestire la modalità "Scrittura"
     bool isWriteMode;
     bool newValueToSet;
 
+    void processTag(const tag* t) {
+        if (t && !t->getName().empty()) {
+            tagText = "@" + t->getName();
+            tagColor = t->getColor();
+        } else {
+            tagColor = QColor();
+            //tagText = "";
+        }
+    }
 public:
-    DisplayVisitor() : textSummary(""), isRoutineType(false), hasCheckableStatus(false), isChecked(false), isWriteMode(false), newValueToSet(false) {}
+    DisplayVisitor() : textSummary(""), tagText(""), isRoutineType(false), hasCheckableStatus(false), isChecked(false), isWriteMode(false), newValueToSet(false) {}
 
     void setWriteMode(bool value) {
         isWriteMode = true;
@@ -33,6 +45,44 @@ public:
     bool isRoutine() const { return isRoutineType; }
     bool isCheckable() const { return hasCheckableStatus; }
     bool getCheckedState() const { return isChecked; }
+    QColor getTagColor() const { return tagColor; }
+
+    void applyToLayout(QVBoxLayout* targetLayout, QWidget* parent) const {
+        if (!targetLayout) return;
+
+        // 1. Label per il testo dell'attività (Testo scuro standard)
+        QLabel* summaryLabel = new QLabel(QString::fromStdString(textSummary), parent);
+        summaryLabel->setWordWrap(true);
+        summaryLabel->setStyleSheet("QLabel { color: #555; background-color: #fcfcfc; padding: 5px; border-radius: 4px; }");
+        targetLayout->addWidget(summaryLabel);
+
+        // 2. Se c'è un tag, il Visitor crea una riga dedicata sotto con il colore specifico del tag
+        if (!tagText.empty() && tagColor.isValid()) {
+            QWidget* tagContainer = new QWidget(parent);
+            QHBoxLayout* tagLayout = new QHBoxLayout(tagContainer);
+            tagLayout->setContentsMargins(5, 2, 5, 2);
+            tagLayout->setSpacing(0);
+
+            QLabel* sepLabel = new QLabel(" | ", parent);
+            sepLabel->setStyleSheet("QLabel { color: #888; }");
+            tagLayout->addWidget(sepLabel);
+
+            QLabel* tagLabel = new QLabel(QString::fromStdString(tagText), parent);
+
+            QFont tagFont = tagLabel->font();
+            tagFont.setBold(true);
+            tagLabel->setFont(tagFont);
+
+            // Applichiamo il colore in modo forzato con Style Sheet usando il colore estratto
+            QString hexColor = tagColor.name();
+            tagLabel->setStyleSheet(QString("QLabel { color: %1; }").arg(hexColor));
+
+            tagLayout->addWidget(tagLabel);
+            tagLayout->addStretch();
+
+            targetLayout->addWidget(tagContainer);
+        }
+    }
 
     void visit(Event& e) override {
         isRoutineType = false;
@@ -45,6 +95,7 @@ public:
             textSummary += " → " + e.getEndDate().toString();
         if (!e.getLocation().empty())
             textSummary += " | " + e.getLocation();
+        processTag(e.getTag());
     }
 
     void visit(Reminder& r) override {
@@ -54,6 +105,7 @@ public:
         textSummary += r.getDate().toString() + " " + r.getTime().toString();
         if (!r.getLocation().empty())
             textSummary += " | " + r.getLocation();
+        processTag(r.getTag());
     }
 
     void visit(task& t) override {
@@ -71,6 +123,7 @@ public:
         if (!t.getDescription().empty())
             textSummary += "  " + t.getDescription() + "\n";
         textSummary += "  Scadenza: " + t.getDeadline().toString() + " ore " + t.getODeadline().toString() + "\n";
+        processTag(t.getTag());
     }
 
     void visit(project& p) override {
@@ -94,6 +147,7 @@ public:
             std::string subStatus = t->isCompleted() ? "[✓]" : "[ ]";
             textSummary += "    " + subStatus + " " + t->getName() + "\n";
         }
+        processTag(p.getTag());
     }
 
     void visit(Routine& r) override {
@@ -118,6 +172,7 @@ public:
                 textSummary += b ? "●" : "○";
             }
         }
+        processTag(r.getTag());
     }
 };
 

@@ -12,15 +12,15 @@ TagComboBox::TagComboBox(tagManager& tm, QWidget* parent): QWidget(parent), tm(t
     layout->setContentsMargins(0, 0, 0, 0);
 
     combo  = new QComboBox(this);
-    bAdd = new QPushButton("+", this);
-    bAdd->setFixedWidth(30);
+    /*bAdd = new QPushButton("+", this);
+    bAdd->setFixedWidth(30);*/
 
     layout->addWidget(combo);
-    layout->addWidget(bAdd);
+    ///layout->addWidget(bAdd);
 
     tagPopulation();
 
-    connect(bAdd, &QPushButton::clicked, this, &TagComboBox::onAddTag);
+    //connect(bAdd, &QPushButton::clicked, this, &TagComboBox::onAddTag);
 }
 
 void TagComboBox::tagPopulation(){
@@ -38,7 +38,7 @@ tag* TagComboBox::getSelectedTag() const {
     return t;
 }
 
-void TagComboBox::onAddTag() {
+/*void TagComboBox::onAddTag() {
     QDialog dialog(this);
     dialog.setWindowTitle("New tag");
 
@@ -81,7 +81,7 @@ void TagComboBox::onAddTag() {
     });
 
     dialog.exec();
-}
+}*/
 
 
 void TagComboBox::setCurrentIndex(const unsigned int& idx) const {

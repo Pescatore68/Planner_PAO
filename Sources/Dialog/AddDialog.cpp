@@ -140,6 +140,12 @@ AbstractActivity* AddDialog::createActivity() {
     return current->createActivity();
 }
 
+void AddDialog::refreshTagCombo() {
 
-
+    if (eventForm)    eventForm->refreshTags();
+    if (reminderForm) reminderForm->refreshTags();
+    if (taskForm)     taskForm->refreshTags();
+    if (routineForm)  routineForm->refreshTags();
+    if (projectForm)  projectForm->refreshTags();
+}
 

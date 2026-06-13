@@ -37,6 +37,7 @@ public:
     virtual AbstractActivity* createActivity() = 0;
     virtual bool validate() = 0;
     virtual void reset();
+    virtual void refreshTags();
 };
 
 #endif // ACTIVITYFORM_H

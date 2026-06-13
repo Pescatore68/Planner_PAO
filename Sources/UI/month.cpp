@@ -101,21 +101,39 @@ void MonthWidget::onDateChanged(const QDate& qd)
         DisplayVisitor visitor;
         act->accept(visitor);
 
-        QLabel* summaryLabel = new QLabel(QString::fromStdString(visitor.getSummary()), this);
-        summaryLabel->setWordWrap(true);
-        summaryLabel->setStyleSheet("QLabel { color: #555; background-color: #fcfcfc; padding: 5px; border-radius: 4px; }");
-        expansionLayout->addWidget(summaryLabel);
+
+        QWidget* contentContainer = new QWidget(this);
+        QVBoxLayout* contentLayout = new QVBoxLayout(contentContainer);
+        contentLayout->setContentsMargins(0, 0, 0, 0);
+        contentLayout->setSpacing(2);
+
+        visitor.applyToLayout(contentLayout, this);
+        expansionLayout->addWidget(contentContainer);
+
+
 
         if (visitor.isCheckable()) {
             QCheckBox* statusCheck = new QCheckBox("Complete", this);
             statusCheck->setChecked(visitor.getCheckedState());
             expansionLayout->addWidget(statusCheck);
 
-            connect(statusCheck, &QCheckBox::toggled, this, [act, summaryLabel, this](bool checked) {
+            connect(statusCheck, &QCheckBox::toggled, this, [act, contentLayout, contentContainer, this](bool checked) {
                 DisplayVisitor writeVisitor;
                 writeVisitor.setWriteMode(checked);
                 act->accept(writeVisitor);
-                summaryLabel->setText(QString::fromStdString(writeVisitor.getSummary()));
+
+
+                QLayoutItem* child;
+                while ((child = contentLayout->takeAt(0)) != nullptr) {
+                    if (child->widget()) {
+                        child->widget()->hide(); // Lo nasconde immediatamente per evitare glitch visivi
+                        delete child->widget();  // Lo elimina dalla memoria
+                    }
+                    delete child;
+                }
+
+                writeVisitor.applyToLayout(contentLayout, contentContainer);
+
                 emit activityUpdated();
                 this->updateCalendarView();
             });

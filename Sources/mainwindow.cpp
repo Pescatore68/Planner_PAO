@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 
 #include "Headers/mainwindow.h"
+#include "Headers/UI/TagWidget.h"
 #include "Headers/UI/navBar.h"
 #include "Headers/UI/TaskWidget.h"
 #include "Headers/Dialog/AddDialog.h"
@@ -20,17 +21,19 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
+    navContainer = new QWidget(this);
+    navContainer->setFixedWidth(300);
+    navStack = new QStackedLayout(navContainer);
+
     // 1️⃣ Prima crea i widget (addView nasce qui)
     setupStackedWidget();
     // 2️⃣ Poi la navbar (usa addView già esistente)
     setupNavBar();
 
     // 3️⃣ navContainer/navStack creati UNA SOLA VOLTA
-    navContainer = new QWidget(this);
-    navContainer->setFixedWidth(300);
-    navStack = new QStackedLayout(navContainer);
     navStack->addWidget(navigationBar); // index 0
-    navStack->addWidget(addView);       // index 1  ← stesso oggetto di setupStackedWidget
+    navStack->addWidget(addView);       // index 1
+    navStack->addWidget(tagView);       // index 2
 
     mainLayout->addWidget(navContainer);
     mainLayout->addWidget(stackedWidget);
@@ -56,6 +59,12 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
                 calendarView->refresh();
                 calendarView->getMonthWidget()->updateCalendarView();
             });
+    //PROVA
+    connect(tagView, &TagWidget::tagViewClosed, this, [this]{
+        navStack->setCurrentIndex(0);
+    });
+
+    connect(tagView, &TagWidget::tagsChanged, addView, &AddDialog::refreshTagCombo);
 
     resize(1200, 800);
     setWindowTitle("Activity Manager");
@@ -70,14 +79,13 @@ void MainWindow::setupStackedWidget()
     calendarView  = new calendar(am, this);
     taskWidget    = new TaskWidget(am, this);
     searchView    = new QWidget(this);
-    tagView       = new QWidget(this);
+    tagView       = new TagWidget(tm, am, this);
     addView       = new AddDialog(tm, this);
 
     stackedWidget->addWidget(calendarView);
     stackedWidget->addWidget(taskWidget);
     stackedWidget->addWidget(searchView);
-    stackedWidget->addWidget(tagView);
-    stackedWidget->addWidget(addView);
+    //stackedWidget->addWidget(addView);
 
     connect(calendarView, &calendar::dateSelected,
             this, [this](const date& d) {
@@ -91,10 +99,10 @@ void MainWindow::setupNavBar()
     navigationBar = new navBar(this);
 
     // view navigation
-    connect(navigationBar, &navBar::calendarClicked,     this, &MainWindow::showCalendar);
-    connect(navigationBar, &navBar::taskProjectClicked,  this, &MainWindow::showTaskProject);
-    connect(navigationBar, &navBar::searchClicked,       this, &MainWindow::showSearch);
-    // connect(navigationBar, &navBar::tagsClicked,      this, &MainWindow::showTags); // quando avrai la vista
+    connect(navigationBar, &navBar::calendarClicked, this, &MainWindow::showCalendar);
+    connect(navigationBar, &navBar::taskProjectClicked, this, &MainWindow::showTaskProject);
+    connect(navigationBar, &navBar::searchClicked, this, &MainWindow::showSearch);
+    connect(navigationBar, &navBar::tagsClicked, this, &MainWindow::showTags); // quando avrai la vista
 
     connect(navigationBar, &navBar::addClicked, this, [this]{
         navStack->setCurrentIndex(1);
@@ -127,4 +135,15 @@ void MainWindow::showSearch()
 void MainWindow::showTaskProject()
 {
     stackedWidget->setCurrentWidget(taskWidget);
+}
+
+void MainWindow::showTags()
+{
+    // Facciamo il cast di tagView al suo tipo reale TagWidget per chiamare il refresh
+    if (tagView) {
+        tagView->refresh();
+    }
+
+    // Mostra il widget nel QStackedWidget
+    navStack->setCurrentIndex(2);
 }

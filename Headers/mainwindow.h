@@ -7,6 +7,7 @@
 #include <QWidget>
 
 #include "Headers/ActivityManager.h"
+#include "Headers/UI/TagWidget.h"
 #include "Headers/tagManager.h"
 #include "Headers/UI/navBar.h"
 #include "Headers/UI/calendar.h"
@@ -42,7 +43,7 @@ private:
 
     calendar* calendarView = nullptr;
     QWidget* searchView = nullptr;
-    QWidget* tagView = nullptr;
+    TagWidget* tagView = nullptr;
     void setupNavBar();
     void setupStackedWidget();
 
@@ -53,6 +54,7 @@ public:
     void showCalendar();
     void showTaskProject();
     void showSearch();
+    void showTags();
     void showDetail(AbstractActivity* a);
     void showForm(AbstractActivity* a = nullptr);
     void onActivitySelected(AbstractActivity* a);

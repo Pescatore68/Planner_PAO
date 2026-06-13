@@ -3,9 +3,8 @@
 #include <QMessageBox>
 
 ReminderForm::ReminderForm(tagManager& tm, QWidget* parent)
-    : ActivityForm(parent)
+    :  ActivityForm(tm, parent)
 {
-    buildCommonFields(tm);
 
     dateEdit = new QDateEdit(QDate::currentDate(), this);
     dateEdit->setCalendarPopup(false);
@@ -15,17 +14,17 @@ ReminderForm::ReminderForm(tagManager& tm, QWidget* parent)
     timeEdit->setDisplayFormat("HH:mm");
 
     locationEdit = new QLineEdit(this);
-    locationEdit->setPlaceholderText("Luogo (opzionale)");
+    locationEdit->setPlaceholderText("Location (optional)");
 
+    addRow(locationEdit);
     addTimeRow("Date",  dateEdit, timeEdit);
-    addRow("Location", locationEdit);
 
     mainLayout->addStretch();
 }
 
 bool ReminderForm::validate() {
     if (nameEdit->text().trimmed().isEmpty()) {
-        QMessageBox::warning(this, "Campo obbligatorio", "Inserisci un nome per il reminder.");
+        QMessageBox::warning(this, "Required field", "Please enter a name for the reminder.");
         nameEdit->setFocus();
         return false;
     }

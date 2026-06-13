@@ -9,9 +9,12 @@
 #include "Headers/ActivityManager.h"
 #include "Headers/date.h"
 #include "Headers/tagManager.h"
+#include "Headers/UI/TaskWidget.h"
 
 #include "Headers/UI/month.h"
 #include "Headers/UI/week.h"
+#include "Headers/UI/DayWidget.h"
+
 
 class calendar : public QWidget {
     Q_OBJECT
@@ -27,8 +30,10 @@ private:
 
     // views
     MonthWidget* wMonth;
-    WeekWidget* wWeek;
-    QWidget* wDay;
+    WeekWidget*  wWeek;
+    QWidget*     wDayContainer;
+    DayWidget*   wDay;            // ← ora è un DayWidget vero
+    TaskWidget* wTaskWidget;
 
     date selected;
     ActivityManager& am;
@@ -49,6 +54,7 @@ private slots:
     void ShowDay();
 
     void onMonthDateClicked(const QDate& d);
+
 };
 
 #endif

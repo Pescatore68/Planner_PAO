@@ -30,6 +30,7 @@ private:
     QWidget* centralWidget = nullptr;
     QHBoxLayout* mainLayout = nullptr;
 
+
     AbstractActivity* selectedActivity = nullptr;
 
     // ── NAV AREA (navbar swap) ───────────────────────────────────

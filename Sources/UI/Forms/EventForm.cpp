@@ -3,9 +3,8 @@
 #include <QMessageBox>
 
 EventForm::EventForm(tagManager& tm, QWidget* parent)
-    : ActivityForm(parent)
+    :  ActivityForm(tm, parent)
 {
-    buildCommonFields(tm);
 
     startDateEdit = new QDateEdit(QDate::currentDate(), this);
     startDateEdit->setCalendarPopup(true);
@@ -25,10 +24,11 @@ EventForm::EventForm(tagManager& tm, QWidget* parent)
 
     locationEdit = new QLineEdit(this);
     locationEdit->setPlaceholderText("Location (optional)");
+    addRow(locationEdit);
     addTimeRow("Starts",  startDateEdit, startTimeEdit);
     addTimeRow("Ends",    endDateEdit, endTimeEdit);
-    addRow("", allDayCheck);
-    addRow("Location", locationEdit);
+    addRow(allDayCheck);
+
 
     mainLayout->addStretch();
 
@@ -42,15 +42,24 @@ void EventForm::onAllDayToggled(bool checked) {
 
 bool EventForm::validate() {
     if (nameEdit->text().trimmed().isEmpty()) {
-        QMessageBox::warning(this, "Campo obbligatorio", "Inserisci un nome per l'evento.");
+        QMessageBox::warning(this, "Required field", "Please enter a name for the event.");
         nameEdit->setFocus();
         return false;
     }
     if (endDateEdit->date() < startDateEdit->date()) {
-        QMessageBox::warning(this, "Date non valide",
-                             "La data di fine deve essere uguale o successiva a quella di inizio.");
+        QMessageBox::warning(this, "Invalid date",
+                             "End date cannot exceed start date.");
         endDateEdit->setFocus();
         return false;
+    }
+
+    if (endDateEdit->date() == startDateEdit->date()) {
+        if (endTimeEdit->time() < startTimeEdit->time()) {
+            QMessageBox::warning(this, "Invalid Time Range",
+                                 "End time cannot exceed start time.");
+            endTimeEdit->setFocus();
+            return false;
+        }
     }
     return true;
 }

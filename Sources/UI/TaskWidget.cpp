@@ -6,9 +6,6 @@
 #include <QHeaderView>
 #include <QMessageBox>
 
-// ─────────────────────────────────────────────
-//  Ruoli custom per i dati nascosti nelle voci
-// ─────────────────────────────────────────────
 // Salviamo il puntatore all'AbstractActivity direttamente nell'item
 // così non dobbiamo cercare per indice ogni volta.
 static constexpr int ActivityPtrRole = Qt::UserRole;
@@ -19,41 +16,39 @@ static constexpr int ParentProjectRole = Qt::UserRole + 1;
 TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
     : QWidget(parent), am(am)
 {
-    // ── layout principale ────────────────────
     mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(8, 8, 8, 8);
     mainLayout->setSpacing(6);
 
-    // ── toolbar (bottoni in alto) ────────────
+    //toolbar
     toolbarLayout = new QHBoxLayout();
     btnDelete     = new QPushButton("Elimina",   this);
 
-    btnDelete->setEnabled(false); // disabilitato finché non si seleziona qualcosa
+    btnDelete->setEnabled(false); //disabled if no task selected
 
     toolbarLayout->addStretch();
     toolbarLayout->addWidget(btnDelete);
 
-    // ── albero ──────────────────────────────
+    //tree
     tree = new QTreeWidget(this);
     tree->setColumnCount(3);
-    tree->setHeaderLabels({"Nome", "Scadenza", "Stato"});
+    tree->setHeaderLabels({"Nome", "Scadenza"});
     tree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     tree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    tree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    //tree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     tree->setSelectionMode(QAbstractItemView::SingleSelection);
     tree->setAnimated(true);
 
-    // ── assembla ────────────────────────────
     mainLayout->addLayout(toolbarLayout);
     mainLayout->addWidget(tree);
 
-    // ── connessioni ─────────────────────────
+    //connections
     connect(btnDelete,     &QPushButton::clicked, this, &TaskWidget::onDeleteClicked);
 
     connect(tree, &QTreeWidget::itemClicked,
             this, &TaskWidget::onItemClicked);
 
-    // itemChanged scatta quando l'utente spunta/de-spunta un checkbox
+    //itemChanged for checked or unchecked task
     connect(tree, &QTreeWidget::itemChanged,
             this, &TaskWidget::onItemChanged);
 
@@ -62,8 +57,7 @@ TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
 
 
 void TaskWidget::refresh() {
-    // blocca temporaneamente itemChanged mentre ricostruiamo l'albero
-    // per evitare che il completamento venga scritto due volte
+    //itemChanged temporary blocked while refreshing
     tree->blockSignals(true);
     buildTree();
     tree->blockSignals(false);
@@ -75,9 +69,9 @@ void TaskWidget::refresh() {
 void TaskWidget::buildTree() {
     tree->clear();
 
-    // nodi radice fissi per separare task e project visivamente
-    auto* rootTasks    = new QTreeWidgetItem(tree, {"Task",     "", ""});
-    auto* rootProjects = new QTreeWidgetItem(tree, {"Progetti", "", ""});
+    //root node separated for Task and Project
+    auto* rootTasks    = new QTreeWidgetItem(tree, {"Task",     ""});
+    auto* rootProjects = new QTreeWidgetItem(tree, {"Project", ""});
 
     // stile grassetto per le sezioni
     QFont boldFont = rootTasks->font(0);
@@ -161,9 +155,7 @@ void TaskWidget::buildTree() {
     rootProjects->setExpanded(true);
 }
 
-// ─────────────────────────────────────────────
-//  Helpers
-// ─────────────────────────────────────────────
+
 AbstractActivity* TaskWidget::activityFromItem(QTreeWidgetItem* item) const {
     if (!item) return nullptr;
     QVariant v = item->data(0, ActivityPtrRole);
@@ -171,9 +163,7 @@ AbstractActivity* TaskWidget::activityFromItem(QTreeWidgetItem* item) const {
     return static_cast<AbstractActivity*>(v.value<void*>());
 }
 
-// ─────────────────────────────────────────────
-//  Slot privati
-// ─────────────────────────────────────────────
+
 void TaskWidget::onItemClicked(QTreeWidgetItem* item, int) {
     AbstractActivity* a = activityFromItem(item);
     current = a;

@@ -9,6 +9,7 @@
 #include "Headers/Dialog/AddDialog.h"
 #include "Headers/routine.h"
 #include "Headers/UI/calendar.h"
+#include "Headers/UI/DayWidget.h"
 
 MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QMainWindow(parent), am(am), tm(tm)
@@ -48,18 +49,20 @@ void MainWindow::setupStackedWidget()
     taskWidget    = new TaskWidget(am, this);
     searchView    = new QWidget(this);
     tagView       = new QWidget(this);
-    addView       = new AddDialog(tm, this); // ✅ creato UNA SOLA VOLTA
+    addView       = new AddDialog(tm, this);
 
-    stackedWidget->addWidget(calendarView); // 0
-    stackedWidget->addWidget(taskWidget);   // 1
-    stackedWidget->addWidget(searchView);   // 2
-    stackedWidget->addWidget(tagView);      // 3
-    stackedWidget->addWidget(addView);      // 4
+    stackedWidget->addWidget(calendarView);
+    stackedWidget->addWidget(taskWidget);
+    stackedWidget->addWidget(searchView);
+    stackedWidget->addWidget(tagView);
+    stackedWidget->addWidget(addView);
 
     connect(calendarView, &calendar::dateSelected,
             this, [this](const date& d) {
                 qDebug() << QString::fromStdString(d.toString());
             });
+
+
 }
 
 void MainWindow::setupNavBar()

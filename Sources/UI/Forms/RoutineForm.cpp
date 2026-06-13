@@ -3,9 +3,8 @@
 #include <QMessageBox>
 
 RoutineForm::RoutineForm(tagManager& tm, QWidget* parent)
-    : ActivityForm(parent)
+    :  ActivityForm(tm, parent)
 {
-    buildCommonFields(tm);
 
     freqCombo = new QComboBox(this);
     freqCombo->addItem("Daily",   static_cast<int>(Routine::Frequency::Daily));
@@ -27,7 +26,7 @@ RoutineForm::RoutineForm(tagManager& tm, QWidget* parent)
     endTimeEdit = new QTimeEdit(QTime::currentTime().addSecs(3600), this);
     endTimeEdit->setDisplayFormat("HH:mm");
 
-    addRow("Frequency",   freqCombo);
+    addRow(freqCombo, "Frequency");
     addTimeRow("Starts", startDateEdit, startTimeEdit);
     addTimeRow("Ends",   endDateEdit, endTimeEdit);
 
@@ -36,15 +35,23 @@ RoutineForm::RoutineForm(tagManager& tm, QWidget* parent)
 
 bool RoutineForm::validate() {
     if (nameEdit->text().trimmed().isEmpty()) {
-        QMessageBox::warning(this, "Campo obbligatorio", "Inserisci un nome per la routine.");
+        QMessageBox::warning(this, "Required field", "Please enter a name for the routine.");
         nameEdit->setFocus();
         return false;
     }
     if (endDateEdit->date() < startDateEdit->date()) {
-        QMessageBox::warning(this, "Date non valide",
-                             "La data di fine deve essere uguale o successiva a quella di inizio.");
+        QMessageBox::warning(this, "Invalid date",
+                             "End date cannot exceed start date.");
         endDateEdit->setFocus();
         return false;
+    }
+    if (endDateEdit->date() == startDateEdit->date()) {
+        if (endTimeEdit->time() < startTimeEdit->time()) {
+            QMessageBox::warning(this, "Invalid Time Range",
+                                 "End time cannot exceed start time.");
+            endTimeEdit->setFocus();
+            return false;
+        }
     }
     return true;
 }

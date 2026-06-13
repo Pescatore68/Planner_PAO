@@ -31,6 +31,7 @@ private:
     QWidget* centralWidget = nullptr;
     QHBoxLayout* mainLayout = nullptr;
 
+
     AbstractActivity* selectedActivity = nullptr;
 
     //navbar

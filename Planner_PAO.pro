@@ -16,6 +16,7 @@ SOURCES += \
     Sources/HourMinute.cpp \
     Sources/JSONformat.cpp \
     Sources/UI/ActivityDelete.cpp \
+    Sources/UI/DayWidget.cpp \
     Sources/UI/Forms/EventForm.cpp \
     Sources/UI/Forms/ProjectForm.cpp \
     Sources/UI/Forms/ReminderForm.cpp \
@@ -40,7 +41,8 @@ SOURCES += \
     Sources/event.cpp \
     Sources/xmlFormat.cpp \
     Sources/UI/Forms/ActivityForm.cpp \
-    Sources/UI/TagComboBox.cpp
+    Sources/UI/TagComboBox.cpp \
+    Sources/Visitor/DayWidgetVisitor.cpp \
 
 HEADERS += \
     Headers/AbstractActivity.h \
@@ -64,6 +66,7 @@ HEADERS += \
     Headers/UI/week.h \
     Headers/UI/DayWidget.h \
     Headers/Visitor/AddSubtaskVisitor.h \
+    Headers/Visitor/DayWidgetVisitor.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \

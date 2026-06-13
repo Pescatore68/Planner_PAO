@@ -3,7 +3,7 @@
 #include <QHBoxLayout>
 
 calendar::calendar(ActivityManager& am, QWidget* parent)
-    : QWidget(parent), selected(1, 1, 2026), am(am)
+    : QWidget(parent), selected(date::today()), am(am)
 {
     setTopBar();
     setWidgets();
@@ -40,41 +40,54 @@ void calendar::setWidgets()
 
     wMonth = new MonthWidget(am, this);
     wWeek  = new WeekWidget(this);
-    wDay   = new QWidget(this); // placeholder
+    wDayContainer = new QWidget(this);
+    auto dayLayout = new QHBoxLayout(wDayContainer);
+    dayLayout->setContentsMargins(0, 0, 0, 0);
+    dayLayout->setSpacing(8);
+    wDay = new DayWidget(am, wDayContainer);
+    wTaskWidget = new TaskWidget(am, wDayContainer);
+
+    dayLayout->addWidget(wDay, 7);
+    dayLayout->addWidget(wTaskWidget, 3);
 
     wStack->addWidget(wMonth);
     wStack->addWidget(wWeek);
-    wStack->addWidget(wDay);
+    wStack->addWidget(wDayContainer);
 
-    layout()->addWidget(wStack);
+    auto mainLayout = qobject_cast<QVBoxLayout*>(layout());
+    if (mainLayout) {
+        mainLayout->addWidget(wStack, 1);
+    }
 }
+
 void calendar::ShowMonth()
 {
     wStack->setCurrentWidget(wMonth);
 }
 
-void calendar::ShowWeek()
-{
+void calendar::ShowWeek() {
     wStack->setCurrentWidget(wWeek);
 }
 
-void calendar::ShowDay()
-{
-    wStack->setCurrentWidget(wDay);
+void calendar::ShowDay() {
+    wDay->setDate(selected);
+    //wTaskWidget->setDate(selected); //non so come meglio implementare
+    wStack->setCurrentWidget(wDayContainer);
 }
 
 void calendar::onMonthDateClicked(const QDate& d)
 {
     selected = date(d.day(), d.month(), d.year());
-
-    // aggiorna week automaticamente
     wWeek->setWeek(selected);
-
+    wDay->setDate(selected);
     emit dateSelected(selected);
-
     wStack->setCurrentWidget(wWeek);
 }
 
 void calendar::refresh() {
     wMonth->updateCalendarView();
+    wDay->refresh();
+    wTaskWidget->refresh();
 }
+
+

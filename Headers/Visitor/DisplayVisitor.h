@@ -30,7 +30,6 @@ private:
             tagColor = t->getColor();
         } else {
             tagColor = QColor();
-            //tagText = "";
         }
     }
 public:

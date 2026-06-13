@@ -9,7 +9,7 @@
 #include <QScrollArea>
 #include <QFrame>
 
-class ProjectForm : public ActivityForm {
+class ProjectForm : public TaskForm {
     Q_OBJECT
 public:
     explicit ProjectForm(tagManager& tm, QWidget* parent = nullptr);
@@ -18,16 +18,12 @@ public:
     void reset() override;
 
 private:
-    // deadline progetto
-    QDateEdit* deadlineEdit;
-    QTimeEdit* oDeadlineEdit;
-
     // subtask
     QPushButton*        btnAddSubtask;
-    QFrame*             subtaskPanel;   // pannello che appare/scompare
-    QVBoxLayout*        subtaskLayout;  // lista dei TaskForm
+    QFrame*             subtaskPanel;
+    QVBoxLayout*        subtaskLayout;
     QList<TaskForm*>    subtaskForms;
-    tagManager*         tmPtr;          // serve per creare nuovi TaskForm
+    tagManager*         tmPtr;
     QScrollArea* scroll = nullptr;
 
     void setupSubtaskPanel();

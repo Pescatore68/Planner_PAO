@@ -12,6 +12,9 @@
 #include "Headers/UI/calendar.h"
 #include "Headers/UI/ActivityDelete.h"
 
+#include "Headers/UI/DayWidget.h"
+
+
 MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QMainWindow(parent), am(am), tm(tm)
 {
@@ -79,13 +82,17 @@ void MainWindow::setupStackedWidget()
     calendarView  = new calendar(am, this);
     taskWidget    = new TaskWidget(am, this);
     searchView    = new QWidget(this);
+
     tagView       = new TagWidget(tm, am, this);
+
     addView       = new AddDialog(tm, this);
 
     stackedWidget->addWidget(calendarView);
     stackedWidget->addWidget(taskWidget);
     stackedWidget->addWidget(searchView);
-    //stackedWidget->addWidget(addView);
+    stackedWidget->addWidget(tagView);
+    stackedWidget->addWidget(addView);
+
 
     connect(calendarView, &calendar::dateSelected,
             this, [this](const date& d) {

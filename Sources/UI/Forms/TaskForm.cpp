@@ -3,25 +3,20 @@
 #include <QMessageBox>
 
 TaskForm::TaskForm(tagManager& tm, QWidget* parent)
-    : ActivityForm(parent)
+    : ActivityForm(tm, parent)
 {
-    buildCommonFields(tm);
-
     deadlineEdit = new QDateEdit(QDate::currentDate(), this);
     deadlineEdit->setCalendarPopup(false);
     deadlineEdit->setDisplayFormat("dd/MM/yyyy");
-
     oDeadlineEdit = new QTimeEdit(QTime(23, 59), this);
     oDeadlineEdit->setDisplayFormat("HH:mm");
-
-    addTimeRow("Scadenza", deadlineEdit, oDeadlineEdit);
-
+    addTimeRow("Deadline", deadlineEdit, oDeadlineEdit);
     mainLayout->addStretch();
 }
 
 bool TaskForm::validate() {
     if (nameEdit->text().trimmed().isEmpty()) {
-        QMessageBox::warning(this, "Campo obbligatorio", "Inserisci un nome per il task.");
+        QMessageBox::warning(this, "Required field", "Please enter a name for the task.");
         nameEdit->setFocus();
         return false;
     }
@@ -49,4 +44,16 @@ void TaskForm::reset() {
 
 QDate TaskForm::getDeadlineDate() const {
     return deadlineEdit->date();
+}
+
+QDateEdit* TaskForm::getDeadlineEdit() const {
+    return deadlineEdit;
+}
+
+QTime TaskForm::getODeadlineTime() const {
+    return oDeadlineEdit->time();
+}
+
+QTimeEdit* TaskForm::getODeadlineEdit() const {
+    return oDeadlineEdit;
 }

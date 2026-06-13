@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QProgressBar>
 
 #include "Headers/ActivityManager.h"
 #include "Headers/AbstractActivity.h"

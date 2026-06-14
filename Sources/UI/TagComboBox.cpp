@@ -16,7 +16,7 @@ TagComboBox::TagComboBox(tagManager& tm, QWidget* parent): QWidget(parent), tm(t
     bAdd->setFixedWidth(30);*/
 
     layout->addWidget(combo);
-    ///layout->addWidget(bAdd);
+    //layout->addWidget(bAdd);
 
     tagPopulation();
 

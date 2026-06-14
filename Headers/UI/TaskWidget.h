@@ -25,14 +25,18 @@ public:
     explicit TaskWidget(ActivityManager& am, QWidget* parent = nullptr);
     ActivityDelete& getActivityDelete() { return activityDelete; }
     void refresh();
+public slots:
+    void handleExternalActivitySelected(AbstractActivity* a);
 
 signals:
     void activitySelected(AbstractActivity* a);
+    void activityDoubleClicked(AbstractActivity* a);
     void deleteRequested(AbstractActivity* a);
 
 private slots:
     void onItemClicked(QTreeWidgetItem* item, int column);
     void onItemChanged(QTreeWidgetItem* item, int column);
+    void onItemDoubleClicked(QTreeWidgetItem* item, int column);
     void onDeleteClicked();
 
 private:
@@ -55,7 +59,7 @@ signals:
 };
 
 
-
+//PROGRESS BAR!
 class ProgressBarDelegate : public QStyledItemDelegate {
     Q_OBJECT
 public:
@@ -82,13 +86,13 @@ public:
         QVariant vColor = index.data(TagColorRole);
         QColor barColor = vColor.canConvert<QColor>() ? vColor.value<QColor>() : QColor(200, 200, 200);
 
-        float barHeight = 3.0f; // Alzato a 2.0f: 1px con l'antialiasing si dissolve troppo su schermi standard
+        float barHeight = 3.0f;
         float borderRadius = barHeight / 2.0f;
 
-        // CALCOLO GEOMETRICO ANCORATO ALLA RIGA CORRETTA
+
         float left = option.rect.left() + 16.0f;
         float right = option.rect.right() - 10.0f;
-        float bottom = option.rect.bottom() - 2.0f; // Resta sollevato di 4px dal bordo inferiore
+        float bottom = option.rect.bottom() - 2.0f;
         float top = bottom - barHeight;
 
         QRectF totalBarRect(left, top, right - left, barHeight);

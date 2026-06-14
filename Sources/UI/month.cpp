@@ -14,6 +14,7 @@ MonthWidget::MonthWidget(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QWidget(parent), am(am), tm(tm), activityDelete(am)
 {
     setup();
+    updateCalendarView();
 }
 void MonthWidget::setup()
 {
@@ -91,131 +92,133 @@ void MonthWidget::onDateChanged(const QDate& qd)
     for (AbstractActivity* act : activities) {
         if (!act) continue;
 
-        QListWidgetItem* item = new QListWidgetItem(activityList);
+        if(dynamic_cast<task*>(act) == nullptr){
+            QListWidgetItem* item = new QListWidgetItem(activityList);
 
-        QWidget* rowContainer = new QWidget(this);
-        QVBoxLayout* rowLayout = new QVBoxLayout(rowContainer);
-        rowLayout->setContentsMargins(5, 5, 5, 5);
-        rowLayout->setSpacing(0);
-
-
-        QLabel* titleLabel = new QLabel("• " + QString::fromStdString(act->getName()), this);
-        titleLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 13px; padding: 4px; }");
-        rowLayout->addWidget(titleLabel);
-
-        //expan activity
-        QWidget* expansionWidget = new QWidget(this);
-        QVBoxLayout* expansionLayout = new QVBoxLayout(expansionWidget);
-        expansionLayout->setContentsMargins(15, 5, 5, 5);
-        expansionLayout->setSpacing(5);
-
-        DisplayVisitor visitor;
-        act->accept(visitor);
+            QWidget* rowContainer = new QWidget(this);
+            QVBoxLayout* rowLayout = new QVBoxLayout(rowContainer);
+            rowLayout->setContentsMargins(5, 5, 5, 5);
+            rowLayout->setSpacing(0);
 
 
-        QWidget* contentContainer = new QWidget(this);
-        QVBoxLayout* contentLayout = new QVBoxLayout(contentContainer);
-        contentLayout->setContentsMargins(0, 0, 0, 0);
-        contentLayout->setSpacing(2);
+            QLabel* titleLabel = new QLabel("• " + QString::fromStdString(act->getName()), this);
+            titleLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 13px; padding: 4px; }");
+            rowLayout->addWidget(titleLabel);
 
-        visitor.applyToLayout(contentLayout, this);
-        expansionLayout->addWidget(contentContainer);
+            //expan activity
+            QWidget* expansionWidget = new QWidget(this);
+            QVBoxLayout* expansionLayout = new QVBoxLayout(expansionWidget);
+            expansionLayout->setContentsMargins(15, 5, 5, 5);
+            expansionLayout->setSpacing(5);
 
-
-
-        if (visitor.isCheckable()) {
-            QCheckBox* statusCheck = new QCheckBox("Complete", this);
-            statusCheck->setChecked(visitor.getCheckedState());
-            expansionLayout->addWidget(statusCheck);
-
-            connect(statusCheck, &QCheckBox::toggled, this, [act, contentLayout, contentContainer, this](bool checked) {
-                DisplayVisitor writeVisitor;
-                writeVisitor.setWriteMode(checked);
-                act->accept(writeVisitor);
+            DisplayVisitor visitor;
+            act->accept(visitor);
 
 
-                QLayoutItem* child;
-                while ((child = contentLayout->takeAt(0)) != nullptr) {
-                    if (child->widget()) {
-                        child->widget()->hide(); // Lo nasconde immediatamente per evitare glitch visivi
-                        delete child->widget();  // Lo elimina dalla memoria
+            QWidget* contentContainer = new QWidget(this);
+            QVBoxLayout* contentLayout = new QVBoxLayout(contentContainer);
+            contentLayout->setContentsMargins(0, 0, 0, 0);
+            contentLayout->setSpacing(2);
+
+            visitor.applyToLayout(contentLayout, this);
+            expansionLayout->addWidget(contentContainer);
+
+
+
+            if (visitor.isCheckable()) {
+                QCheckBox* statusCheck = new QCheckBox("Complete", this);
+                statusCheck->setChecked(visitor.getCheckedState());
+                expansionLayout->addWidget(statusCheck);
+
+                connect(statusCheck, &QCheckBox::toggled, this, [act, contentLayout, contentContainer, this](bool checked) {
+                    DisplayVisitor writeVisitor;
+                    writeVisitor.setWriteMode(checked);
+                    act->accept(writeVisitor);
+
+
+                    QLayoutItem* child;
+                    while ((child = contentLayout->takeAt(0)) != nullptr) {
+                        if (child->widget()) {
+                            child->widget()->hide(); // Lo nasconde immediatamente per evitare glitch visivi
+                            delete child->widget();  // Lo elimina dalla memoria
+                        }
+                        delete child;
                     }
-                    delete child;
-                }
 
-                writeVisitor.applyToLayout(contentLayout, contentContainer);
+                    writeVisitor.applyToLayout(contentLayout, contentContainer);
 
-                emit activityUpdated();
-                this->updateCalendarView();
-            });
-        }
-
-
-        QWidget* actionButtonsWidget = new QWidget(this);
-        QHBoxLayout* actionLayout = new QHBoxLayout(actionButtonsWidget);
-        actionLayout->setContentsMargins(0, 5, 0, 0);
-        actionLayout->setSpacing(10);
-        actionLayout->addStretch();
-
-        QPushButton* editBtn = new QPushButton("Edit", this);
-        editBtn->setCursor(Qt::PointingHandCursor);
-        editBtn->setStyleSheet("QPushButton { color: white; background-color: #0275d8; border-radius: 3px; padding: 4px 8px; }"
-                               "QPushButton:hover { background-color: #025aa5; }");
-        actionLayout->addWidget(editBtn);
-
-        QPushButton* deleteBtn = new QPushButton("Delete", this);
-        deleteBtn->setCursor(Qt::PointingHandCursor);
-        deleteBtn->setStyleSheet("QPushButton { color: white; background-color: #d9534f; border-radius: 3px; padding: 4px 8px; }"
-                                 "QPushButton:hover { background-color: #c9302c; }");
-        actionLayout->addWidget(deleteBtn);
-
-        expansionLayout->addWidget(actionButtonsWidget);
-
-        connect(editBtn, &QPushButton::clicked, this, [this, act]() {
-            if (!act) return;
-
-            // 1. Nascondiamo temporaneamente la lista e il suo titolo a destra
-            this->titleLabel->hide();
-            activityList->hide();
-
-            // 2. Istanziamo il guscio di modifica passandogli l'attività e il tagManager della classe
-            auto* modifyWidget = new ActivityModify(act, tm, this);
-            sideLayout->addWidget(modifyWidget);
-
-            // 3. Quando l'utente finisce (clicca Salva o Annulla) ripristiniamo lo stato precedente
-            connect(modifyWidget, &ActivityModify::modificationFinished, this, [=]() {
-                sideLayout->removeWidget(modifyWidget);
-                modifyWidget->deleteLater(); // Pulizia della memoria del widget di modifica
-
-                this->titleLabel->show();
-                activityList->show(); // Fa ricomparire la lista originale delle attività
-
-                // Sincronizza i dati aggiornati graficamente sia sul mese che sulle viste della MainWindow
-                updateCalendarView();
-                emit activityUpdated();
-            });
-        });
-
-        connect(deleteBtn, &QPushButton::clicked, this, [this, act, qd]() {
-            // Chiamata alla classe a parte ActivityDelete
-            if (activityDelete.execute(act, this)) {
-                this->onDateChanged(qd);      // Rinfresca la lista del giorno corrente
-                this->updateCalendarView();   // Rinfresca il calendario grafico
+                    emit activityUpdated();
+                    this->updateCalendarView();
+                });
             }
-        });
 
 
-        expansionWidget->setVisible(false);
-        rowLayout->addWidget(expansionWidget);
+            QWidget* actionButtonsWidget = new QWidget(this);
+            QHBoxLayout* actionLayout = new QHBoxLayout(actionButtonsWidget);
+            actionLayout->setContentsMargins(0, 5, 0, 0);
+            actionLayout->setSpacing(10);
+            actionLayout->addStretch();
 
-        activityList->addItem(item);
-        activityList->setItemWidget(item, rowContainer);
+            QPushButton* editBtn = new QPushButton("Edit", this);
+            editBtn->setCursor(Qt::PointingHandCursor);
+            editBtn->setStyleSheet("QPushButton { color: white; background-color: #0275d8; border-radius: 3px; padding: 4px 8px; }"
+                                   "QPushButton:hover { background-color: #025aa5; }");
+            actionLayout->addWidget(editBtn);
 
-        item->setSizeHint(rowContainer->sizeHint());
+            QPushButton* deleteBtn = new QPushButton("Delete", this);
+            deleteBtn->setCursor(Qt::PointingHandCursor);
+            deleteBtn->setStyleSheet("QPushButton { color: white; background-color: #d9534f; border-radius: 3px; padding: 4px 8px; }"
+                                     "QPushButton:hover { background-color: #c9302c; }");
+            actionLayout->addWidget(deleteBtn);
+
+            expansionLayout->addWidget(actionButtonsWidget);
+
+            connect(editBtn, &QPushButton::clicked, this, [this, act]() {
+                if (!act) return;
+
+                // 1. Nascondiamo temporaneamente la lista e il suo titolo a destra
+                this->titleLabel->hide();
+                activityList->hide();
+
+                // 2. Istanziamo il guscio di modifica passandogli l'attività e il tagManager della classe
+                auto* modifyWidget = new ActivityModify(act, tm, this);
+                sideLayout->addWidget(modifyWidget);
+
+                // 3. Quando l'utente finisce (clicca Salva o Annulla) ripristiniamo lo stato precedente
+                connect(modifyWidget, &ActivityModify::modificationFinished, this, [=]() {
+                    sideLayout->removeWidget(modifyWidget);
+                    modifyWidget->deleteLater(); // Pulizia della memoria del widget di modifica
+
+                    this->titleLabel->show();
+                    activityList->show(); // Fa ricomparire la lista originale delle attività
+
+                    // Sincronizza i dati aggiornati graficamente sia sul mese che sulle viste della MainWindow
+                    updateCalendarView();
+                    emit activityUpdated();
+                });
+            });
+
+            connect(deleteBtn, &QPushButton::clicked, this, [this, act, qd]() {
+                // Chiamata alla classe a parte ActivityDelete
+                if (activityDelete.execute(act, this)) {
+                    this->onDateChanged(qd);      // Rinfresca la lista del giorno corrente
+                    this->updateCalendarView();   // Rinfresca il calendario grafico
+                }
+            });
 
 
-        item->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(expansionWidget)));
-        item->setData(Qt::UserRole + 1, QVariant::fromValue(static_cast<void*>(rowContainer)));
+            expansionWidget->setVisible(false);
+            rowLayout->addWidget(expansionWidget);
+
+            activityList->addItem(item);
+            activityList->setItemWidget(item, rowContainer);
+
+            item->setSizeHint(rowContainer->sizeHint());
+
+
+            item->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(expansionWidget)));
+            item->setData(Qt::UserRole + 1, QVariant::fromValue(static_cast<void*>(rowContainer)));
+        }
     }
 }
 void MonthWidget::updateCalendarView()

@@ -25,7 +25,6 @@ public:
     void setLocation(const std::string&);
 
     bool isExpired() const override;
-    std::string summary() const override;
     bool isActive(const date&) const override;
 
     //data persistence

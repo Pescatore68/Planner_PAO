@@ -21,15 +21,6 @@ bool Reminder::isExpired() const {
     return false;
 }
 
-
-std::string Reminder::summary() const {
-    std::string s = getName() + " — " + getDescription() + "\n";
-    s += day.toString() + " " + time.toString();
-    if (!location.empty())
-        s += " | " + location;
-    return s;
-}
-
 bool Reminder::isActive(const date& d) const{
     return d==day;
 }

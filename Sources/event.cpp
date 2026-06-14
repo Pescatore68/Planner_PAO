@@ -60,18 +60,6 @@ bool Event::isExpired() const {
     return false;
 }
 
-std::string Event::summary() const {
-    std::string s = getName() + " — " + getDescription() + "\n";
-    s += StartDate.toString();
-    if (hasTime())
-        s += " " + StartTime.toString() + "–" + EndTime.toString();
-    else
-        s += " → " + EndDate.toString();
-    if (!location.empty())
-        s += " | " + location;
-    return s;
-}
-
 bool Event::isActive(const date& d) const{
     return !(StartDate > d || d > EndDate);
 }

@@ -57,21 +57,6 @@ bool Routine::isExpired() const {
     return date::today() > endDate;
 }
 
-std::string Routine::summary() const {
-    std::string s = getName() + " — " + FrequencyToString() + " - " + getDescription() + "\n";
-    s += startTime.toString() + "–" + endTime.toString();
-    s += " | oggi: ";
-    s += check ? "✓" : "○";
-
-    if (!check_history.empty()) {
-        s += " | ";
-        for (bool b : check_history) {
-            s += b ? "●" : "○";
-        }
-    }
-    return s;
-}
-
 std::string Routine::FrequencyToString() const {
     if (freq == Frequency::Daily) return "Daily";
     if (freq == Frequency::Weekly) return "Weekly";

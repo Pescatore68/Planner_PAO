@@ -18,6 +18,7 @@ private:
 public:
     explicit TagComboBox(tagManager& tm, QWidget* parent = nullptr);
     tag* getSelectedTag() const;
+    QComboBox* getCombo() const { return combo; }
     void setCurrentIndex(const unsigned int&) const;
     void tagPopulation();
     void setCurrentTagByName(const std::string& tagName) const;

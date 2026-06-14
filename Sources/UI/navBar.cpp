@@ -1,6 +1,6 @@
 #include "Headers/UI/navBar.h"
 
-navBar::navBar(QWidget* parent) : QWidget(parent) {
+navBar::navBar(tagManager &tm, QWidget* parent) : QWidget(parent), tm(tm) {
     setup();
 }
 
@@ -14,6 +14,9 @@ void navBar::setup() {
     btnCalendar = new QPushButton("Calendar", this);
     btnTaskProject = new QPushButton("Task/Project", this);
     btnSearch = new QPushButton("Search", this);
+    btnFilter = new QPushButton("Filter", this);
+    filterCombo = new TagComboBox(tm, this); // Usa il tm passato
+    filterCombo->hide();
     btnTags = new QPushButton("Tag", this);
     btnAdd = new QPushButton("+ add", this);
 
@@ -23,6 +26,9 @@ void navBar::setup() {
     layout->addWidget(btnTags);
     layout->addStretch();
     layout->addWidget(btnAdd);
+
+    layout->addWidget(btnFilter);
+    layout->addWidget(filterCombo);
 
     searchEdit = new QLineEdit(this);
     searchEdit->setPlaceholderText("Search Activity");
@@ -38,4 +44,8 @@ void navBar::setup() {
     connect(btnTags,        &QPushButton::clicked, this, &navBar::tagsClicked);
     connect(btnAdd,         &QPushButton::clicked, this, &navBar::addClicked);
     connect(searchEdit, &QLineEdit::textChanged, this, &navBar::searchTextChanged);
+
+    connect(btnFilter, &QPushButton::clicked, this, [this](){
+        filterCombo->setVisible(filterCombo->isHidden());
+    });
 }

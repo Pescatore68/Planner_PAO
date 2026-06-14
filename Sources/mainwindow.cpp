@@ -68,9 +68,17 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
         navStack->setCurrentIndex(0);
     });
 
-    connect(tagView, &TagWidget::tagsChanged, addView, &AddDialog::refreshTagCombo);
 
-    //PROVA
+    connect(tagView, &TagWidget::tagsChanged, this, [this](){
+        addView->refreshTagCombo();
+
+        // have to block signal for tagWidget
+        navigationBar->getFilterCombo()->getCombo()->blockSignals(true);
+        navigationBar->getFilterCombo()->tagPopulation();
+        navigationBar->getFilterCombo()->getCombo()->blockSignals(false);
+    });
+
+
     connect(navigationBar, &navBar::searchTextChanged, this, [this, &am](const QString &text) {
         if (text.isEmpty()) {
             showCalendar(); // O nascondi i risultati
@@ -81,6 +89,15 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
         auto results = ActivitySearch::findByName(am, text.toStdString());
         updateSearchUI(results);
         showSearch();
+    });
+
+    connect(navigationBar->getFilterCombo()->getCombo(), &QComboBox::currentTextChanged, this, [this, &am](const QString& text){
+        std::string name = text.toStdString();
+
+        // Filtra e aggiorna
+        auto results = ActivitySearch::findByTag(am, name);
+        updateSearchUI(results);
+        showSearch(); // Passa alla pagina dei risultati
     });
 
     resize(1200, 800);
@@ -119,7 +136,7 @@ void MainWindow::setupStackedWidget()
 
 void MainWindow::setupNavBar()
 {
-    navigationBar = new navBar(this);
+    navigationBar = new navBar(tm, this);
 
     // view navigation
     connect(navigationBar, &navBar::calendarClicked, this, &MainWindow::showCalendar);

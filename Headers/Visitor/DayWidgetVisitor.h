@@ -4,19 +4,17 @@
 #include "ActivityVisitor.h"
 #include "../date.h"
 
-// Forward declarations
 class Event;
 class Reminder;
 class Routine;
 class task;
 class project;
 
-// ─── VISITOR 1: Identifica se un'attività occupa l'intera giornata ───────────
+//check if activity is selected all day
 class AllDayCheckVisitor : public ActivityVisitor {
 public:
     bool isAllDay = false;
 
-    // 🔥 Ora usano i riferimenti (&) senza const per fare l'override corretto
     void visit(Event& e) override;
     void visit(Reminder& r) override;
     void visit(Routine& ro) override;
@@ -24,7 +22,7 @@ public:
     void visit(project& p) override;
 };
 
-// ─── VISITOR 2: Estrae i minuti di inizio e fine per il posizionamento ───────
+//return start and end time for pos on grid
 class MinutesExtractorVisitor : public ActivityVisitor {
 private:
     const date& targetDate;
@@ -42,7 +40,7 @@ public:
     void visit(project& p) override;
 };
 
-// ─── VISITOR 3: Filtra le attività da escludere (task e project) ─────────────
+//filter task and project
 class TypeCheckVisitor : public ActivityVisitor {
 public:
     bool valid = true;

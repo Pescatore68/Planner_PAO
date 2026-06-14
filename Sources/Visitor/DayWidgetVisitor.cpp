@@ -5,22 +5,14 @@
 #include "Headers/task.h"
 #include "Headers/project.h"
 
-// ═══════════════════════════════════════════════════════════════════════════════
-//  AllDayCheckVisitor
-// ═══════════════════════════════════════════════════════════════════════════════
-
 void AllDayCheckVisitor::visit(Event& e) {
-    isAllDay = !e.hasTime(); // Usiamo il punto (.) al posto della freccia (->)
+    isAllDay = !e.hasTime();
 }
 
 void AllDayCheckVisitor::visit(Reminder&) { isAllDay = false; }
 void AllDayCheckVisitor::visit(Routine&)  { isAllDay = false; }
 void AllDayCheckVisitor::visit(task&)     { isAllDay = false; }
 void AllDayCheckVisitor::visit(project&)  { isAllDay = false; }
-
-// ═══════════════════════════════════════════════════════════════════════════════
-//  MinutesExtractorVisitor
-// ═══════════════════════════════════════════════════════════════════════════════
 
 MinutesExtractorVisitor::MinutesExtractorVisitor(const date& d)
     : targetDate(d), startMinutes(0), endMinutes(30) {}
@@ -35,7 +27,6 @@ void MinutesExtractorVisitor::visit(Event& e) {
         return;
     }
 
-    // Gestione eventi multi-giorno
     if (!(e.getStartDate() == targetDate) && !(e.getEndDate() == targetDate)) {
         startMinutes = 0;
         endMinutes = 24 * 60;
@@ -63,10 +54,6 @@ void MinutesExtractorVisitor::visit(Routine& ro) {
 
 void MinutesExtractorVisitor::visit(task&) {}
 void MinutesExtractorVisitor::visit(project&) {}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-//  TypeCheckVisitor
-// ═══════════════════════════════════════════════════════════════════════════════
 
 void TypeCheckVisitor::visit(Event&)    { valid = true; }
 void TypeCheckVisitor::visit(Reminder&) { valid = true; }

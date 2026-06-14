@@ -25,12 +25,12 @@ SOURCES += \
     Sources/UI/Forms/TaskForm.cpp \
     Sources/UI/TagWidget.cpp \
     Sources/UI/TaskWidget.cpp \
-    #Sources/UI/addDialog.cpp \
     Sources/UI/calendar.cpp \
     Sources/UI/month.cpp \
     Sources/UI/navBar.cpp \
     Sources/UI/week.cpp \
     Sources/Visitor/FormSelectVisitor.cpp \
+    Sources/Visitor/TaskWidgetVisitor.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
@@ -54,7 +54,6 @@ HEADERS += \
     Headers/DisplayVisitor.h \
     Headers/HourMinute.h \
     Headers/JSONformat.h \
-    #Headers/UI/addDialog.h \
     Headers/UI/ActivityDelete.h \
     Headers/UI/ActivityModify.h \
     Headers/UI/Forms/EventForm.h \
@@ -71,6 +70,7 @@ HEADERS += \
     Headers/Visitor/AddSubtaskVisitor.h \
     Headers/Visitor/DayWidgetVisitor.h \
     Headers/Visitor/FormSelectVisitor.h \
+    Headers/Visitor/TaskWidgetVisitor.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \
@@ -90,9 +90,3 @@ HEADERS += \
 
 
 
-FORMS +=
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QLineEdit>
 
 class navBar : public QWidget {
     Q_OBJECT
@@ -15,6 +16,8 @@ private:
     QPushButton* btnSearch;
     QPushButton* btnTags;
     QPushButton* btnAdd;
+    QLineEdit* searchEdit;
+
 
     void setup();
 
@@ -27,6 +30,7 @@ signals:
     void searchClicked();
     void tagsClicked();
     void addClicked();
+    void searchTextChanged(const QString& text);
 };
 
 #endif

@@ -48,6 +48,11 @@ private slots:
     void ShowMonth();
     void ShowDay();
     void onMonthDateClicked(const QDate& d);
+
+public slots:
+    void DayRequested(const QDate& date);
+
 };
+
 
 #endif

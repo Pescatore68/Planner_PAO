@@ -81,6 +81,10 @@ void MonthWidget::setup()
             editBtn->click();
         }
     });
+
+    connect(calendar, &QCalendarWidget::activated, this, [this](const QDate& date) {
+        emit dayRequested(date); // Notifica al genitore (calendar)
+    });
 }
 void MonthWidget::onDateChanged(const QDate& qd)
 {

@@ -30,7 +30,7 @@ void calendar::setWidgets(tagManager& tm)
     wStack = new QStackedWidget(this);
 
     wMonth = new MonthWidget(am, tm, this);
-
+    connect(wMonth, &MonthWidget::dayRequested, this, &calendar::DayRequested);
 
     wDayContainer = new QWidget(this);
     auto dayLayout = new QHBoxLayout(wDayContainer);
@@ -80,6 +80,15 @@ void calendar::onMonthDateClicked(const QDate& d)
     selected = date(d.day(), d.month(), d.year());
     wDay->setDate(selected);
     emit dateSelected(selected);
+}
+
+void calendar::DayRequested(const QDate& d)
+{
+    // Aggiorna la data selezionata nel calendario principale
+    selected = date(d.day(), d.month(), d.year());
+
+    // Passa alla vista giorno
+    ShowDay();
 }
 
 void calendar::refresh()

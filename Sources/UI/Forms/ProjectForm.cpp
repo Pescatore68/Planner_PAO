@@ -5,31 +5,19 @@
 #include <QLabel>
 
 ProjectForm::ProjectForm(tagManager& tm, QWidget* parent)
-    : ActivityForm(parent), tmPtr(&tm)
+    : TaskForm(tm, parent)
 {
-    buildCommonFields(tm);
-
-    deadlineEdit = new QDateEdit(QDate::currentDate(), this);
-    deadlineEdit->setCalendarPopup(false);
-    deadlineEdit->setDisplayFormat("dd/MM/yyyy");
-
-    oDeadlineEdit = new QTimeEdit(QTime(23, 59), this);
-    oDeadlineEdit->setDisplayFormat("HH:mm");
-
-    addTimeRow("Deadline", deadlineEdit, oDeadlineEdit);
-
     setupSubtaskPanel();
-
     mainLayout->addStretch();
 }
 
 void ProjectForm::setupSubtaskPanel()
 {
-    // bottone per mostrare/aggiungere subtask
-    btnAddSubtask = new QPushButton("+ Aggiungi Subtask", this);
+    //btn add subtask
+    btnAddSubtask = new QPushButton("+ Add Subtask", this);
     mainLayout->addWidget(btnAddSubtask);
 
-    // pannello scrollabile che contiene i TaskForm
+    //scrollable panel
     subtaskPanel = new QFrame(this);
     subtaskPanel->setFrameShape(QFrame::StyledPanel);
     subtaskPanel->setVisible(false);
@@ -106,7 +94,7 @@ void ProjectForm::addSubtaskForm()
     header->addWidget(btnRem);
     vl->addLayout(header);
 
-    auto* form = new TaskForm(*tmPtr, container);
+    auto* form = new TaskForm(tm, container);
     form->setMaximumWidth(225);
     form->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     form->adjustSize();
@@ -124,28 +112,47 @@ void ProjectForm::addSubtaskForm()
 
     connect(btnRem, &QPushButton::clicked, this, [this, container, form]{
         subtaskForms.removeOne(form);
+        subtaskLayout->removeWidget(container); // Scollega subito il widget dal layout grafico
         container->deleteLater();
+
+        // Se non ci sono più subtask, nascondi il pannello dello scroll
+        if (subtaskForms.isEmpty()) {
+            subtaskPanel->setVisible(false);
+            scroll->setVisible(false);
+        }
     });
 }
 
 bool ProjectForm::validate()
 {
+
     if (nameEdit->text().trimmed().isEmpty()) {
-        QMessageBox::warning(this, "Campo obbligatorio", "Inserisci un nome per il progetto.");
+        QMessageBox::warning(this, "Required field", "Please enter a name for the project.");
         nameEdit->setFocus();
         return false;
     }
 
-    const QDate projectDeadline = deadlineEdit->date();
+    const QDate projectDeadline  = getDeadlineDate();
+    const QTime projectODeadline = getODeadlineTime();
 
     for (QList<TaskForm*>::const_iterator it = subtaskForms.cbegin(); it != subtaskForms.cend(); ++it) {
         if (!(*it)->validate()) return false;
 
         if ((*it)->getDeadlineDate() > projectDeadline) {
-            QMessageBox::warning(this, "Data non valida",
-                                 "La scadenza di una subtask non può superare quella del progetto.");
+            QMessageBox::warning(this,"Invalid Date",
+                                 "Subtask deadline cannot exceed project deadline.");
+            (*it)->getDeadlineEdit()->setFocus();
             return false;
         }
+        if ((*it)->getDeadlineDate() == projectDeadline) {
+            if ((*it)->getODeadlineTime() > projectODeadline) {
+                QMessageBox::warning(this,"Invalid Time",
+                                     "Subtask deadline cannot exceed project deadline.");
+                (*it)->getODeadlineEdit()->setFocus();
+                return false;
+            }
+        }
+
     }
     return true;
 }
@@ -155,8 +162,8 @@ AbstractActivity* ProjectForm::createActivity()
     const std::string name = nameEdit->text().trimmed().toStdString();
     const std::string desc = descEdit->text().trimmed().toStdString();
     const tag* t           = tagCombo->getSelectedTag();
-    const QDate qd         = deadlineEdit->date();
-    const QTime qt         = oDeadlineEdit->time();
+    const QDate qd         = getDeadlineDate();
+    const QTime qt         = getODeadlineTime();
 
     auto* p = new project(
         name, desc, t,
@@ -176,15 +183,67 @@ AbstractActivity* ProjectForm::createActivity()
 }
 
 void ProjectForm::reset() {
-    ActivityForm::reset();
-    deadlineEdit->setDate(QDate::currentDate());
-    oDeadlineEdit->setTime(QTime(23, 59));
+    TaskForm::reset();
 
-    // rimuovi tutti i container delle subtask
+    //rm all subtasks conteiner
     for (QList<TaskForm*>::const_iterator it = subtaskForms.cbegin(); it != subtaskForms.cend(); ++it)
-        (*it)->parentWidget()->deleteLater(); // elimina il container
+        (*it)->parentWidget()->deleteLater();
 
     subtaskForms.clear();
     subtaskPanel->setVisible(false);
     scroll->setVisible(false);
+}
+void ProjectForm::triggerAddSubtaskForm() {
+    if (subtaskPanel && !subtaskPanel->isVisible()) {
+        subtaskPanel->setVisible(true);
+        if (scroll) scroll->setVisible(true);
+    }
+    addSubtaskForm();
+}
+
+void ProjectForm::loadFromActivity(AbstractActivity* act) {
+    auto* p = dynamic_cast<project*>(act);
+    if (!p) return;
+    fillCommonFields(p);
+    getDeadlineEdit()->setDate(QDate(p->getDeadline().getYear(), p->getDeadline().getMonth(), p->getDeadline().getDay()));
+    getODeadlineEdit()->setTime(QTime(p->getODeadline().getOre(), p->getODeadline().getMin()));
+
+    // Rimuoviamo eventuali subtask esistenti e ricarichiamo
+    // Assicurati che reset() pulisca la UI prima
+    for(auto* sub : p->getSubtasks()) {
+        triggerAddSubtaskForm();
+        getSubtaskForms().last()->loadFromActivity(sub);
+    }
+}
+
+void ProjectForm::saveToActivity(AbstractActivity* act) {
+    auto* p = dynamic_cast<project*>(act);
+    if (!p) return;
+    p->setName(nameEdit->text().toStdString());
+    p->setDesc(descEdit->text().toStdString());
+    p->setTag(tagCombo->getSelectedTag());
+    p->setDeadline(date(getDeadlineEdit()->date().day(), getDeadlineEdit()->date().month(), getDeadlineEdit()->date().year()));
+    p->setODeadline(HourMinute(getODeadlineEdit()->time().hour(), getODeadlineEdit()->time().minute()));
+
+    while (p->size() > 0) {
+        p->remove(static_cast<unsigned int>(0));
+    }
+
+    // Aggiungiamo i nuovi dati aggiornati
+    for (int i = 0; i < subtaskForms.size(); ++i) {
+        // Creiamo un task temporaneo
+        task* tempTask = new task("", "", nullptr, date(1,1,2000), HourMinute(0,0), false);
+
+        // Deleghiamo il salvataggio al form specifico
+        subtaskForms[i]->saveToActivity(tempTask);
+
+        // Aggiungiamo al progetto
+        p->add(tempTask->getName(),
+               tempTask->getDescription(),
+               tempTask->getDeadline(),
+               tempTask->getODeadline(),
+               tempTask->isCompleted());
+
+        delete tempTask;
+    }
 }

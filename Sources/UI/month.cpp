@@ -6,14 +6,15 @@
 #include "Headers/date.h"
 #include "Headers/AbstractActivity.h"
 #include "qcheckbox.h"
+#include "qpushbutton.h"
 #include "qtextformat.h"
+#include "Headers/UI/ActivityModify.h"
 
-MonthWidget::MonthWidget(ActivityManager& am, QWidget* parent)
-    : QWidget(parent), am(am)
+MonthWidget::MonthWidget(ActivityManager& am, tagManager& tm, QWidget* parent)
+    : QWidget(parent), am(am), tm(tm), activityDelete(am)
 {
     setup();
 }
-
 void MonthWidget::setup()
 {
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
@@ -25,10 +26,10 @@ void MonthWidget::setup()
     mainLayout->addWidget(calendar, 2);
 
     QWidget* sidePanel = new QWidget(this);
-    QVBoxLayout* sideLayout = new QVBoxLayout(sidePanel);
-    sideLayout->setContentsMargins(0, 0, 0, 0);
+    sideLayout = new QVBoxLayout(sidePanel);
+    sideLayout->setContentsMargins(0, 0, 0, 0);;
 
-    QLabel* titleLabel = new QLabel("Attività del giorno:", this);
+    titleLabel = new QLabel("Day Activity:", this);
 
     QFont titleFont = titleLabel->font();
     titleFont.setBold(true);
@@ -69,6 +70,16 @@ void MonthWidget::setup()
             activityList->update();
         }
     });
+
+    connect(activityList, &QListWidget::itemDoubleClicked, this, [](QListWidgetItem* item) {
+        if (!item) return;
+
+        QWidget* rowContainer = static_cast<QWidget*>(item->data(Qt::UserRole + 1).value<void*>());
+        QPushButton* editBtn = rowContainer->findChild<QPushButton*>();
+        if (editBtn) {
+            editBtn->click();
+        }
+    });
 }
 void MonthWidget::onDateChanged(const QDate& qd)
 {
@@ -87,12 +98,12 @@ void MonthWidget::onDateChanged(const QDate& qd)
         rowLayout->setContentsMargins(5, 5, 5, 5);
         rowLayout->setSpacing(0);
 
-        // Intestazione
+
         QLabel* titleLabel = new QLabel("• " + QString::fromStdString(act->getName()), this);
-        titleLabel->setStyleSheet("QLabe l { font-weight: bold; font-size: 13px; padding: 4px; }");
+        titleLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 13px; padding: 4px; }");
         rowLayout->addWidget(titleLabel);
 
-        // AREA DETTAGLI
+        //expan activity
         QWidget* expansionWidget = new QWidget(this);
         QVBoxLayout* expansionLayout = new QVBoxLayout(expansionWidget);
         expansionLayout->setContentsMargins(15, 5, 5, 5);
@@ -102,10 +113,14 @@ void MonthWidget::onDateChanged(const QDate& qd)
         act->accept(visitor);
 
 
-        QLabel* summaryLabel = new QLabel(QString::fromStdString(visitor.getSummary()), this);
-        summaryLabel->setWordWrap(true);
-        summaryLabel->setStyleSheet("QLabel { color: #555; background-color: #fcfcfc; padding: 5px; border-radius: 4px; }");
-        expansionLayout->addWidget(summaryLabel);
+        QWidget* contentContainer = new QWidget(this);
+        QVBoxLayout* contentLayout = new QVBoxLayout(contentContainer);
+        contentLayout->setContentsMargins(0, 0, 0, 0);
+        contentLayout->setSpacing(2);
+
+        visitor.applyToLayout(contentLayout, this);
+        expansionLayout->addWidget(contentContainer);
+
 
 
         if (visitor.isCheckable()) {
@@ -113,16 +128,81 @@ void MonthWidget::onDateChanged(const QDate& qd)
             statusCheck->setChecked(visitor.getCheckedState());
             expansionLayout->addWidget(statusCheck);
 
-            connect(statusCheck, &QCheckBox::toggled, this, [act, summaryLabel, this](bool checked) {
-
+            connect(statusCheck, &QCheckBox::toggled, this, [act, contentLayout, contentContainer, this](bool checked) {
                 DisplayVisitor writeVisitor;
                 writeVisitor.setWriteMode(checked);
                 act->accept(writeVisitor);
-                summaryLabel->setText(QString::fromStdString(writeVisitor.getSummary()));
+
+
+                QLayoutItem* child;
+                while ((child = contentLayout->takeAt(0)) != nullptr) {
+                    if (child->widget()) {
+                        child->widget()->hide(); // Lo nasconde immediatamente per evitare glitch visivi
+                        delete child->widget();  // Lo elimina dalla memoria
+                    }
+                    delete child;
+                }
+
+                writeVisitor.applyToLayout(contentLayout, contentContainer);
+
+                emit activityUpdated();
                 this->updateCalendarView();
             });
         }
 
+
+        QWidget* actionButtonsWidget = new QWidget(this);
+        QHBoxLayout* actionLayout = new QHBoxLayout(actionButtonsWidget);
+        actionLayout->setContentsMargins(0, 5, 0, 0);
+        actionLayout->setSpacing(10);
+        actionLayout->addStretch();
+
+        QPushButton* editBtn = new QPushButton("Edit", this);
+        editBtn->setCursor(Qt::PointingHandCursor);
+        editBtn->setStyleSheet("QPushButton { color: white; background-color: #0275d8; border-radius: 3px; padding: 4px 8px; }"
+                               "QPushButton:hover { background-color: #025aa5; }");
+        actionLayout->addWidget(editBtn);
+
+        QPushButton* deleteBtn = new QPushButton("Delete", this);
+        deleteBtn->setCursor(Qt::PointingHandCursor);
+        deleteBtn->setStyleSheet("QPushButton { color: white; background-color: #d9534f; border-radius: 3px; padding: 4px 8px; }"
+                                 "QPushButton:hover { background-color: #c9302c; }");
+        actionLayout->addWidget(deleteBtn);
+
+        expansionLayout->addWidget(actionButtonsWidget);
+
+        connect(editBtn, &QPushButton::clicked, this, [this, act]() {
+            if (!act) return;
+
+            // 1. Nascondiamo temporaneamente la lista e il suo titolo a destra
+            this->titleLabel->hide();
+            activityList->hide();
+
+            // 2. Istanziamo il guscio di modifica passandogli l'attività e il tagManager della classe
+            auto* modifyWidget = new ActivityModify(act, tm, this);
+            sideLayout->addWidget(modifyWidget);
+
+            // 3. Quando l'utente finisce (clicca Salva o Annulla) ripristiniamo lo stato precedente
+            connect(modifyWidget, &ActivityModify::modificationFinished, this, [=]() {
+                sideLayout->removeWidget(modifyWidget);
+                modifyWidget->deleteLater(); // Pulizia della memoria del widget di modifica
+
+                this->titleLabel->show();
+                activityList->show(); // Fa ricomparire la lista originale delle attività
+
+                // Sincronizza i dati aggiornati graficamente sia sul mese che sulle viste della MainWindow
+                updateCalendarView();
+                emit activityUpdated();
+            });
+        });
+
+        connect(deleteBtn, &QPushButton::clicked, this, [this, act, qd]() {
+            // Chiamata alla classe a parte ActivityDelete
+            if (activityDelete.execute(act, this)) {
+                this->onDateChanged(qd);      // Rinfresca la lista del giorno corrente
+                this->updateCalendarView();   // Rinfresca il calendario grafico
+            }
+        });
 
 
         expansionWidget->setVisible(false);
@@ -133,7 +213,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
         item->setSizeHint(rowContainer->sizeHint());
 
-        // Salviamo i riferimenti per il click alternato (Accordion)
+
         item->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(expansionWidget)));
         item->setData(Qt::UserRole + 1, QVariant::fromValue(static_cast<void*>(rowContainer)));
     }

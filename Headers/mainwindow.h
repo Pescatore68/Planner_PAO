@@ -7,6 +7,7 @@
 #include <QWidget>
 
 #include "Headers/ActivityManager.h"
+#include "Headers/UI/TagWidget.h"
 #include "Headers/tagManager.h"
 #include "Headers/UI/navBar.h"
 #include "Headers/UI/calendar.h"
@@ -23,26 +24,27 @@ private:
     ActivityManager& am;
     tagManager& tm;
 
-    // ── CORE WIDGETS ─────────────────────────────────────────────
+
     TaskWidget* taskWidget = nullptr;
     AddDialog* addView = nullptr;
 
     QWidget* centralWidget = nullptr;
     QHBoxLayout* mainLayout = nullptr;
 
+
     AbstractActivity* selectedActivity = nullptr;
 
-    // ── NAV AREA (navbar swap) ───────────────────────────────────
+    //navbar
     navBar* navigationBar = nullptr;
     QWidget* navContainer = nullptr;
     QStackedLayout* navStack = nullptr;
 
-    // ── CONTENT AREA ─────────────────────────────────────────────
+
     QStackedWidget* stackedWidget = nullptr;
 
     calendar* calendarView = nullptr;
     QWidget* searchView = nullptr;
-    QWidget* tagView = nullptr;
+    TagWidget* tagView = nullptr;
     void setupNavBar();
     void setupStackedWidget();
 
@@ -53,6 +55,7 @@ public:
     void showCalendar();
     void showTaskProject();
     void showSearch();
+    void showTags();
     void showDetail(AbstractActivity* a);
     void showForm(AbstractActivity* a = nullptr);
     void onActivitySelected(AbstractActivity* a);

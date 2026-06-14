@@ -6,9 +6,14 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QStyledItemDelegate>
+#include <QStyleOptionProgressBar>
+#include <QApplication>
+#include <QPainter>
 
 #include "Headers/ActivityManager.h"
 #include "Headers/AbstractActivity.h"
+#include "Headers/UI/ActivityDelete.h"
 
 class task;
 class project;
@@ -18,7 +23,7 @@ class TaskWidget : public QWidget {
 
 public:
     explicit TaskWidget(ActivityManager& am, QWidget* parent = nullptr);
-
+    ActivityDelete& getActivityDelete() { return activityDelete; }
     void refresh();
 
 signals:
@@ -32,6 +37,7 @@ private slots:
 
 private:
     ActivityManager& am;
+    ActivityDelete activityDelete;
 
     QVBoxLayout* mainLayout;
     QHBoxLayout* toolbarLayout;
@@ -42,10 +48,81 @@ private:
     AbstractActivity* current = nullptr;
 
     void buildTree();
-    void addTaskItem(QTreeWidgetItem* parent, const task* t, AbstractActivity* owner);
-    void addProjectItem(QTreeWidget* tree, project* p, unsigned int amIndex);
 
     AbstractActivity* activityFromItem(QTreeWidgetItem* item) const;
+signals:
+    void activityUpdated();
+};
+
+
+
+class ProgressBarDelegate : public QStyledItemDelegate {
+    Q_OBJECT
+public:
+    static constexpr int ProgressRole = Qt::UserRole + 10;
+    static constexpr int TagColorRole = Qt::UserRole + 11;
+
+    explicit ProgressBarDelegate(QObject* parent = nullptr)
+        : QStyledItemDelegate(parent) {}
+
+    void paint(QPainter* painter,
+               const QStyleOptionViewItem& option,
+               const QModelIndex& index) const override
+    {
+        QVariant v = index.data(ProgressRole);
+        if (!v.isValid() || v.toInt() < 0) {
+            QStyledItemDelegate::paint(painter, option, index);
+            return;
+        }
+
+        QStyledItemDelegate::paint(painter, option, index);
+
+        int pct = qBound(0, v.toInt(), 100);
+
+        QVariant vColor = index.data(TagColorRole);
+        QColor barColor = vColor.canConvert<QColor>() ? vColor.value<QColor>() : QColor(200, 200, 200);
+
+        float barHeight = 3.0f; // Alzato a 2.0f: 1px con l'antialiasing si dissolve troppo su schermi standard
+        float borderRadius = barHeight / 2.0f;
+
+        // CALCOLO GEOMETRICO ANCORATO ALLA RIGA CORRETTA
+        float left = option.rect.left() + 16.0f;
+        float right = option.rect.right() - 10.0f;
+        float bottom = option.rect.bottom() - 2.0f; // Resta sollevato di 4px dal bordo inferiore
+        float top = bottom - barHeight;
+
+        QRectF totalBarRect(left, top, right - left, barHeight);
+
+        float fillWidth = (totalBarRect.width() * pct) / 100.0f;
+        QRectF fillRect = totalBarRect;
+        fillRect.setWidth(fillWidth);
+
+        painter->save();
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setPen(Qt::NoPen);
+
+        painter->setBrush(QColor(235, 235, 235));
+        painter->drawRoundedRect(totalBarRect, borderRadius, borderRadius);
+
+        if (fillWidth > 0.0f) {
+            painter->setBrush(barColor);
+            painter->drawRoundedRect(fillRect, borderRadius, borderRadius);
+        }
+
+        painter->restore();
+    }
+
+    QSize sizeHint(const QStyleOptionViewItem& option,
+                   const QModelIndex& index) const override
+    {
+        QVariant v = index.data(ProgressRole);
+        if (v.isValid() && v.toInt() >= 0) {
+            QSize s = QStyledItemDelegate::sizeHint(option, index);
+            s.setHeight(s.height() + 12);
+            return s;
+        }
+        return QStyledItemDelegate::sizeHint(option, index);
+    }
 };
 
 #endif // TASKWIDGET_H

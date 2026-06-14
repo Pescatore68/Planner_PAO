@@ -7,7 +7,6 @@
 
 using namespace AddDialogIdx;
 
-// ─────────────────────────────────────────────────────────────────────────────
 AddDialog::AddDialog(tagManager& tm, QWidget* parent)
     : QWidget(parent), tm(tm)
 {
@@ -20,11 +19,7 @@ AddDialog::AddDialog(tagManager& tm, QWidget* parent)
     setupActions();
 }
 
-// ─── Toolbar con chip ─────────────────────────────────────────────────────────
 void AddDialog::setupToolbar() {
-    toolbarLayout = new QHBoxLayout();
-    toolbarLayout->setSpacing(6);
-
     typeGroup = new QButtonGroup(this);
     typeGroup->setExclusive(true);
 
@@ -34,35 +29,43 @@ void AddDialog::setupToolbar() {
     btnTask     = makeChip("Task");
     btnProject  = makeChip("Project");
 
-    // id = indice stack
     typeGroup->addButton(btnEvent,    Event);
     typeGroup->addButton(btnReminder, Reminder);
     typeGroup->addButton(btnRoutine,  Routine);
     typeGroup->addButton(btnTask,     Task);
     typeGroup->addButton(btnProject,  Project);
 
-    toolbarLayout->addWidget(btnEvent);
-    toolbarLayout->addWidget(btnReminder);
-    toolbarLayout->addWidget(btnRoutine);
-    toolbarLayout->addWidget(btnTask);
-    toolbarLayout->addWidget(btnProject);
-    toolbarLayout->addStretch();
+    btnEvent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    btnReminder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    btnRoutine->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    btnTask->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    btnProject->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    mainLayout->addLayout(toolbarLayout);
+    QHBoxLayout* row1Layout = new QHBoxLayout();
+    row1Layout->setSpacing(6);
+    row1Layout->addWidget(btnEvent);
+    row1Layout->addWidget(btnReminder);
+    row1Layout->addWidget(btnRoutine);
+
+    QHBoxLayout* row2Layout = new QHBoxLayout();
+    row2Layout->setSpacing(6);
+    row2Layout->addWidget(btnTask);
+    row2Layout->addWidget(btnProject);
+
+    mainLayout->addLayout(row1Layout);
+    mainLayout->addLayout(row2Layout);
 
     separator = new QFrame(this);
     separator->setFrameShape(QFrame::HLine);
     separator->setFrameShadow(QFrame::Sunken);
     mainLayout->addWidget(separator);
 
-    // seleziona Event di default
     btnEvent->setChecked(true);
 
     connect(typeGroup, &QButtonGroup::idClicked,
             this,      &AddDialog::onTypeSelected);
 }
 
-// ─── Stack dei form ───────────────────────────────────────────────────────────
 void AddDialog::setupStack() {
     eventForm    = new EventForm(tm, this);
     reminderForm = new ReminderForm(tm, this);
@@ -81,12 +84,11 @@ void AddDialog::setupStack() {
     mainLayout->addWidget(stack);
 }
 
-// ─── Bottoni Aggiungi / Annulla ───────────────────────────────────────────────
 void AddDialog::setupActions() {
     actionLayout = new QHBoxLayout();
 
-    btnAdd    = new QPushButton("Aggiungi", this);
-    btnCancel = new QPushButton("Annulla", this);
+    btnAdd    = new QPushButton("Add", this);
+    btnCancel = new QPushButton("Cancel", this);
 
     actionLayout->addStretch();
     actionLayout->addWidget(btnCancel);
@@ -102,7 +104,6 @@ void AddDialog::setupActions() {
 
 }
 
-// ─── Helper chip ─────────────────────────────────────────────────────────────
 QPushButton* AddDialog::makeChip(const QString& label) {
     auto* btn = new QPushButton(label, this);
     btn->setCheckable(true);
@@ -110,12 +111,10 @@ QPushButton* AddDialog::makeChip(const QString& label) {
     return btn;
 }
 
-// ─── Slot: cambio tipo ────────────────────────────────────────────────────────
 void AddDialog::onTypeSelected(int index) {
     stack->setCurrentIndex(index);
 }
 
-// ─── Slot: Aggiungi premuto — valida prima di chiudere ────────────────────────
 void AddDialog::onAddClicked() {
     ActivityForm* current =
         qobject_cast<ActivityForm*>(stack->currentWidget());
@@ -130,16 +129,21 @@ void AddDialog::onAddClicked() {
 void AddDialog::onCancelClicked()
 {
     static_cast<ActivityForm*>(stack->currentWidget())->reset();
-    emit activityCancelled(); // o un segnale dedicato
+    emit activityCancelled();
 }
 
-// ─── Restituisce l'attività creata dal form attivo ────────────────────────────
 AbstractActivity* AddDialog::createActivity() {
     ActivityForm* current = qobject_cast<ActivityForm*>(stack->currentWidget());
     if (!current) return nullptr;
     return current->createActivity();
 }
 
+void AddDialog::refreshTagCombo() {
 
-
+    if (eventForm)    eventForm->refreshTags();
+    if (reminderForm) reminderForm->refreshTags();
+    if (taskForm)     taskForm->refreshTags();
+    if (routineForm)  routineForm->refreshTags();
+    if (projectForm)  projectForm->refreshTags();
+}
 

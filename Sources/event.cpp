@@ -32,7 +32,9 @@ date Event::getStartDate() const { return StartDate; }
 date Event::getEndDate() const { return EndDate; }
 HourMinute Event::getStartTime() const { return StartTime; }
 HourMinute Event::getEndTime() const { return EndTime; }
-bool Event::hasTime() const { return !(StartTime==HourMinute(0,0) && EndTime==HourMinute(23,59));}
+bool Event::hasTime() const {
+    return !((StartTime.getOre() == 0 && StartTime.getMin() == 0 &&
+     EndTime.getOre() == 0 && EndTime.getMin() == 0));}
 std::string Event::getLocation() const { return location; }
 
 //set

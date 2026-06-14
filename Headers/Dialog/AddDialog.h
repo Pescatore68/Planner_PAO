@@ -26,6 +26,7 @@ public:
     explicit AddDialog(tagManager& tm, QWidget* parent = nullptr);
 
     AbstractActivity* createActivity();
+    void refreshTagCombo();
 
 signals:
     void activityCreated(AbstractActivity* a);

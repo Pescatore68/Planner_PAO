@@ -15,6 +15,12 @@ public:
     bool validate() override;
     void reset() override;
     QDate getDeadlineDate() const;
+    QDateEdit* getDeadlineEdit() const;
+    QTime getODeadlineTime() const;
+    QTimeEdit* getODeadlineEdit() const;
+
+    void loadFromActivity(AbstractActivity* act) override;
+    void saveToActivity(AbstractActivity* act) override;
 
 private:
     QDateEdit* deadlineEdit;

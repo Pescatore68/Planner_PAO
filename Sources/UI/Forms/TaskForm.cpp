@@ -3,25 +3,20 @@
 #include <QMessageBox>
 
 TaskForm::TaskForm(tagManager& tm, QWidget* parent)
-    : ActivityForm(parent)
+    : ActivityForm(tm, parent)
 {
-    buildCommonFields(tm);
-
     deadlineEdit = new QDateEdit(QDate::currentDate(), this);
     deadlineEdit->setCalendarPopup(false);
     deadlineEdit->setDisplayFormat("dd/MM/yyyy");
-
     oDeadlineEdit = new QTimeEdit(QTime(23, 59), this);
     oDeadlineEdit->setDisplayFormat("HH:mm");
-
-    addTimeRow("Scadenza", deadlineEdit, oDeadlineEdit);
-
+    addTimeRow("Deadline", deadlineEdit, oDeadlineEdit);
     mainLayout->addStretch();
 }
 
 bool TaskForm::validate() {
     if (nameEdit->text().trimmed().isEmpty()) {
-        QMessageBox::warning(this, "Campo obbligatorio", "Inserisci un nome per il task.");
+        QMessageBox::warning(this, "Required field", "Please enter a name for the task.");
         nameEdit->setFocus();
         return false;
     }
@@ -49,4 +44,35 @@ void TaskForm::reset() {
 
 QDate TaskForm::getDeadlineDate() const {
     return deadlineEdit->date();
+}
+
+QDateEdit* TaskForm::getDeadlineEdit() const {
+    return deadlineEdit;
+}
+
+QTime TaskForm::getODeadlineTime() const {
+    return oDeadlineEdit->time();
+}
+
+QTimeEdit* TaskForm::getODeadlineEdit() const {
+    return oDeadlineEdit;
+}
+
+// Sources/UI/Forms/TaskForm.cpp
+void TaskForm::loadFromActivity(AbstractActivity* act) {
+    auto* t = dynamic_cast<task*>(act);
+    if (!t) return;
+    fillCommonFields(t);
+    getDeadlineEdit()->setDate(QDate(t->getDeadline().getYear(), t->getDeadline().getMonth(), t->getDeadline().getDay()));
+    getODeadlineEdit()->setTime(QTime(t->getODeadline().getOre(), t->getODeadline().getMin()));
+}
+
+void TaskForm::saveToActivity(AbstractActivity* act) {
+    auto* t = dynamic_cast<task*>(act);
+    if (!t) return;
+    t->setName(nameEdit->text().trimmed().toStdString());
+    t->setDesc(descEdit->text().trimmed().toStdString());
+    t->setTag(tagCombo->getSelectedTag());
+    t->setDeadline(date(getDeadlineEdit()->date().day(), getDeadlineEdit()->date().month(), getDeadlineEdit()->date().year()));
+    t->setODeadline(HourMinute(getODeadlineEdit()->time().hour(), getODeadlineEdit()->time().minute()));
 }

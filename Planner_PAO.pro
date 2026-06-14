@@ -15,17 +15,22 @@ SOURCES += \
     Sources/Dialog/AddDialog.cpp \
     Sources/HourMinute.cpp \
     Sources/JSONformat.cpp \
+    Sources/UI/ActivityDelete.cpp \
+    Sources/UI/ActivityModify.cpp \
+    Sources/UI/DayWidget.cpp \
     Sources/UI/Forms/EventForm.cpp \
     Sources/UI/Forms/ProjectForm.cpp \
     Sources/UI/Forms/ReminderForm.cpp \
     Sources/UI/Forms/RoutineForm.cpp \
     Sources/UI/Forms/TaskForm.cpp \
+    Sources/UI/TagWidget.cpp \
     Sources/UI/TaskWidget.cpp \
-    #Sources/UI/addDialog.cpp \
     Sources/UI/calendar.cpp \
     Sources/UI/month.cpp \
     Sources/UI/navBar.cpp \
     Sources/UI/week.cpp \
+    Sources/Visitor/FormSelectVisitor.cpp \
+    Sources/Visitor/TaskWidgetVisitor.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
@@ -38,7 +43,8 @@ SOURCES += \
     Sources/event.cpp \
     Sources/xmlFormat.cpp \
     Sources/UI/Forms/ActivityForm.cpp \
-    Sources/UI/TagComboBox.cpp
+    Sources/UI/TagComboBox.cpp \
+    Sources/Visitor/DayWidgetVisitor.cpp \
 
 HEADERS += \
     Headers/AbstractActivity.h \
@@ -48,18 +54,23 @@ HEADERS += \
     Headers/DisplayVisitor.h \
     Headers/HourMinute.h \
     Headers/JSONformat.h \
-    #Headers/UI/addDialog.h \
+    Headers/UI/ActivityDelete.h \
+    Headers/UI/ActivityModify.h \
     Headers/UI/Forms/EventForm.h \
     Headers/UI/Forms/ProjectForm.h \
     Headers/UI/Forms/ReminderForm.h \
     Headers/UI/Forms/RoutineForm.h \
     Headers/UI/Forms/TaskForm.h \
+    Headers/UI/TagWidget.h \
     Headers/UI/calendar.h \
     Headers/UI/month.h \
     Headers/UI/navBar.h \
     Headers/UI/week.h \
     Headers/UI/DayWidget.h \
     Headers/Visitor/AddSubtaskVisitor.h \
+    Headers/Visitor/DayWidgetVisitor.h \
+    Headers/Visitor/FormSelectVisitor.h \
+    Headers/Visitor/TaskWidgetVisitor.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \
@@ -75,13 +86,7 @@ HEADERS += \
     Headers/Visitor/DisplayVisitor.h \
     Headers/UI/TaskWidget.h \
     Headers/UI/Forms/ActivityForm.h \
-    Headers/UI/TagComboBox.h \
+    Headers/UI/TagComboBox.h
 
 
 
-FORMS +=
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target

@@ -16,6 +16,17 @@ public:
     bool validate() override;
     void reset() override;
 
+    QDateEdit* getStartDateEdit() const { return startDateEdit; }
+    QDateEdit* getEndDateEdit()   const { return endDateEdit; }
+    QTimeEdit* getStartTimeEdit() const { return startTimeEdit; }
+    QTimeEdit* getEndTimeEdit()   const { return endTimeEdit; }
+    QLineEdit* getLocationEdit()   const { return locationEdit; }
+    QCheckBox* getAllDayCheck()   const { return allDayCheck; }
+
+    void loadFromActivity(AbstractActivity* act) override;
+    void saveToActivity(AbstractActivity* act) override;
+
+
 private slots:
     void onAllDayToggled(bool checked);
 

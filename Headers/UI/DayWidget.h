@@ -37,9 +37,7 @@ private:
     bool hovered = false;
 };
 
-// ─── Griglia oraria (ore + righe) ────────────────────────────────────────────
-// Widget custom che disegna le etichette delle ore a sinistra
-// e le linee orizzontali sottili per ogni ora e mezzora.
+//Timegrid
 class TimeGrid : public QWidget {
     Q_OBJECT
 public:
@@ -57,7 +55,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 };
 
-// ─── DayWidget principale ─────────────────────────────────────────────────────
+//Daywidget
 class DayWidget : public QWidget {
     Q_OBJECT
 
@@ -70,6 +68,10 @@ public:
 
 signals:
     void activityClicked(AbstractActivity* a);
+    void activityDoubleClicked(AbstractActivity* a);
+
+private:
+    bool doubleClickPending = false;
 
 private:
     ActivityManager& am;

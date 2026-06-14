@@ -34,7 +34,7 @@ HourMinute Event::getStartTime() const { return StartTime; }
 HourMinute Event::getEndTime() const { return EndTime; }
 bool Event::hasTime() const {
     return !((StartTime.getOre() == 0 && StartTime.getMin() == 0 &&
-     EndTime.getOre() == 0 && EndTime.getMin() == 0));}
+     EndTime.getOre() == 23 && EndTime.getMin() == 59));}
 std::string Event::getLocation() const { return location; }
 
 //set

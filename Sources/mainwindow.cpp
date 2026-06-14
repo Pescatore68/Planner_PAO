@@ -8,9 +8,10 @@
 #include "Headers/UI/navBar.h"
 #include "Headers/UI/TaskWidget.h"
 #include "Headers/Dialog/AddDialog.h"
-#include "Headers/routine.h"
+#include "Headers/Visitor/DisplayVisitor.h"
 #include "Headers/UI/calendar.h"
 #include "Headers/UI/ActivityDelete.h"
+#include "Headers/UI/ActivitySearch.h"
 
 #include "Headers/UI/DayWidget.h"
 
@@ -62,12 +63,42 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
                 calendarView->refresh();
                 calendarView->getMonthWidget()->updateCalendarView();
             });
-    //PROVA
+
     connect(tagView, &TagWidget::tagViewClosed, this, [this]{
         navStack->setCurrentIndex(0);
     });
 
-    connect(tagView, &TagWidget::tagsChanged, addView, &AddDialog::refreshTagCombo);
+
+    connect(tagView, &TagWidget::tagsChanged, this, [this](){
+        addView->refreshTagCombo();
+
+        // have to block signal for tagWidget
+        navigationBar->getFilterCombo()->getCombo()->blockSignals(true);
+        navigationBar->getFilterCombo()->tagPopulation();
+        navigationBar->getFilterCombo()->getCombo()->blockSignals(false);
+    });
+
+
+    connect(navigationBar, &navBar::searchTextChanged, this, [this, &am](const QString &text) {
+        if (text.isEmpty()) {
+            showCalendar(); // O nascondi i risultati
+            return;
+        }
+
+        // Cerca, aggiorna e mostra
+        auto results = ActivitySearch::findByName(am, text.toStdString());
+        updateSearchUI(results);
+        showSearch();
+    });
+
+    connect(navigationBar->getFilterCombo()->getCombo(), &QComboBox::currentTextChanged, this, [this, &am](const QString& text){
+        std::string name = text.toStdString();
+
+        // Filtra e aggiorna
+        auto results = ActivitySearch::findByTag(am, name);
+        updateSearchUI(results);
+        showSearch(); // Passa alla pagina dei risultati
+    });
 
     resize(1200, 800);
     setWindowTitle("Activity Manager");
@@ -83,8 +114,10 @@ void MainWindow::setupStackedWidget()
     taskWidget    = new TaskWidget(am, this);
     searchView    = new QWidget(this);
 
-    tagView       = new TagWidget(tm, am, this);
+    searchResultLayout = new QVBoxLayout(searchView);
+    searchResultLayout->setAlignment(Qt::AlignTop);
 
+    tagView       = new TagWidget(tm, am, this);
     addView       = new AddDialog(tm, this);
 
     stackedWidget->addWidget(calendarView);
@@ -103,7 +136,7 @@ void MainWindow::setupStackedWidget()
 
 void MainWindow::setupNavBar()
 {
-    navigationBar = new navBar(this);
+    navigationBar = new navBar(tm, this);
 
     // view navigation
     connect(navigationBar, &navBar::calendarClicked, this, &MainWindow::showCalendar);
@@ -153,4 +186,26 @@ void MainWindow::showTags()
 
     // Mostra il widget nel QStackedWidget
     navStack->setCurrentIndex(2);
+}
+
+
+void MainWindow::updateSearchUI(const std::vector<AbstractActivity*>& results) {
+    // 1. Pulisci i risultati precedenti
+    QLayoutItem* child;
+    while ((child = searchResultLayout->takeAt(0)) != nullptr) {
+        if (child->widget()) delete child->widget();
+        delete child;
+    }
+
+    // 2. Crea i widget per ogni attività trovata usando il Visitor
+    for (AbstractActivity* act : results) {
+        QWidget* container = new QWidget(this);
+        QVBoxLayout* vLayout = new QVBoxLayout(container);
+
+        DisplayVisitor visitor;
+        act->accept(visitor);
+        visitor.applyToLayout(vLayout, this);
+
+        searchResultLayout->addWidget(container);
+    }
 }

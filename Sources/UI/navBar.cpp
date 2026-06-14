@@ -1,6 +1,6 @@
 #include "Headers/UI/navBar.h"
 
-navBar::navBar(QWidget* parent) : QWidget(parent) {
+navBar::navBar(tagManager &tm, QWidget* parent) : QWidget(parent), tm(tm) {
     setup();
 }
 
@@ -14,6 +14,9 @@ void navBar::setup() {
     btnCalendar = new QPushButton("Calendar", this);
     btnTaskProject = new QPushButton("Task/Project", this);
     btnSearch = new QPushButton("Search", this);
+    btnFilter = new QPushButton("Filter", this);
+    filterCombo = new TagComboBox(tm, this); // Usa il tm passato
+    filterCombo->hide();
     btnTags = new QPushButton("Tag", this);
     btnAdd = new QPushButton("+ add", this);
 
@@ -24,9 +27,25 @@ void navBar::setup() {
     layout->addStretch();
     layout->addWidget(btnAdd);
 
+    layout->addWidget(btnFilter);
+    layout->addWidget(filterCombo);
+
+    searchEdit = new QLineEdit(this);
+    searchEdit->setPlaceholderText("Search Activity");
+    searchEdit->hide();
+    layout->addWidget(searchEdit);
+
+    connect(btnSearch, &QPushButton::clicked, this, [this](){
+        searchEdit->setVisible(searchEdit->isHidden());
+    });
     connect(btnCalendar,    &QPushButton::clicked, this, &navBar::calendarClicked);
     connect(btnTaskProject, &QPushButton::clicked, this, &navBar::taskProjectClicked);
-    connect(btnSearch,      &QPushButton::clicked, this, &navBar::searchClicked);
+    //connect(btnSearch,      &QPushButton::clicked, this, &navBar::searchClicked);
     connect(btnTags,        &QPushButton::clicked, this, &navBar::tagsClicked);
     connect(btnAdd,         &QPushButton::clicked, this, &navBar::addClicked);
+    connect(searchEdit, &QLineEdit::textChanged, this, &navBar::searchTextChanged);
+
+    connect(btnFilter, &QPushButton::clicked, this, [this](){
+        filterCombo->setVisible(filterCombo->isHidden());
+    });
 }

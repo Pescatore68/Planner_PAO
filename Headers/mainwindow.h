@@ -31,6 +31,9 @@ private:
     QWidget* centralWidget = nullptr;
     QHBoxLayout* mainLayout = nullptr;
 
+    QVBoxLayout* searchResultLayout;
+    void updateSearchUI(const std::vector<AbstractActivity*>& results);
+
 
     AbstractActivity* selectedActivity = nullptr;
 

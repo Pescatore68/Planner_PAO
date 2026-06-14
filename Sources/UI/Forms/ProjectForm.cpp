@@ -193,3 +193,57 @@ void ProjectForm::reset() {
     subtaskPanel->setVisible(false);
     scroll->setVisible(false);
 }
+void ProjectForm::triggerAddSubtaskForm() {
+    if (subtaskPanel && !subtaskPanel->isVisible()) {
+        subtaskPanel->setVisible(true);
+        if (scroll) scroll->setVisible(true);
+    }
+    addSubtaskForm();
+}
+
+void ProjectForm::loadFromActivity(AbstractActivity* act) {
+    auto* p = dynamic_cast<project*>(act);
+    if (!p) return;
+    fillCommonFields(p);
+    getDeadlineEdit()->setDate(QDate(p->getDeadline().getYear(), p->getDeadline().getMonth(), p->getDeadline().getDay()));
+    getODeadlineEdit()->setTime(QTime(p->getODeadline().getOre(), p->getODeadline().getMin()));
+
+    // Rimuoviamo eventuali subtask esistenti e ricarichiamo
+    // Assicurati che reset() pulisca la UI prima
+    for(auto* sub : p->getSubtasks()) {
+        triggerAddSubtaskForm();
+        getSubtaskForms().last()->loadFromActivity(sub);
+    }
+}
+
+void ProjectForm::saveToActivity(AbstractActivity* act) {
+    auto* p = dynamic_cast<project*>(act);
+    if (!p) return;
+    p->setName(nameEdit->text().toStdString());
+    p->setDesc(descEdit->text().toStdString());
+    p->setTag(tagCombo->getSelectedTag());
+    p->setDeadline(date(getDeadlineEdit()->date().day(), getDeadlineEdit()->date().month(), getDeadlineEdit()->date().year()));
+    p->setODeadline(HourMinute(getODeadlineEdit()->time().hour(), getODeadlineEdit()->time().minute()));
+
+    while (p->size() > 0) {
+        p->remove(static_cast<unsigned int>(0));
+    }
+
+    // Aggiungiamo i nuovi dati aggiornati
+    for (int i = 0; i < subtaskForms.size(); ++i) {
+        // Creiamo un task temporaneo
+        task* tempTask = new task("", "", nullptr, date(1,1,2000), HourMinute(0,0), false);
+
+        // Deleghiamo il salvataggio al form specifico
+        subtaskForms[i]->saveToActivity(tempTask);
+
+        // Aggiungiamo al progetto
+        p->add(tempTask->getName(),
+               tempTask->getDescription(),
+               tempTask->getDeadline(),
+               tempTask->getODeadline(),
+               tempTask->isCompleted());
+
+        delete tempTask;
+    }
+}

@@ -39,10 +39,10 @@ private:
     ActivityManager& am;
 
     void setTopBar();
-    void setWidgets();
+    void setWidgets(tagManager& tm);
 
 public:
-    explicit calendar(ActivityManager& am, QWidget* parent = nullptr);
+    explicit calendar(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
     void refresh();
     MonthWidget* getMonthWidget() const { return wMonth; }
 

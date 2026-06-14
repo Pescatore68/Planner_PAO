@@ -16,6 +16,11 @@ public:
     AbstractActivity* createActivity() override;
     bool validate() override;
     void reset() override;
+    const QList<TaskForm*>& getSubtaskForms() const { return subtaskForms; }
+    void triggerAddSubtaskForm();
+
+    void loadFromActivity(AbstractActivity* act) override;
+    void saveToActivity(AbstractActivity* act) override;
 
 private:
     // subtask

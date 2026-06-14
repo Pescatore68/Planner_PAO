@@ -87,3 +87,12 @@ tag* TagComboBox::getSelectedTag() const {
 void TagComboBox::setCurrentIndex(const unsigned int& idx) const {
     combo->setCurrentIndex(idx);
 }
+void TagComboBox::setCurrentTagByName(const std::string& tagName) const {
+    if (!combo) return;
+
+    // Cerchiamo il testo all'interno della QComboBox reale e cambiamo l'indice
+    int index = combo->findText(QString::fromStdString(tagName));
+    if (index != -1) {
+        combo->setCurrentIndex(index);
+    }
+}

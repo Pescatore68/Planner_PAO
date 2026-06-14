@@ -15,6 +15,14 @@ public:
     bool validate() override;
     void reset() override;
 
+    QDateEdit* getDateEdit()     const { return dateEdit; }
+    QTimeEdit* getTimeEdit()     const { return timeEdit; }
+    QLineEdit* getLocationEdit() const { return locationEdit; }
+
+    void loadFromActivity(AbstractActivity* act) override;
+    void saveToActivity(AbstractActivity* act) override;
+
+
 private:
     QDateEdit* dateEdit;
     QTimeEdit* timeEdit;

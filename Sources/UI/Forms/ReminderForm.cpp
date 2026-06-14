@@ -51,3 +51,23 @@ void ReminderForm::reset() {
     timeEdit->setTime(QTime::currentTime());
     locationEdit->clear();
 }
+
+void ReminderForm::loadFromActivity(AbstractActivity* act) {
+    auto* rem = dynamic_cast<Reminder*>(act);
+    if (!rem) return;
+    fillCommonFields(rem);
+    getDateEdit()->setDate(QDate(rem->getDate().getYear(), rem->getDate().getMonth(), rem->getDate().getDay()));
+    getTimeEdit()->setTime(QTime(rem->getTime().getOre(), rem->getTime().getMin()));
+    getLocationEdit()->setText(QString::fromStdString(rem->getLocation()));
+}
+
+void ReminderForm::saveToActivity(AbstractActivity* act) {
+    auto* rem = dynamic_cast<Reminder*>(act);
+    if (!rem) return;
+    rem->setName(nameEdit->text().toStdString());
+    rem->setDesc(descEdit->text().toStdString());
+    rem->setTag(tagCombo->getSelectedTag());
+    rem->setDate(date(getDateEdit()->date().day(), getDateEdit()->date().month(), getDateEdit()->date().year()));
+    rem->setTime(HourMinute(getTimeEdit()->time().hour(), getTimeEdit()->time().minute()));
+    rem->setLocation(getLocationEdit()->text().toStdString());
+}

@@ -57,3 +57,22 @@ QTime TaskForm::getODeadlineTime() const {
 QTimeEdit* TaskForm::getODeadlineEdit() const {
     return oDeadlineEdit;
 }
+
+// Sources/UI/Forms/TaskForm.cpp
+void TaskForm::loadFromActivity(AbstractActivity* act) {
+    auto* t = dynamic_cast<task*>(act);
+    if (!t) return;
+    fillCommonFields(t);
+    getDeadlineEdit()->setDate(QDate(t->getDeadline().getYear(), t->getDeadline().getMonth(), t->getDeadline().getDay()));
+    getODeadlineEdit()->setTime(QTime(t->getODeadline().getOre(), t->getODeadline().getMin()));
+}
+
+void TaskForm::saveToActivity(AbstractActivity* act) {
+    auto* t = dynamic_cast<task*>(act);
+    if (!t) return;
+    t->setName(nameEdit->text().trimmed().toStdString());
+    t->setDesc(descEdit->text().trimmed().toStdString());
+    t->setTag(tagCombo->getSelectedTag());
+    t->setDeadline(date(getDeadlineEdit()->date().day(), getDeadlineEdit()->date().month(), getDeadlineEdit()->date().year()));
+    t->setODeadline(HourMinute(getODeadlineEdit()->time().hour(), getODeadlineEdit()->time().minute()));
+}

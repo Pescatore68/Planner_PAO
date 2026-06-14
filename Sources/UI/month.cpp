@@ -8,9 +8,10 @@
 #include "qcheckbox.h"
 #include "qpushbutton.h"
 #include "qtextformat.h"
+#include "Headers/UI/ActivityModify.h"
 
-MonthWidget::MonthWidget(ActivityManager& am, QWidget* parent)
-    : QWidget(parent), am(am), activityDelete(am) // Inizializzazione rapida
+MonthWidget::MonthWidget(ActivityManager& am, tagManager& tm, QWidget* parent)
+    : QWidget(parent), am(am), tm(tm), activityDelete(am)
 {
     setup();
 }
@@ -25,10 +26,10 @@ void MonthWidget::setup()
     mainLayout->addWidget(calendar, 2);
 
     QWidget* sidePanel = new QWidget(this);
-    QVBoxLayout* sideLayout = new QVBoxLayout(sidePanel);
-    sideLayout->setContentsMargins(0, 0, 0, 0);
+    sideLayout = new QVBoxLayout(sidePanel);
+    sideLayout->setContentsMargins(0, 0, 0, 0);;
 
-    QLabel* titleLabel = new QLabel("Attività del giorno:", this);
+    titleLabel = new QLabel("Day Activity:", this);
 
     QFont titleFont = titleLabel->font();
     titleFont.setBold(true);
@@ -67,6 +68,16 @@ void MonthWidget::setup()
             item->setSizeHint(rowContainer->sizeHint());
 
             activityList->update();
+        }
+    });
+
+    connect(activityList, &QListWidget::itemDoubleClicked, this, [](QListWidgetItem* item) {
+        if (!item) return;
+
+        QWidget* rowContainer = static_cast<QWidget*>(item->data(Qt::UserRole + 1).value<void*>());
+        QPushButton* editBtn = rowContainer->findChild<QPushButton*>();
+        if (editBtn) {
+            editBtn->click();
         }
     });
 }
@@ -144,11 +155,13 @@ void MonthWidget::onDateChanged(const QDate& qd)
         QHBoxLayout* actionLayout = new QHBoxLayout(actionButtonsWidget);
         actionLayout->setContentsMargins(0, 5, 0, 0);
         actionLayout->setSpacing(10);
-        actionLayout->addStretch(); // Spinge i bottoni a destra
+        actionLayout->addStretch();
 
-        /*QPushButton* editBtn = new QPushButton("Modifica", this);
+        QPushButton* editBtn = new QPushButton("Edit", this);
         editBtn->setCursor(Qt::PointingHandCursor);
-        actionLayout->addWidget(editBtn);*/
+        editBtn->setStyleSheet("QPushButton { color: white; background-color: #0275d8; border-radius: 3px; padding: 4px 8px; }"
+                               "QPushButton:hover { background-color: #025aa5; }");
+        actionLayout->addWidget(editBtn);
 
         QPushButton* deleteBtn = new QPushButton("Delete", this);
         deleteBtn->setCursor(Qt::PointingHandCursor);
@@ -158,6 +171,31 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
         expansionLayout->addWidget(actionButtonsWidget);
 
+        connect(editBtn, &QPushButton::clicked, this, [this, act]() {
+            if (!act) return;
+
+            // 1. Nascondiamo temporaneamente la lista e il suo titolo a destra
+            this->titleLabel->hide();
+            activityList->hide();
+
+            // 2. Istanziamo il guscio di modifica passandogli l'attività e il tagManager della classe
+            auto* modifyWidget = new ActivityModify(act, tm, this);
+            sideLayout->addWidget(modifyWidget);
+
+            // 3. Quando l'utente finisce (clicca Salva o Annulla) ripristiniamo lo stato precedente
+            connect(modifyWidget, &ActivityModify::modificationFinished, this, [=]() {
+                sideLayout->removeWidget(modifyWidget);
+                modifyWidget->deleteLater(); // Pulizia della memoria del widget di modifica
+
+                this->titleLabel->show();
+                activityList->show(); // Fa ricomparire la lista originale delle attività
+
+                // Sincronizza i dati aggiornati graficamente sia sul mese che sulle viste della MainWindow
+                updateCalendarView();
+                emit activityUpdated();
+            });
+        });
+
         connect(deleteBtn, &QPushButton::clicked, this, [this, act, qd]() {
             // Chiamata alla classe a parte ActivityDelete
             if (activityDelete.execute(act, this)) {
@@ -166,10 +204,6 @@ void MonthWidget::onDateChanged(const QDate& qd)
             }
         });
 
-        /*connect(editBtn, &QPushButton::clicked, this, [this, act]() {
-            // Logica futura per la modifica dell'attività
-        });*/
-        // ─────────────────────────────────────────────────────────────────
 
         expansionWidget->setVisible(false);
         rowLayout->addWidget(expansionWidget);

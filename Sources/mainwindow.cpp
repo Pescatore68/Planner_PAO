@@ -79,7 +79,7 @@ void MainWindow::setupStackedWidget()
 {
     stackedWidget = new QStackedWidget(this);
 
-    calendarView  = new calendar(am, this);
+    calendarView  = new calendar(am, tm, this);
     taskWidget    = new TaskWidget(am, this);
     searchView    = new QWidget(this);
 

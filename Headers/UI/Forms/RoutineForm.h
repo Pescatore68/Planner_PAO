@@ -16,6 +16,16 @@ public:
     bool validate() override;
     void reset() override;
 
+    QDateEdit* getStartDateEdit() const { return startDateEdit; }
+    QDateEdit* getEndDateEdit()   const { return endDateEdit; }
+    QTimeEdit* getStartTimeEdit() const { return startTimeEdit; }
+    QTimeEdit* getEndTimeEdit()   const { return endTimeEdit; }
+    QComboBox* getFreqCombo()     const { return freqCombo; }
+
+    void loadFromActivity(AbstractActivity* act) override;
+    void saveToActivity(AbstractActivity* act) override;
+
+
 private:
     QComboBox* freqCombo;
     QDateEdit* startDateEdit;

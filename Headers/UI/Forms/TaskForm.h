@@ -19,6 +19,9 @@ public:
     QTime getODeadlineTime() const;
     QTimeEdit* getODeadlineEdit() const;
 
+    void loadFromActivity(AbstractActivity* act) override;
+    void saveToActivity(AbstractActivity* act) override;
+
 private:
     QDateEdit* deadlineEdit;
     QTimeEdit* oDeadlineEdit;

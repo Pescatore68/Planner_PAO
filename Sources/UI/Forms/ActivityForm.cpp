@@ -2,11 +2,11 @@
 
 ActivityForm::ActivityForm(tagManager& tm, QWidget* parent)
     : QWidget(parent),
-    tm(tm),
     mainLayout(new QVBoxLayout(this)),
     nameEdit(new QLineEdit(this)),
     descEdit(new QLineEdit(this)),
-    tagCombo(nullptr)
+    tagCombo(nullptr),
+    tm(tm)
 {
     mainLayout->setContentsMargins(8, 8, 8, 8);
     mainLayout->setSpacing(6);
@@ -63,5 +63,15 @@ void ActivityForm::reset() {
 void ActivityForm::refreshTags() {
     if (tagCombo) {
         tagCombo->tagPopulation();
+    }
+}
+void ActivityForm::fillCommonFields(AbstractActivity* activity) {
+    if (!activity) return;
+    nameEdit->setText(QString::fromStdString(activity->getName()));
+    descEdit->setText(QString::fromStdString(activity->getDescription()));
+
+    // Usiamo il nuovo metodo appena creato sulla combo personalizzata
+    if (activity->getTag() && tagCombo) {
+        tagCombo->setCurrentTagByName(activity->getTag()->getName());
     }
 }

@@ -20,6 +20,7 @@ public:
     tag* getSelectedTag() const;
     void setCurrentIndex(const unsigned int&) const;
     void tagPopulation();
+    void setCurrentTagByName(const std::string& tagName) const;
 
 /*private slots:
 void onAddTag();*/

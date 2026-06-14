@@ -34,8 +34,17 @@ public:
 
     virtual AbstractActivity* createActivity() = 0;
     virtual bool validate() = 0;
+    virtual void loadFromActivity(AbstractActivity* act) = 0;
+    virtual void saveToActivity(AbstractActivity* act) = 0;
     virtual void reset();
     virtual void refreshTags();
+
+
+
+    void fillCommonFields(AbstractActivity* activity);
+    QLineEdit* getNameEdit() const { return nameEdit; }
+    QLineEdit* getDescEdit() const { return descEdit; }
+    TagComboBox* getTagCombo() const { return tagCombo; }
 };
 
 #endif // ACTIVITYFORM_H

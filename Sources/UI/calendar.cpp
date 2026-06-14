@@ -2,11 +2,11 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-calendar::calendar(ActivityManager& am, QWidget* parent)
+calendar::calendar(ActivityManager& am,tagManager& tm, QWidget* parent)
     : QWidget(parent), selected(date::today()), am(am)
 {
     setTopBar();
-    setWidgets();
+    setWidgets(tm);
 }
 
 void calendar::setTopBar()
@@ -34,11 +34,11 @@ void calendar::setTopBar()
     mainLayout->addLayout(topLayout);
 }
 
-void calendar::setWidgets()
+void calendar::setWidgets(tagManager& tm)
 {
     wStack = new QStackedWidget(this);
 
-    wMonth = new MonthWidget(am, this);
+    wMonth = new MonthWidget(am, tm, this);
     wWeek  = new WeekWidget(this);
     wDayContainer = new QWidget(this);
     auto dayLayout = new QHBoxLayout(wDayContainer);

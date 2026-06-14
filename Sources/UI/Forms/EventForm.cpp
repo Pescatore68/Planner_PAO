@@ -95,3 +95,51 @@ void EventForm::reset() {
     allDayCheck->setChecked(false);
     locationEdit->clear();
 }
+
+void EventForm::loadFromActivity(AbstractActivity* act) {
+    auto* e = dynamic_cast<Event*>(act);
+    if (!e) return;
+    fillCommonFields(e);
+    getStartDateEdit()->setDate(QDate(e->getStartDate().getYear(), e->getStartDate().getMonth(), e->getStartDate().getDay()));
+    getEndDateEdit()->setDate(QDate(e->getEndDate().getYear(), e->getEndDate().getMonth(), e->getEndDate().getDay()));
+
+    getStartTimeEdit()->setTime(QTime(e->getStartTime().getOre(), e->getStartTime().getMin()));
+    getEndTimeEdit()->setTime(QTime(e->getEndTime().getOre(), e->getEndTime().getMin()));
+    if(getLocationEdit()) getLocationEdit()->setText(QString::fromStdString(e->getLocation()));
+
+}
+
+void EventForm::saveToActivity(AbstractActivity* act) {
+    auto* e = dynamic_cast<Event*>(act);
+    if (!e) return;
+    e->setName(nameEdit->text().toStdString());
+    e->setDesc(descEdit->text().toStdString());
+    e->setTag(tagCombo->getSelectedTag());
+    date newStart(startDateEdit->date().day(), startDateEdit->date().month(), startDateEdit->date().year());
+    date newEnd(endDateEdit->date().day(), endDateEdit->date().month(), endDateEdit->date().year());
+
+    if (newStart > e->getEndDate()) {
+        e->setEndDate(newEnd);
+        e->setStartDate(newStart);
+    }
+
+    else if (e->getStartDate() > newEnd ) {
+        e->setStartDate(newStart);
+        e->setEndDate(newEnd);
+    }
+    else {
+        e->setStartDate(newStart);
+        e->setEndDate(newEnd);
+    }    e->setLocation(getLocationEdit()->text().toStdString());
+
+
+    if (allDayCheck->isChecked()) {
+        //if all day time star and time end equal to 00:00
+        e->setStartTime(HourMinute(0, 0));
+        e->setEndTime(HourMinute(0, 0));
+    } else {
+        e->setStartTime(HourMinute(startTimeEdit->time().hour(), startTimeEdit->time().minute()));
+        e->setEndTime(HourMinute(endTimeEdit->time().hour(), endTimeEdit->time().minute()));
+    }
+
+}

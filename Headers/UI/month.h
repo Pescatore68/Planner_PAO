@@ -6,6 +6,8 @@
 #include <QListWidget>
 #include "Headers/ActivityManager.h"
 #include "Headers/UI/ActivityDelete.h"
+#include "qboxlayout.h"
+#include "qlabel.h"
 
 class MonthWidget : public QWidget {
     Q_OBJECT
@@ -13,15 +15,24 @@ private:
     QCalendarWidget* calendar;
     QListWidget* activityList;
     ActivityManager& am;
+    tagManager& tm;
     ActivityDelete activityDelete;
+
+    QVBoxLayout* sideLayout;
+    QLabel* titleLabel;
 
 public:
 
-    explicit MonthWidget(ActivityManager& am, QWidget* parent = nullptr);
+    explicit MonthWidget(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
 
     void setup();
     void updateCalendarView();
     ActivityDelete& getActivityDelete() { return activityDelete; }
+
+    QLabel* getTitleLabel()        const { return titleLabel; }
+    QListWidget* getActivityList() const { return activityList; }
+    QVBoxLayout* getSideLayout()   const { return sideLayout; }
+    tagManager& getTagManager()    const { return tm; }
 
 private slots:
     void onDateChanged(const QDate& date);

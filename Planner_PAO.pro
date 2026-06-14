@@ -16,6 +16,7 @@ SOURCES += \
     Sources/HourMinute.cpp \
     Sources/JSONformat.cpp \
     Sources/UI/ActivityDelete.cpp \
+    Sources/UI/ActivityModify.cpp \
     Sources/UI/DayWidget.cpp \
     Sources/UI/Forms/EventForm.cpp \
     Sources/UI/Forms/ProjectForm.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
     Sources/UI/month.cpp \
     Sources/UI/navBar.cpp \
     Sources/UI/week.cpp \
+    Sources/Visitor/FormSelectVisitor.cpp \
     Sources/date.cpp \
     Sources/main.cpp \
     Sources/mainwindow.cpp \
@@ -54,6 +56,7 @@ HEADERS += \
     Headers/JSONformat.h \
     #Headers/UI/addDialog.h \
     Headers/UI/ActivityDelete.h \
+    Headers/UI/ActivityModify.h \
     Headers/UI/Forms/EventForm.h \
     Headers/UI/Forms/ProjectForm.h \
     Headers/UI/Forms/ReminderForm.h \
@@ -67,6 +70,7 @@ HEADERS += \
     Headers/UI/DayWidget.h \
     Headers/Visitor/AddSubtaskVisitor.h \
     Headers/Visitor/DayWidgetVisitor.h \
+    Headers/Visitor/FormSelectVisitor.h \
     Headers/config.h \
     Headers/date.h \
     Headers/event.h \

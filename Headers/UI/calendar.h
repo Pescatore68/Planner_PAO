@@ -11,7 +11,6 @@
 #include "Headers/tagManager.h"
 #include "Headers/UI/TaskWidget.h"
 #include "Headers/UI/month.h"
-#include "Headers/UI/week.h"
 #include "Headers/UI/DayWidget.h"
 
 class calendar : public QWidget {
@@ -19,11 +18,11 @@ class calendar : public QWidget {
 
 private:
     QPushButton*    bMonth;
-    QPushButton*    bWeek;
+
     QPushButton*    bDay;
     QStackedWidget* wStack;
     MonthWidget*    wMonth;
-    WeekWidget*     wWeek;
+
     QWidget*        wDayContainer;
     DayWidget*      wDay;
     TaskWidget*     wTaskWidget;
@@ -47,7 +46,6 @@ signals:
 
 private slots:
     void ShowMonth();
-    void ShowWeek();
     void ShowDay();
     void onMonthDateClicked(const QDate& d);
 };

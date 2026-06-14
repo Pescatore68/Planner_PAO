@@ -171,7 +171,6 @@ void MainWindow::setupNavBar()
     navigationBar = new navBar(tm, this);
 
     connect(navigationBar, &navBar::calendarClicked,    this, &MainWindow::showCalendar);
-    connect(navigationBar, &navBar::taskProjectClicked, this, &MainWindow::showTaskProject);
     connect(navigationBar, &navBar::searchClicked,      this, &MainWindow::showSearch);
     connect(navigationBar, &navBar::tagsClicked,        this, &MainWindow::showTags);
 

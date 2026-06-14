@@ -2,7 +2,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-calendar::calendar(ActivityManager& am,tagManager& tm, QWidget* parent)
+calendar::calendar(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QWidget(parent), selected(date::today()), am(am)
 {
     setTopBar();
@@ -12,23 +12,17 @@ calendar::calendar(ActivityManager& am,tagManager& tm, QWidget* parent)
 void calendar::setTopBar()
 {
     bMonth = new QPushButton("Month", this);
-    bWeek  = new QPushButton("Week", this);
-    bDay   = new QPushButton("Day", this);
+    bWeek  = new QPushButton("Week",  this);
+    bDay   = new QPushButton("Day",   this);
 
     auto topLayout = new QHBoxLayout();
-
     topLayout->addWidget(bMonth);
     topLayout->addWidget(bWeek);
     topLayout->addWidget(bDay);
 
-    connect(bMonth, &QPushButton::clicked,
-            this, &calendar::ShowMonth);
-
-    connect(bWeek, &QPushButton::clicked,
-            this, &calendar::ShowWeek);
-
-    connect(bDay, &QPushButton::clicked,
-            this, &calendar::ShowDay);
+    connect(bMonth, &QPushButton::clicked, this, &calendar::ShowMonth);
+    connect(bWeek,  &QPushButton::clicked, this, &calendar::ShowWeek);
+    connect(bDay,   &QPushButton::clicked, this, &calendar::ShowDay);
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(topLayout);
@@ -40,14 +34,16 @@ void calendar::setWidgets(tagManager& tm)
 
     wMonth = new MonthWidget(am, tm, this);
     wWeek  = new WeekWidget(this);
+
     wDayContainer = new QWidget(this);
     auto dayLayout = new QHBoxLayout(wDayContainer);
     dayLayout->setContentsMargins(0, 0, 0, 0);
     dayLayout->setSpacing(8);
-    wDay = new DayWidget(am, wDayContainer);
+
+    wDay        = new DayWidget(am, wDayContainer);
     wTaskWidget = new TaskWidget(am, wDayContainer);
 
-    dayLayout->addWidget(wDay, 7);
+    dayLayout->addWidget(wDay,        7);
     dayLayout->addWidget(wTaskWidget, 3);
 
     wStack->addWidget(wMonth);
@@ -55,23 +51,33 @@ void calendar::setWidgets(tagManager& tm)
     wStack->addWidget(wDayContainer);
 
     auto mainLayout = qobject_cast<QVBoxLayout*>(layout());
-    if (mainLayout) {
+    if (mainLayout)
         mainLayout->addWidget(wStack, 1);
-    }
+
+    setupConnections();
 }
 
-void calendar::ShowMonth()
+void calendar::setupConnections()
 {
-    wStack->setCurrentWidget(wMonth);
+    connect(wDay, &DayWidget::activityClicked,
+            wTaskWidget, &TaskWidget::handleExternalActivitySelected);
+
+    connect(wDay, &DayWidget::activityDoubleClicked,
+            this, &calendar::activityModifyRequested);
+
+    connect(wTaskWidget, &TaskWidget::activityDoubleClicked,
+            this, &calendar::activityModifyRequested);
+
+    connect(wTaskWidget, &TaskWidget::deleteRequested,
+            this, &calendar::refresh);
 }
 
-void calendar::ShowWeek() {
-    wStack->setCurrentWidget(wWeek);
-}
+void calendar::ShowMonth() { wStack->setCurrentWidget(wMonth); }
+void calendar::ShowWeek()  { wStack->setCurrentWidget(wWeek);  }
 
-void calendar::ShowDay() {
+void calendar::ShowDay()
+{
     wDay->setDate(selected);
-    //wTaskWidget->setDate(selected); //non so come meglio implementare
     wStack->setCurrentWidget(wDayContainer);
 }
 
@@ -84,10 +90,10 @@ void calendar::onMonthDateClicked(const QDate& d)
     wStack->setCurrentWidget(wWeek);
 }
 
-void calendar::refresh() {
+void calendar::refresh()
+{
     wMonth->updateCalendarView();
     wDay->refresh();
     wTaskWidget->refresh();
 }
-
 

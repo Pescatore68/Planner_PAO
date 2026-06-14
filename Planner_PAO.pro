@@ -17,6 +17,7 @@ SOURCES += \
     Sources/JSONformat.cpp \
     Sources/UI/ActivityDelete.cpp \
     Sources/UI/ActivityModify.cpp \
+    Sources/UI/ActivitySearch.cpp \
     Sources/UI/DayWidget.cpp \
     Sources/UI/Forms/EventForm.cpp \
     Sources/UI/Forms/ProjectForm.cpp \
@@ -56,6 +57,7 @@ HEADERS += \
     Headers/JSONformat.h \
     Headers/UI/ActivityDelete.h \
     Headers/UI/ActivityModify.h \
+    Headers/UI/ActivitySearch.h \
     Headers/UI/Forms/EventForm.h \
     Headers/UI/Forms/ProjectForm.h \
     Headers/UI/Forms/ReminderForm.h \

@@ -103,6 +103,10 @@ void EventForm::loadFromActivity(AbstractActivity* act) {
     getStartDateEdit()->setDate(QDate(e->getStartDate().getYear(), e->getStartDate().getMonth(), e->getStartDate().getDay()));
     getEndDateEdit()->setDate(QDate(e->getEndDate().getYear(), e->getEndDate().getMonth(), e->getEndDate().getDay()));
 
+    bool allDay = !e->hasTime();
+    getAllDayCheck()->setChecked(allDay);      // ← imposta il checkbox
+    onAllDayToggled(allDay);
+
     getStartTimeEdit()->setTime(QTime(e->getStartTime().getOre(), e->getStartTime().getMin()));
     getEndTimeEdit()->setTime(QTime(e->getEndTime().getOre(), e->getEndTime().getMin()));
     if(getLocationEdit()) getLocationEdit()->setText(QString::fromStdString(e->getLocation()));
@@ -136,7 +140,7 @@ void EventForm::saveToActivity(AbstractActivity* act) {
     if (allDayCheck->isChecked()) {
         //if all day time star and time end equal to 00:00
         e->setStartTime(HourMinute(0, 0));
-        e->setEndTime(HourMinute(0, 0));
+        e->setEndTime(HourMinute(23, 59));
     } else {
         e->setStartTime(HourMinute(startTimeEdit->time().hour(), startTimeEdit->time().minute()));
         e->setEndTime(HourMinute(endTimeEdit->time().hour(), endTimeEdit->time().minute()));

@@ -495,19 +495,31 @@ void DayWidget::populateBlocks()
     timeGrid->update();
 }
 
-
+//for mouse click action
 bool DayWidget::eventFilter(QObject* obj, QEvent* event)
 {
-    if (event->type() == QEvent::MouseButtonPress) {
-        auto* block = qobject_cast<ActivityBlock*>(obj);
-        if (block) {
-            void* ptr = block->property("activityPtr").value<void*>();
-            if (ptr) emit activityClicked(static_cast<AbstractActivity*>(ptr));
-        }
+    auto* block = qobject_cast<ActivityBlock*>(obj);
+    if (!block) return QWidget::eventFilter(obj, event);
+
+    void* ptr = block->property("activityPtr").value<void*>();
+    if (!ptr) return QWidget::eventFilter(obj, event);
+
+    AbstractActivity* act = static_cast<AbstractActivity*>(ptr);
+
+    //double click, modify
+    if (event->type() == QEvent::MouseButtonDblClick) {
+        emit activityDoubleClicked(act);
+        return true;
     }
+
+    //single click, select
+    if (event->type() == QEvent::MouseButtonPress) {
+        emit activityClicked(act);
+        return true;
+    }
+
     return QWidget::eventFilter(obj, event);
 }
-
 
 void DayWidget::setDate(const date& d)
 {

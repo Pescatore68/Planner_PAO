@@ -29,25 +29,7 @@ TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
     tree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
     tree->setSelectionMode(QAbstractItemView::SingleSelection);
     tree->setAnimated(true);
-    tree->setStyleSheet("QTreeView { font-size: 15px; } "
-                        "QHeaderView { font-size: 15px; }");
-    tree->setStyleSheet(
-        "QTreeView { "
-        "  font-family: 'SF Pro Text', '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; "
-        "  font-size: 14px; "
-        "  color: #1c1c1e; "
-        "}"
-        "QHeaderView::section { "
-        "  font-family: 'SF Pro Text', '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; "
-        "  font-size: 12px; "
-        "  font-weight: 600; "
-        "  color: #8e8e93; " // Grigio chiaro stile iOS/macOS
-        "  background-color: transparent; "
-        "  border: none; "
-        "}"
-        );
 
-    // Applica lo stile elegante basato su SF Pro / Inter
     tree->setStyleSheet(
         "QTreeView { "
         "  font-family: 'SF Pro Text', '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; "
@@ -76,10 +58,14 @@ TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
     connect(tree, &QTreeWidget::itemChanged,
             this, &TaskWidget::onItemChanged);
 
+    connect(tree, &QTreeWidget::itemDoubleClicked,
+            this, &TaskWidget::onItemDoubleClicked);
+
     buildTree();
 }
 
-void TaskWidget::refresh() {
+void TaskWidget::refresh()
+{
     tree->blockSignals(true);
     buildTree();
     tree->blockSignals(false);
@@ -88,11 +74,11 @@ void TaskWidget::refresh() {
     btnDelete->setEnabled(false);
 }
 
-void TaskWidget::buildTree() {
+void TaskWidget::buildTree()
+{
     tree->clear();
 
-    // Sezioni radice
-    auto* rootTasks    = new QTreeWidgetItem(tree, {"Task",   ""});
+    auto* rootTasks    = new QTreeWidgetItem(tree, {"Task",    ""});
     auto* rootProjects = new QTreeWidgetItem(tree, {"Project", ""});
 
     QFont boldFont = rootTasks->font(0);
@@ -100,59 +86,82 @@ void TaskWidget::buildTree() {
     rootTasks->setFont(0, boldFont);
     rootProjects->setFont(0, boldFont);
 
+    //root not selectable
     rootTasks->setFlags(Qt::ItemIsEnabled);
     rootProjects->setFlags(Qt::ItemIsEnabled);
 
     TreeBuilderVisitor visitor(rootTasks, rootProjects);
-
     for (unsigned int i = 0; i < am.size(); ++i) {
         AbstractActivity* a = am.get(i);
-        if (a) {
-            a->accept(visitor); // call visit(task&) or visit(project&)
-        }
+        if (a) a->accept(visitor);
     }
 
     rootTasks->setExpanded(true);
     rootProjects->setExpanded(true);
 }
 
-// return the activity from item, use static cast to abstract
-AbstractActivity* TaskWidget::activityFromItem(QTreeWidgetItem* item) const {
+AbstractActivity* TaskWidget::activityFromItem(QTreeWidgetItem* item) const
+{
     if (!item) return nullptr;
     QVariant v = item->data(0, TaskWidgetRoles::ActivityPtrRole);
     if (!v.isValid()) return nullptr;
     return static_cast<AbstractActivity*>(v.value<void*>());
 }
 
-void TaskWidget::onItemClicked(QTreeWidgetItem* item, int) {
+void TaskWidget::onItemClicked(QTreeWidgetItem* item, int)
+{
     AbstractActivity* a = activityFromItem(item);
     current = a;
     btnDelete->setEnabled(a != nullptr);
-    if (a)
-        emit activitySelected(a);
+    if (a) emit activitySelected(a);
 }
 
-void TaskWidget::onItemChanged(QTreeWidgetItem* item, int column) {
-    if (column != 0) return;
 
+void TaskWidget::onItemDoubleClicked(QTreeWidgetItem* item, int)
+{
     AbstractActivity* a = activityFromItem(item);
     if (!a) return;
 
-    // RISOLTO: Uso del Visitor come da specifiche del branch remoto
+    QVariant vParent = item->data(0, TaskWidgetRoles::ParentProjectRole);
+    if (vParent.isValid()) {
+        AbstractActivity* parentProject = static_cast<AbstractActivity*>(vParent.value<void*>());
+        if (parentProject) {
+            emit activityDoubleClicked(parentProject);
+            return;
+        }
+    }
+
+    emit activityDoubleClicked(a);
+}
+
+void TaskWidget::onItemChanged(QTreeWidgetItem* item, int column)
+{
+    if (column != 0) return;
+    AbstractActivity* a = activityFromItem(item);
+    if (!a) return;
+
     ItemChangedVisitor visitor(item);
     a->accept(visitor);
 }
 
-void TaskWidget::onDeleteClicked() {
+void TaskWidget::onDeleteClicked()
+{
     if (!current) return;
 
     AbstractActivity* toDelete = current;
-
-    // RISOLTO: Esegue il comando di eliminazione e aggiorna l'interfaccia via segnale/refresh
     if (activityDelete.execute(toDelete, this)) {
         current = nullptr;
         btnDelete->setEnabled(false);
         emit deleteRequested(toDelete);
         this->refresh();
+    }
+}
+
+void TaskWidget::handleExternalActivitySelected(AbstractActivity* a) {
+    current = a;
+    btnDelete->setEnabled(a != nullptr);
+
+    if (a) {
+        tree->clearSelection();
     }
 }

@@ -1,24 +1,20 @@
 #include "Headers/UI/ActivityModify.h"
-#include "Headers/Visitor/FormSelectVisitor.h" // Il visitor che fa il "new" del form corretto
+#include "Headers/Visitor/FormSelectVisitor.h"
 
 #include <QHBoxLayout>
 
 ActivityModify::ActivityModify(AbstractActivity* act, tagManager& tm, QWidget* parent)
-    : QWidget(parent), activeForm(nullptr), activity(act) // Inizializza sempre a nullptr!
+    : QWidget(parent), activeForm(nullptr), activity(act)
 {
-    if (!activity) {
-        qDebug() << "CRASH PREVENTED: activity è NULL!";
-        return; // Non fare NIENTE
-    }
+
     mainLayout = new QVBoxLayout(this);
 
-    // Il FormSelectVisitor crea il form corretto (questo lo teniamo!)
-    FormSelectVisitor selector(tm, nullptr); // Passa nullptr invece di 'this'
+    FormSelectVisitor selector(tm, nullptr);
     activity->accept(selector);
     activeForm = selector.chosenForm;
 
     if (activeForm) {
-        activeForm->setParent(this); // Lo colleghi DOPO che è stato creato
+        activeForm->setParent(this);
         activeForm->loadFromActivity(activity);
         mainLayout->addWidget(activeForm);
     }
@@ -36,7 +32,7 @@ ActivityModify::ActivityModify(AbstractActivity* act, tagManager& tm, QWidget* p
 
     connect(btnSave, &QPushButton::clicked, this, [this]() {
         if (activeForm && activeForm->validate()) {
-            // Il salvataggio ora è diretto e sicuro
+
             activeForm->saveToActivity(activity);
             emit modificationFinished();
         }
@@ -46,8 +42,7 @@ ActivityModify::ActivityModify(AbstractActivity* act, tagManager& tm, QWidget* p
 }
 
 ActivityModify::~ActivityModify() {
-    // Se activeForm è stato creato (new), lo eliminiamo correttamente
-    if (activeForm) {
+        if (activeForm) {
         delete activeForm;
         activeForm = nullptr;
     }

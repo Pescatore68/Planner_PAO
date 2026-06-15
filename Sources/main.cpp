@@ -18,7 +18,7 @@ static const std::string XML_PATH  = "activities.xml";
 
 // ─── Formato preferito ───────────────────────────────────────────────────────
 // Cambia a "xml" per usare XML come formato principale.
-static const std::string SAVE_FORMAT = "json"; // "json" oppure "xml"
+static const std::string SAVE_FORMAT = "xml"; // "json" oppure "xml"
 
 // ─── Caricamento dati ────────────────────────────────────────────────────────
 static bool loadData(ActivityManager& am, tagManager& tm)

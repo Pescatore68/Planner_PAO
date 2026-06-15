@@ -180,12 +180,24 @@ void DisplayVisitor::visit(Routine& r) {
 
     isChecked = (offset >= 0 && offset < (int)history.size()) ? history[offset] : false;
 
-    textSummary = r.getName() + " — " + r.FrequencyToString() + " - " + r.getDescription() + "\n";
+    // --- STRUTTURA OMOLOGATA ALLE ALTRE ATTIVITÀ ---
 
-    textSummary += r.getStartTime().toString() + "–" + r.getEndTime().toString() + "\n";
+    // 1. Prefisso dello stato [ ] o [X] coerente con i Task
+    std::string statusPrefix = isChecked ? "[X]" : "[ ]";
+    textSummary = statusPrefix + " [ROUTINE] " + r.getName();
 
-    textSummary += "Status: " + std::string(isChecked ? "✓" : "○");
+    // 2. Frequenza e Descrizione vanno a capo (se presenti)
+    if (!r.FrequencyToString().empty()) {
+        textSummary += "\nFrequency: " + r.FrequencyToString();
+    }
+    if (!r.getDescription().empty()) {
+        textSummary += "\n" + r.getDescription();
+    }
 
+    // 3. Orari formattati coerentemente con gli Eventi
+    textSummary += "\nTime: " + r.getStartTime().toString() + " - " + r.getEndTime().toString();
+
+    // 4. Sezione dello storico (mantenuta ma formattata in modo pulito alla fine)
     if (!history.empty()) {
         textSummary += "\nHistory: ";
         QDate startDate(r.getStartDate().getYear(), r.getStartDate().getMonth(), r.getStartDate().getDay());
@@ -196,11 +208,12 @@ void DisplayVisitor::visit(Routine& r) {
             date currentBackendDate(currentDate.day(), currentDate.month(), currentDate.year());
 
             if (r.isActive(currentBackendDate)) {
-                if (count > 0 && count % 7 == 0) textSummary += "\n";
+                if (count > 0 && count % 7 == 0) textSummary += "\n              ";
                 textSummary += history[i] ? "●" : "○";
                 count++;
             }
         }
     }
+
     processTag(r.getTag());
 }

@@ -165,3 +165,7 @@ void TaskWidget::handleExternalActivitySelected(AbstractActivity* a) {
         tree->clearSelection();
     }
 }
+
+void TaskWidget::setDeleteEnabled(bool enabled) {
+    btnDelete->setEnabled(enabled && current != nullptr);
+}

@@ -435,16 +435,22 @@ void DayWidget::populateBlocks()
 
     if (!allDayItems.isEmpty()) {
         allDayContainer->setVisible(true);
+        QHBoxLayout* rowLayout = new QHBoxLayout();
+        rowLayout->setContentsMargins(0, 0, 0, 0);
+        rowLayout->setSpacing(6);
         for (AbstractActivity* act : allDayItems) {
             auto* block = new ActivityBlock(act, allDayContainer);
-            block->setFixedHeight(28);
+            block->setFixedHeight(80);
 
             block->installEventFilter(this);
             block->setProperty("activityPtr", QVariant::fromValue(static_cast<void*>(act)));
 
-            allDayLayout->addWidget(block);
+            rowLayout->addWidget(block);
             blocks.append(block);
         }
+
+        allDayLayout->addLayout(rowLayout);
+
     } else {
         allDayContainer->setVisible(false);
     }

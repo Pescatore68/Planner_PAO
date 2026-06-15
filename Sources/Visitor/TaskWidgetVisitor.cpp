@@ -15,7 +15,7 @@ void TreeBuilderVisitor::visit(project& p) {
 
     int pct = static_cast<int>(p.completionPercentage());
     projItem->setData(0, ProgressBarDelegate::ProgressRole, pct);
-    QColor tagColor(200, 200, 200); // Fallback standard se il progetto non ha un tag
+    QColor tagColor(200, 200, 200);
     if (p.getTag()) {
         tagColor = p.getTag()->getColor();
     }

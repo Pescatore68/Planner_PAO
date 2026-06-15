@@ -29,6 +29,7 @@ SOURCES += \
     Sources/UI/calendar.cpp \
     Sources/UI/month.cpp \
     Sources/UI/navBar.cpp \
+    Sources/Visitor/DisplayVisitor.cpp \
     Sources/Visitor/FormSelectVisitor.cpp \
     Sources/Visitor/TaskWidgetVisitor.cpp \
     Sources/date.cpp \

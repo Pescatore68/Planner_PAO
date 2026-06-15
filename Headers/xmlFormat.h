@@ -12,7 +12,7 @@ class ActivityManager;
 class tagManager;
 
 namespace xmlFormat {
-    static AbstractActivity* fromXml(const QDomElement& obj, tagManager& tm);
+    AbstractActivity* fromXml(const QDomElement& obj, tagManager& tm);
     bool loadXml(ActivityManager& am, tagManager& tm, const std::string& path);
     bool saveXml(const ActivityManager& am, const tagManager& tm, const std::string& path);
 }

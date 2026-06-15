@@ -34,7 +34,6 @@ public:
 
 
     bool isExpired() const override;
-    std::string summary() const override;
 
     std::string FrequencyToString() const;
     void accept(ActivityVisitor& v) override;

@@ -21,7 +21,6 @@ public:
     unsigned int size() const;
     void remove(task*);
     void remove(unsigned int i);
-    string summary() const override;
     float completionPercentage() const; // nCompleted() / size() * 100 → per la barra
 
     //data persistence

@@ -50,27 +50,6 @@ void project::remove(unsigned int idx) {
     subtasks.erase(subtasks.begin()+idx);
 }
 
-string project::summary() const {
-    std::string status = isCompleted() ? "[✓]" : "[ ]";
-    std::string result;
-
-    result += status + " " + getName() + "\n";
-
-    if (!getDescription().empty())
-        result += "  " + getDescription() + "\n";
-
-    result += "  Scadenza: " + getDeadline().toString()
-              + " ore " + getODeadline().toString() + "\n";
-
-    for (unsigned int i=0; i<size(); i++) {
-        const task* t = getSubtask(i);
-        std::string status = t->isCompleted() ? "[✓]" : "[ ]";
-        result += status + " " + t->getName() + "\n";
-
-    }
-    return result;
-}
-
 float project::completionPercentage() const {
     if (size() == 0) return 0.0f;                        // evita divisione per zero
     return (float)nCompleted() / size() * 100.0f;        // cast a float prima della divisione

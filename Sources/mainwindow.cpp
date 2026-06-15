@@ -38,6 +38,10 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     mainLayout->addWidget(navContainer);
     mainLayout->addWidget(stackedWidget);
 
+    connect(calendarView->getMonthWidget(), &MonthWidget::dayRequested, this, [this](const QDate& date) {
+        showCalendar();
+    });
+
     connect(calendarView->getMonthWidget(), &MonthWidget::activityUpdated,
             this, [this]() { taskWidget->refresh(); });
 
@@ -171,7 +175,6 @@ void MainWindow::setupNavBar()
     navigationBar = new navBar(tm, this);
 
     connect(navigationBar, &navBar::calendarClicked,    this, &MainWindow::showCalendar);
-    connect(navigationBar, &navBar::taskProjectClicked, this, &MainWindow::showTaskProject);
     connect(navigationBar, &navBar::searchClicked,      this, &MainWindow::showSearch);
     connect(navigationBar, &navBar::tagsClicked,        this, &MainWindow::showTags);
 

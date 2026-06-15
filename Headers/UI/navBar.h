@@ -16,7 +16,6 @@ private:
     tagManager& tm;
     QVBoxLayout* layout;
     QPushButton* btnCalendar;
-    QPushButton* btnTaskProject;
     QPushButton* btnSearch;
     QPushButton* btnFilter;
     QPushButton* btnTags;
@@ -31,7 +30,6 @@ public:
     TagComboBox* getFilterCombo() const { return filterCombo; }
 signals:
     void calendarClicked();
-    void taskProjectClicked();
     void searchClicked();
     void tagsClicked();
     void addClicked();

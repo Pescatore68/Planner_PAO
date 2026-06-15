@@ -30,7 +30,6 @@ public:
     void setName(const string&);
     void setDesc(const string&);
     void setTag(const tag*);
-    virtual string summary() const = 0;
     virtual bool isExpired() const = 0;
     virtual bool isActive(const date&) const = 0;
     virtual QJsonObject toJson() const = 0;

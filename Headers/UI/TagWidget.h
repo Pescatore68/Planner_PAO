@@ -22,8 +22,8 @@ private:
     QListWidget* tagList;
     QPushButton* btnBack;
 
-    QPushButton* btnColorPick;   // Il pulsante-anteprima di fianco al testo
-    QWidget* paletteContainer;     // Il contenitore della griglia (da mostrare/nascondere)
+    QPushButton* btnColorPick;
+    QWidget* paletteContainer;
     QColor currentSelectedColor;
 
     const QList<Qt::GlobalColor> defaultColors = {

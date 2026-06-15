@@ -29,7 +29,6 @@ SOURCES += \
     Sources/UI/calendar.cpp \
     Sources/UI/month.cpp \
     Sources/UI/navBar.cpp \
-    Sources/UI/week.cpp \
     Sources/Visitor/FormSelectVisitor.cpp \
     Sources/Visitor/TaskWidgetVisitor.cpp \
     Sources/date.cpp \
@@ -50,9 +49,7 @@ SOURCES += \
 HEADERS += \
     Headers/AbstractActivity.h \
     Headers/ActivityManager.h \
-    Headers/ActivityVisitor.h \
     Headers/Dialog/AddDialog.h \
-    Headers/DisplayVisitor.h \
     Headers/HourMinute.h \
     Headers/JSONformat.h \
     Headers/UI/ActivityDelete.h \
@@ -67,7 +64,6 @@ HEADERS += \
     Headers/UI/calendar.h \
     Headers/UI/month.h \
     Headers/UI/navBar.h \
-    Headers/UI/week.h \
     Headers/UI/DayWidget.h \
     Headers/Visitor/AddSubtaskVisitor.h \
     Headers/Visitor/DayWidgetVisitor.h \

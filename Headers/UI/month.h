@@ -40,6 +40,7 @@ private slots:
 signals:
     void dateClicked(const QDate& date);
     void activityUpdated();
+    void dayRequested(const QDate& date);
 };
 
 #endif // MONTH_H

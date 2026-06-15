@@ -62,7 +62,7 @@ void TagWidget::setupUI() {
 
     connect(btnColorPick, &QPushButton::clicked, this, &TagWidget::openColorDialog);
 }
-//Rivedi
+
 void TagWidget::createPaletteGrid() {
     QGridLayout* grid = new QGridLayout(paletteContainer);
     grid->setContentsMargins(0, 5, 0, 5);
@@ -71,7 +71,6 @@ void TagWidget::createPaletteGrid() {
     int row = 0;
     int col = 0;
 
-    // Generiamo la griglia usando i colori globali pronti di Qt
     for (Qt::GlobalColor globalColor : defaultColors) {
         QColor color(globalColor);
 
@@ -81,21 +80,18 @@ void TagWidget::createPaletteGrid() {
         colorBtn->setStyleSheet(QString("QPushButton { background-color: %1; border: 1px solid #aaa; border-radius: 4px; }"
                                         "QPushButton:hover { border: 2px solid #333; }").arg(color.name()));
 
-        // Quando clicchi un colore della griglia:
         connect(colorBtn, &QPushButton::clicked, this, [this, color]() {
-            currentSelectedColor = color; // Aggiorna la scelta
+            currentSelectedColor = color;
 
-            // Cambia il colore del cerchietto principale per dare feedback visivo
-            btnColorPick->setStyleSheet(QString("QPushButton { background-color: %1; border: 2px solid #ccc; border-radius: 14px; }")
-                                            .arg(color.name()));
+            btnColorPick->setStyleSheet(QString("QPushButton { background-color: %1; border: 2px solid #ccc; border-radius: 14px; }").arg(color.name()));
 
-            paletteContainer->setVisible(false); // Si ricomprime automaticamente verso l'alto
+            paletteContainer->setVisible(false);
         });
 
         grid->addWidget(colorBtn, row, col);
 
         col++;
-        if (col > 4) { // Massimo 5 quadratini per riga per non stringere la UI
+        if (col > 4) {
             col = 0;
             row++;
         }
@@ -103,7 +99,6 @@ void TagWidget::createPaletteGrid() {
 }
 
 void TagWidget::openColorDialog() {
-    // Esprime l'effetto fisarmonica: inverte lo stato di visibilità attuale del contenitore
     paletteContainer->setVisible(!paletteContainer->isVisible());
 }
 
@@ -138,7 +133,7 @@ void TagWidget::populateList() {
             label->setStyleSheet(QString("QLabel { color: %1; font-weight: bold; }").arg(t->getColor().name()));
 
             QPushButton* btnDelete = new QPushButton("delete", this);
-            btnDelete->setFixedSize(28, 28);
+            btnDelete->setFixedSize(60, 28);
             btnDelete->setCursor(Qt::PointingHandCursor);
             btnDelete->setStyleSheet("QPushButton { color: #d9534f; background: transparent; font-size: 14px; }"
                                      "QPushButton:hover { background-color: #f2dede; border-radius: 4px; }");

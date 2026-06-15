@@ -22,6 +22,7 @@ private:
     QColor tagColor;
     bool isWriteMode;
     bool newValueToSet;
+    date currentViewDate;
 
     void processTag(const tag* t) {
         if (t && !t->getName().empty()) {
@@ -31,8 +32,17 @@ private:
             tagColor = QColor();
         }
     }
+
+    int getOffset(const date& start) const {
+        QDate s(start.getYear(), start.getMonth(), start.getDay());
+        QDate c(currentViewDate.getYear(), currentViewDate.getMonth(), currentViewDate.getDay());
+        return s.daysTo(c);
+    }
+
 public:
-    DisplayVisitor() : textSummary(""), tagText(""), isRoutineType(false), hasCheckableStatus(false), isChecked(false), isWriteMode(false), newValueToSet(false) {}
+    DisplayVisitor() : textSummary(""), tagText(""), isRoutineType(false), hasCheckableStatus(false), isChecked(false), isWriteMode(false), newValueToSet(false), currentViewDate(date::today()) {}
+
+    void setViewDate(const date& d) { currentViewDate = d; }
 
     void setWriteMode(bool value) {
         isWriteMode = true;
@@ -180,24 +190,39 @@ public:
         isRoutineType = true;
         hasCheckableStatus = true;
 
+        int offset = getOffset(r.getStartDate());
+        std::vector<bool> history = r.getcheckHistory();
+
         if (isWriteMode) {
-            r.setCheck(newValueToSet);
+            if (offset >= 0) {
+                if (offset >= (int)history.size()) history.resize(offset + 1, false);
+                history[offset] = newValueToSet;
+                r.setCheckHistory(history);
+            }
         }
 
-        isChecked = r.getCheck();
-        std::string status = "[ROUTINE]";
+        isChecked = (offset >= 0 && offset < (int)history.size()) ? history[offset] : false;
 
-        textSummary = status + " " + r.getName();
-        if (!r.getDescription().empty())
-            textSummary += "\n" + r.getDescription();
-        textSummary += "\nTime: " + r.getStartTime().toString() + " - " + r.getEndTime().toString() + " | Frequency: " + r.FrequencyToString();
-        textSummary += "\nToday's Status: " + std::string(isChecked ? "Completed" : "Not completed");
+        textSummary = r.getName() + " — " + r.FrequencyToString() + " - " + r.getDescription() + "\n";
 
-        const auto& history = r.getcheckHistory();
+        textSummary += r.getStartTime().toString() + "–" + r.getEndTime().toString() + "\n";
+
+        textSummary += "Status: " + std::string(isChecked ? "✓" : "○");
+
         if (!history.empty()) {
-            textSummary += " | History: ";
-            for (bool b : history) {
-                textSummary += b ? "+" : "-";
+            textSummary += "\nHistory: ";
+            QDate startDate(r.getStartDate().getYear(), r.getStartDate().getMonth(), r.getStartDate().getDay());
+            int count = 0;
+
+            for (int i = 0; i < (int)history.size(); ++i) {
+                QDate currentDate = startDate.addDays(i);
+                date currentBackendDate(currentDate.day(), currentDate.month(), currentDate.year());
+
+                if (r.isActive(currentBackendDate)) {
+                    if (count > 0 && count % 7 == 0) textSummary += "\n";
+                    textSummary += history[i] ? "●" : "○";
+                    count++;
+                }
             }
         }
         processTag(r.getTag());

@@ -32,6 +32,7 @@ ActivityBlock::ActivityBlock(AbstractActivity* a, QWidget* parent)
     setAttribute(Qt::WA_TransparentForMouseEvents, false);
 }
 
+
 void ActivityBlock::paintEvent(QPaintEvent*)
 {
     if (!activity) return;
@@ -39,33 +40,31 @@ void ActivityBlock::paintEvent(QPaintEvent*)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    // Colore base preso dal tag o fallback sul pastello carta da zucchero
+    //base color
     QColor base = activity->getTag()
                       ? activity->getTag()->getColor()
                       : QColor(131, 166, 191);
 
     QColor bg = base;
-    // Riduciamo leggermente l'opacità per un effetto vetrato/pastello elegante
     bg.setAlpha(hovered || selected ? 240 : 190);
 
     const int STRIP = 4;
     QColor strip = base.darker(120);
-    const int R = 6; // Angoli leggermente più morbidi
+    const int R = 6;
 
     QRectF rect(0, 0, width(), height());
 
-    // Disegno del corpo principale del blocco
     QPainterPath path;
     path.addRoundedRect(rect, R, R);
     p.fillPath(path, bg);
 
-    // Disegno della strip laterale colorata di accento
+    //colored strip
     p.fillRect(QRectF(0, R, STRIP, height() - 2 * R), strip);
     QPainterPath stripPath;
     stripPath.addRoundedRect(QRectF(0, 0, STRIP, height()), R, R);
     p.fillPath(stripPath, strip);
 
-    // Bordo leggero per separare blocchi sovrapposti
+    //border to separate different activities
     p.setPen(QPen(base.darker(110), 1.0));
     p.drawPath(path);
 
@@ -84,12 +83,12 @@ void ActivityBlock::paintEvent(QPaintEvent*)
     font.setBold(!selected);
     p.setFont(font);
 
-    // Calcolo dinamico del contrasto per il testo (scuro su tag chiari, bianco su tag scuri)
+    //string color dipending on base color
     double luminance = 0.299 * base.red() + 0.587 * base.green() + 0.114 * base.blue();
     if (luminance < 140) {
         p.setPen(QColor(255, 255, 255, 240));
     } else {
-        p.setPen(QColor(74, 62, 77, 240)); // Il nostro vinaccia scuro #4A3E4D
+        p.setPen(QColor(74, 62, 77, 240));
     }
 
     QRectF textRect(STRIP + 8, 4, width() - STRIP - 12, height() - 8);
@@ -136,7 +135,7 @@ void TimeGrid::paintEvent(QPaintEvent*)
 
     const int W = width();
 
-    // Sfondo principale della griglia: Bianco pulito per far risaltare i blocchi pastello
+    //base grid color
     p.fillRect(rect(), QColor("#FFFFFF"));
 
     QFont labelFont;
@@ -146,7 +145,7 @@ void TimeGrid::paintEvent(QPaintEvent*)
     for (int h = 0; h < TOTAL_HOURS; h++) {
         int y = h * HOUR_HEIGHT;
 
-        // Linea delle ore intere: sottile e delicata color panna scuro
+        //hour line
         p.setPen(QPen(QColor("#E6DBCF"), 1.0, Qt::SolidLine));
         p.drawLine(LABEL_WIDTH, y, W, y);
 
@@ -157,18 +156,18 @@ void TimeGrid::paintEvent(QPaintEvent*)
                                   .arg(0, 2, 10, QChar('0'));
 
         if (!label.isEmpty()) {
-            p.setPen(QColor("#A6959B")); // Testo orari neutro e leggibile
+            p.setPen(QColor("#A6959B"));
             QRectF labelRect(4, y - 7, LABEL_WIDTH - 8, 14);
             p.drawText(labelRect, Qt::AlignRight | Qt::AlignVCenter, label);
         }
 
-        // Linea delle mezz'ore: tratteggiata e quasi impercettibile
+        //half hour line
         int yHalf = y + HOUR_HEIGHT / 2;
         p.setPen(QPen(QColor("#F0E6DA"), 1.0, Qt::DashLine));
         p.drawLine(LABEL_WIDTH, yHalf, W, yHalf);
     }
 
-    // Linea verticale di separazione tra ore e griglia
+    //vertical separation line hour label and grid
     p.setPen(QPen(QColor("#D1C4B4"), 1.2));
     p.drawLine(LABEL_WIDTH, 0, LABEL_WIDTH, height());
 }
@@ -198,7 +197,7 @@ void DayWidget::buildHeader()
     headerContainer->setFixedHeight(48);
     headerContainer->setStyleSheet(
         "QWidget {"
-        "  background-color: #D5A5AA;" // Rosa antico della testata principale
+        "  background-color: #D5A5AA;"
         "  border-bottom: 2px solid #C29399;"
         "}"
         );
@@ -262,6 +261,7 @@ void DayWidget::buildHeader()
     mainLayout->addWidget(headerContainer);
 }
 
+
 void DayWidget::buildScrollArea()
 {
     scrollArea = new QScrollArea(this);
@@ -311,7 +311,7 @@ void DayWidget::buildAllDayArea()
 
     allDayContainer->setStyleSheet(
         "QWidget {"
-        "  background-color: #F4EBE1;" // Sfondo panna per la sezione scadenze/tutto il giorno
+        "  background-color: #F4EBE1;"
         "  border-bottom: 1px solid #D1C4B4;"
         "}"
         );
@@ -346,6 +346,7 @@ DayWidget::computeGeometry(AbstractActivity* a, int colIdx, int nCols) const
     return g;
 }
 
+//return activity that has to be showed in DayWidget
 bool DayWidget::shouldShow(AbstractActivity* a) const
 {
     if (!a) return false;
@@ -405,6 +406,7 @@ groupOverlapping(const QList<QPair<AbstractActivity*, std::pair<int,int>>>& item
     return columns;
 }
 
+//create blocks activities
 void DayWidget::populateBlocks()
 {
     clearBlocks();
@@ -524,6 +526,7 @@ bool DayWidget::eventFilter(QObject* obj, QEvent* event)
     return QWidget::eventFilter(obj, event);
 }
 
+//show header date
 void DayWidget::setDate(const date& d)
 {
     currentDate = d;
@@ -531,7 +534,7 @@ void DayWidget::setDate(const date& d)
     static const char* giorni[]  = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
     static const char* mesi[]    = {"","January","February","March","April","May",
                                  "June","July","August","September","October",
-                                 "November","December"}; // Corretto typo "Dicember"
+                                 "November","December"};
     QDate qd(d.getYear(), d.getMonth(), d.getDay());
     QString dayName = giorni[qd.dayOfWeek() % 7];
     QString dateStr = QString("%1 %2 %3 %4")

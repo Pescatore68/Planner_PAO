@@ -160,7 +160,7 @@ void MainWindow::setupStackedWidget()
     stackedWidget->addWidget(addView);
 
     connect(calendarView, &calendar::dateSelected,
-            this, [this](const date& d) {
+            this, [](const date& d) {
                 qDebug() << QString::fromStdString(d.toString());
             });
 }
@@ -213,7 +213,6 @@ void MainWindow::setupNavBar()
 void MainWindow::showCalendar()     { stackedWidget->setCurrentWidget(calendarView); }
 void MainWindow::showSearch()       { stackedWidget->setCurrentWidget(searchView);   }
 void MainWindow::showTaskProject()  { stackedWidget->setCurrentWidget(taskWidget);   }
-
 void MainWindow::showTags()
 {
     if (tagView) tagView->refresh();

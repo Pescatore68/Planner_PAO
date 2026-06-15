@@ -37,10 +37,10 @@ void calendar::setWidgets(tagManager& tm)
     dayLayout->setContentsMargins(0, 0, 0, 0);
     dayLayout->setSpacing(8);
 
-    wDay        = new DayWidget(am, wDayContainer);
+    wDay = new DayWidget(am, wDayContainer);
     wTaskWidget = new TaskWidget(am, wDayContainer);
 
-    dayLayout->addWidget(wDay,        7);
+    dayLayout->addWidget(wDay, 7);
     dayLayout->addWidget(wTaskWidget, 3);
 
     wStack->addWidget(wMonth);
@@ -75,6 +75,7 @@ void calendar::ShowDay()
     wStack->setCurrentWidget(wDayContainer);
 }
 
+
 void calendar::onMonthDateClicked(const QDate& d)
 {
     selected = date(d.day(), d.month(), d.year());
@@ -82,12 +83,10 @@ void calendar::onMonthDateClicked(const QDate& d)
     emit dateSelected(selected);
 }
 
+//select day from calendar
 void calendar::DayRequested(const QDate& d)
 {
-    // Aggiorna la data selezionata nel calendario principale
     selected = date(d.day(), d.month(), d.year());
-
-    // Passa alla vista giorno
     ShowDay();
 }
 

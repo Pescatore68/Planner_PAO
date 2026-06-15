@@ -26,12 +26,24 @@ private:
     QWidget* paletteContainer;
     QColor currentSelectedColor;
 
-    const QList<Qt::GlobalColor> defaultColors = {
-        Qt::red,     Qt::green,   Qt::blue,
-        Qt::cyan,    Qt::magenta, Qt::yellow,
-        Qt::darkRed, Qt::darkGreen, Qt::darkBlue,
-        Qt::darkCyan, Qt::darkMagenta, Qt::darkYellow,
-        Qt::gray,    Qt::darkGray,  Qt::black
+    const QList<QColor> defaultColors = {
+        QColor::fromRgb(255,140,140),
+        QColor::fromRgb(209,221,147),
+        QColor::fromRgb(240,237,170),
+        QColor::fromRgb(194,213,244),
+        QColor::fromRgb(189,238,237),
+
+        QColor::fromRgb(249,150,174),
+        QColor::fromRgb(159,244,223),
+        QColor::fromRgb(255,195,120),
+        QColor::fromRgb(107,206,238),
+        QColor::fromRgb(217,182,253),
+
+        QColor::fromRgb(243,168,188),
+        QColor::fromRgb(245,173,148),
+        QColor::fromRgb(255,103,103),
+        QColor::fromRgb(180,249,165),
+        QColor::fromRgb(158,231,245)
     };
 
     void setupUI();

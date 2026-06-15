@@ -11,6 +11,8 @@ TaskForm::TaskForm(tagManager& tm, QWidget* parent)
     oDeadlineEdit = new QTimeEdit(QTime(23, 59), this);
     oDeadlineEdit->setDisplayFormat("HH:mm");
     addTimeRow("Deadline", deadlineEdit, oDeadlineEdit);
+    deadlineEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    oDeadlineEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
     mainLayout->addStretch();
 }
 

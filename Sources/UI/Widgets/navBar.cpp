@@ -20,13 +20,19 @@ void navBar::setup() {
     filterCombo->hide();
     btnTags = new QPushButton("Tag", this);
     btnAdd = new QPushButton("+ add", this);
+    loadBtn = new QPushButton("Load File", this);
+    saveBtn = new QPushButton("Save File", this);
+    searchEdit = new QLineEdit(this);
+
+    loadBtn->setObjectName("loadButton");
+    saveBtn->setObjectName("saveButton");
 
     searchRow->addWidget(btnSearch);
     searchRow->addWidget(btnFilter);
 
     layout->addWidget(btnCalendar);
     layout->addLayout(searchRow);
-    searchEdit = new QLineEdit(this);
+
     layout->addWidget(searchEdit);
     layout->addWidget(btnFilter);
     layout->addWidget(filterCombo);
@@ -37,6 +43,8 @@ void navBar::setup() {
     layout->addWidget(btnTags);
     layout->addStretch();
     layout->addWidget(btnAdd);
+    layout->addWidget(loadBtn);
+    layout->addWidget(saveBtn);
 
     connect(btnSearch, &QPushButton::clicked, this, [this](){
         searchEdit->setVisible(searchEdit->isHidden());
@@ -45,6 +53,8 @@ void navBar::setup() {
     connect(btnTags,        &QPushButton::clicked, this, &navBar::tagsClicked);
     connect(btnAdd,         &QPushButton::clicked, this, &navBar::addClicked);
     connect(searchEdit, &QLineEdit::textChanged, this, &navBar::searchTextChanged);
+    connect(loadBtn, &QPushButton::clicked, this, &navBar::loadClicked);
+    connect(saveBtn, &QPushButton::clicked, this, &navBar::saveClicked);
 
     connect(btnFilter, &QPushButton::clicked, this, [this](){
         filterCombo->setVisible(filterCombo->isHidden());

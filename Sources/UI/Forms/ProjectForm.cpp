@@ -33,7 +33,8 @@ void ProjectForm::setupSubtaskPanel()
     scroll->setWidget(subtaskPanel);
     scroll->setWidgetResizable(true);
     mainLayout->setStretchFactor(scroll, 1);
-    scroll->setVisible(false);
+    scroll->setVisible(true);
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setStyleSheet(R"(
         QScrollArea {
@@ -49,7 +50,7 @@ void ProjectForm::setupSubtaskPanel()
             margin: 0px;
         }
         QScrollBar::handle:vertical {
-            background: #aaaaaa;
+            background: #C2B6A8;
             border-radius: 1px;
             min-height: 20px;
         }

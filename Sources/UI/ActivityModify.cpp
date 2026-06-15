@@ -23,7 +23,6 @@ ActivityModify::ActivityModify(AbstractActivity* act, tagManager& tm, QWidget* p
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnCancel = new QPushButton("Cancel", this);
     btnSave = new QPushButton("Save", this);
-    btnSave->setStyleSheet("font-weight: bold; background-color: #0275d8; color: white; padding: 5px; border-radius: 4px;");
 
     btnLayout->addStretch();
     btnLayout->addWidget(btnCancel);

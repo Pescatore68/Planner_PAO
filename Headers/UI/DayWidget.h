@@ -43,7 +43,7 @@ public:
 class TimeGrid : public QWidget {
     Q_OBJECT
 public:
-    static constexpr int HOUR_HEIGHT   = 60;
+    static constexpr int HOUR_HEIGHT   = 120;
     static constexpr int LABEL_WIDTH   = 52;
     static constexpr int TOTAL_HOURS   = 24;
     static constexpr int TOTAL_HEIGHT  = HOUR_HEIGHT * TOTAL_HOURS;

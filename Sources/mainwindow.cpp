@@ -125,6 +125,9 @@ void MainWindow::showModify(AbstractActivity* a)
         currentModifyWidget = nullptr;
     }
 
+    //disable delete while the modify panel is open
+    calendarView->getTaskWidget()->setDeleteEnabled(false);
+
     currentModifyWidget = new ActivityModify(a, tm, navContainer);
     navStack->addWidget(currentModifyWidget);
     navStack->setCurrentWidget(currentModifyWidget);
@@ -135,6 +138,10 @@ void MainWindow::showModify(AbstractActivity* a)
                 calendarView->refresh();
                 calendarView->getMonthWidget()->updateCalendarView();
                 taskWidget->refresh();
+
+                //re-enable delete once modify panel is closed
+                calendarView->getTaskWidget()->setDeleteEnabled(true);
+
                 if (currentModifyWidget) {
                     navStack->removeWidget(currentModifyWidget);
                     delete currentModifyWidget;

@@ -27,6 +27,7 @@ public:
     void refresh();
 public slots:
     void handleExternalActivitySelected(AbstractActivity* a);
+    void setDeleteEnabled(bool enabled);
 
 signals:
     void activitySelected(AbstractActivity* a);

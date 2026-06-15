@@ -25,11 +25,17 @@
 #include <algorithm>
 #include <QPushButton>
 
+// ── ACTIVITY BLOCK (Elemento Grafico per le Attività) ──────────────────────
+
 ActivityBlock::ActivityBlock(AbstractActivity* a, QWidget* parent)
-    : QWidget(parent), activity(a)
+    : QWidget(parent), activity(a), hovered(false), selected(false)
 {
     setCursor(Qt::PointingHandCursor);
     setAttribute(Qt::WA_TransparentForMouseEvents, false);
+
+    // Risolve il bug di inizializzazione forzando il ridisegno immediato all'istanza
+    setAutoFillBackground(false);
+    update();
 }
 
 void ActivityBlock::paintEvent(QPaintEvent*)
@@ -39,36 +45,37 @@ void ActivityBlock::paintEvent(QPaintEvent*)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    // Colore base preso dal tag o fallback sul pastello carta da zucchero
-    QColor base = activity->getTag()
+    // Gestione Palette Pastello Dinamica - Fallback su --powder-blue (#99c1de)
+    QColor base = (activity->getTag() && activity->getTag()->getColor().isValid())
                       ? activity->getTag()->getColor()
-                      : QColor(131, 166, 191);
+                      : QColor("#99c1de");
 
     QColor bg = base;
-    // Riduciamo leggermente l'opacità per un effetto vetrato/pastello elegante
-    bg.setAlpha(hovered || selected ? 240 : 190);
+    // Opacità calibrata per l'effetto pastello morbido ma coprente
+    bg.setAlpha(hovered || selected ? 245 : 200);
 
-    const int STRIP = 4;
-    QColor strip = base.darker(120);
-    const int R = 6; // Angoli leggermente più morbidi
+    const int STRIP = 5;
+    QColor strip = base.darker(115);
+    const int R = 10; // Angoli elegantemente stondati (Curvatura Coerente)
 
     QRectF rect(0, 0, width(), height());
 
-    // Disegno del corpo principale del blocco
+    // Sfondo stondato del blocco attività
     QPainterPath path;
     path.addRoundedRect(rect, R, R);
     p.fillPath(path, bg);
 
-    // Disegno della strip laterale colorata di accento
-    p.fillRect(QRectF(0, R, STRIP, height() - 2 * R), strip);
+    // Barra verticale sinistra decorativa
     QPainterPath stripPath;
     stripPath.addRoundedRect(QRectF(0, 0, STRIP, height()), R, R);
     p.fillPath(stripPath, strip);
+    p.fillRect(QRectF(STRIP / 2.0, 0, STRIP / 2.0, height()), strip);
 
-    // Bordo leggero per separare blocchi sovrapposti
-    p.setPen(QPen(base.darker(110), 1.0));
+    // Contorno chiaro protettivo per separare i blocchi sovrapposti
+    p.setPen(QPen(base.darker(108), 1.0));
     p.drawPath(path);
 
+    // Estrazione del testo dell'attività
     QString textToDisplay;
     if (selected) {
         DisplayVisitor visitor;
@@ -78,29 +85,30 @@ void ActivityBlock::paintEvent(QPaintEvent*)
         textToDisplay = QString::fromStdString(activity->getName());
     }
 
+    // Forza la visibilità del testo se vuoto o all'avvio
+    if (textToDisplay.isEmpty()) {
+        textToDisplay = "Unnamed Activity";
+    }
+
     QFont font = p.font();
-    int fontSize = (height() < 24) ? 9 : (height() < 38) ? 11 : 13;
+    font.setFamily("Segoe UI");
+    int fontSize = (height() < 24) ? 10 : (height() < 38) ? 11 : 13;
     font.setPixelSize(fontSize);
-    font.setBold(!selected);
+    font.setBold(true);
     p.setFont(font);
 
-    // Calcolo dinamico del contrasto per il testo (scuro su tag chiari, bianco su tag scuri)
+    // Calcolo del contrasto dinamico per sfondo chiaro/scuro
     double luminance = 0.299 * base.red() + 0.587 * base.green() + 0.114 * base.blue();
-    if (luminance < 140) {
-        p.setPen(QColor(255, 255, 255, 240));
+    if (luminance < 145) {
+        p.setPen(QColor("#fff1e6")); // --linen (chiaro) se il tag è scuro
     } else {
-        p.setPen(QColor(74, 62, 77, 240)); // Il nostro vinaccia scuro #4A3E4D
+        p.setPen(QColor("#4A3E4D")); // Vinaccia scuro ad alto contrasto per i pastello
     }
 
-    QRectF textRect(STRIP + 8, 4, width() - STRIP - 12, height() - 8);
+    QRectF textRect(STRIP + 10, 4, width() - STRIP - 14, height() - 8);
 
-    if (height() < 18) {
-        return;
-    }
-
-    p.drawText(textRect,
-               Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap,
-               textToDisplay);
+    if (height() < 16) return;
+    p.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap, textToDisplay);
 }
 
 void ActivityBlock::enterEvent(QEnterEvent* e)
@@ -116,6 +124,18 @@ void ActivityBlock::leaveEvent(QEvent* e)
     update();
     QWidget::leaveEvent(e);
 }
+
+void ActivityBlock::setSelectedState(bool isSelected) {
+    if (selected != isSelected) {
+        selected = isSelected;
+        update();
+    }
+}
+
+bool ActivityBlock::isSelectedState() const { return selected; }
+
+
+// ── TIME GRID (Griglia Oraria di Sfondo) ───────────────────────────────────
 
 TimeGrid::TimeGrid(QWidget* parent)
     : QWidget(parent)
@@ -136,42 +156,42 @@ void TimeGrid::paintEvent(QPaintEvent*)
 
     const int W = width();
 
-    // Sfondo principale della griglia: Bianco pulito per far risaltare i blocchi pastello
+    // Sfondo della griglia bianca pulita (fitta con il panna esterno)
     p.fillRect(rect(), QColor("#FFFFFF"));
 
-    QFont labelFont;
+    QFont labelFont("Segoe UI");
     labelFont.setPixelSize(11);
+    labelFont.setBold(true);
     p.setFont(labelFont);
 
     for (int h = 0; h < TOTAL_HOURS; h++) {
         int y = h * HOUR_HEIGHT;
 
-        // Linea delle ore intere: sottile e delicata color panna scuro
-        p.setPen(QPen(QColor("#E6DBCF"), 1.0, Qt::SolidLine));
+        // Linee delle ore piene: Sottili e pulite
+        p.setPen(QPen(QColor("#f0efeb"), 1.2, Qt::SolidLine)); // --parchment
         p.drawLine(LABEL_WIDTH, y, W, y);
 
-        QString label = (h == 0)
-                            ? QString()
-                            : QString("%1:%2")
-                                  .arg(h, 2, 10, QChar(' '))
-                                  .arg(0, 2, 10, QChar('0'));
+        QString label = (h == 0) ? QString() : QString("%1:00").arg(h, 2, 10, QChar('0'));
 
         if (!label.isEmpty()) {
-            p.setPen(QColor("#A6959B")); // Testo orari neutro e leggibile
-            QRectF labelRect(4, y - 7, LABEL_WIDTH - 8, 14);
+            p.setPen(QColor("#7D6B7F")); // Testo orari perfettamente leggibile
+            QRectF labelRect(4, y - 7, LABEL_WIDTH - 12, 14);
             p.drawText(labelRect, Qt::AlignRight | Qt::AlignVCenter, label);
         }
 
-        // Linea delle mezz'ore: tratteggiata e quasi impercettibile
+        // Linee delle mezz'ore: Tratteggiate chiarissime
         int yHalf = y + HOUR_HEIGHT / 2;
-        p.setPen(QPen(QColor("#F0E6DA"), 1.0, Qt::DashLine));
+        p.setPen(QPen(QColor("#fff1e6"), 1.0, Qt::DashLine)); // --linen
         p.drawLine(LABEL_WIDTH, yHalf, W, yHalf);
     }
 
-    // Linea verticale di separazione tra ore e griglia
-    p.setPen(QPen(QColor("#D1C4B4"), 1.2));
+    // Linea verticale principale dell'asse orario
+    p.setPen(QPen(QColor("#eddcd2"), 1.5)); // --powder-petal
     p.drawLine(LABEL_WIDTH, 0, LABEL_WIDTH, height());
 }
+
+
+// ── DAY WIDGET (Pannello Giornaliero Principale) ───────────────────────────
 
 DayWidget::DayWidget(ActivityManager& am, QWidget* parent)
     : QWidget(parent), am(am), currentDate(date::today())
@@ -184,7 +204,8 @@ DayWidget::DayWidget(ActivityManager& am, QWidget* parent)
     buildAllDayArea();
     buildScrollArea();
 
-    QTimer::singleShot(0, this, [this] {
+    // Risolve il bug di mancato rendering iniziale forzando la sequenza di caricamento
+    QTimer::singleShot(50, this, [this] {
         refresh();
         int currentHour = QTime::currentTime().hour();
         int scrollTo    = std::max(0, TimeGrid::minutesToY(currentHour * 60) - 120);
@@ -195,52 +216,53 @@ DayWidget::DayWidget(ActivityManager& am, QWidget* parent)
 void DayWidget::buildHeader()
 {
     QWidget* headerContainer = new QWidget(this);
-    headerContainer->setFixedHeight(48);
+    headerContainer->setFixedHeight(52);
     headerContainer->setStyleSheet(
         "QWidget {"
-        "  background-color: #D5A5AA;" // Rosa antico della testata principale
-        "  border-bottom: 2px solid #C29399;"
+        "  background-color: #eddcd2;" // --powder-petal
+        "  border-bottom: 2px solid #fff1e6;" // --linen
         "}"
         );
 
     QHBoxLayout* headerLayout = new QHBoxLayout(headerContainer);
     headerLayout->setContentsMargins(16, 0, 16, 0);
-    headerLayout->setSpacing(12);
 
     QPushButton* btnPrev = new QPushButton("<", headerContainer);
     btnPrev->setFixedSize(32, 32);
     btnPrev->setCursor(Qt::PointingHandCursor);
     btnPrev->setStyleSheet(
         "QPushButton {"
-        "  border: none;"
-        "  background: transparent;"
-        "  color: #FFFFFF;"
-        "  font-size: 18px;"
+        "  border: 1px solid #4A3E4D;"
+        "  background: #fff1e6;"
+        "  color: #4A3E4D;"
+        "  font-size: 15px;"
         "  font-weight: bold;"
+        "  border-radius: 16px;"
         "}"
-        "QPushButton:hover { background-color: rgba(255, 255, 255, 0.2); border-radius: 6px; }"
+        "QPushButton:hover { background-color: #4A3E4D; color: #fff1e6; }"
         );
 
     headerLabel = new QLabel(headerContainer);
     headerLabel->setAlignment(Qt::AlignCenter);
-    QFont f = headerLabel->font();
+    QFont f("Segoe UI");
     f.setPixelSize(15);
     f.setBold(true);
     headerLabel->setFont(f);
-    headerLabel->setStyleSheet("QLabel { color: #FFFFFF; border: none; background: transparent; }");
+    headerLabel->setStyleSheet("QLabel { color: #4A3E4D; border: none; background: transparent; }");
 
     QPushButton* btnNext = new QPushButton(">", headerContainer);
     btnNext->setFixedSize(32, 32);
     btnNext->setCursor(Qt::PointingHandCursor);
     btnNext->setStyleSheet(
         "QPushButton {"
-        "  border: none;"
-        "  background: transparent;"
-        "  color: #FFFFFF;"
-        "  font-size: 18px;"
+        "  border: 1px solid #4A3E4D;"
+        "  background: #fff1e6;"
+        "  color: #4A3E4D;"
+        "  font-size: 15px;"
         "  font-weight: bold;"
+        "  border-radius: 16px;"
         "}"
-        "QPushButton:hover { background-color: rgba(255, 255, 255, 0.2); border-radius: 6px; }"
+        "QPushButton:hover { background-color: #4A3E4D; color: #fff1e6; }"
         );
 
     headerLayout->addWidget(btnPrev);
@@ -270,21 +292,11 @@ void DayWidget::buildScrollArea()
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setFrameShape(QFrame::NoFrame);
     scrollArea->setStyleSheet(
-        "QScrollBar:vertical {"
-        "  width: 8px;"
-        "  background: transparent;"
-        "}"
-        "QScrollBar::handle:vertical {"
-        "  background: #C2B6A8;"
-        "  border-radius: 4px;"
-        "  min-height: 30px;"
-        "}"
-        "QScrollBar::handle:vertical:hover {"
-        "  background: #A69787;"
-        "}"
-        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
-        "  height: 0;"
-        "}"
+        "QScrollArea { background-color: #FFFFFF; border: none; }"
+        "QScrollBar:vertical { width: 8px; background: transparent; }"
+        "QScrollBar::handle:vertical { background: #eddcd2; border-radius: 4px; }"
+        "QScrollBar::handle:vertical:hover { background: #99c1de; }"
+        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }"
         );
 
     scrollContent = new QWidget();
@@ -305,14 +317,13 @@ void DayWidget::buildAllDayArea()
 {
     allDayContainer = new QWidget(this);
     allDayLayout = new QVBoxLayout(allDayContainer);
-
-    allDayLayout->setContentsMargins(TimeGrid::LABEL_WIDTH + 6, 6, 6, 6);
-    allDayLayout->setSpacing(4);
+    allDayLayout->setContentsMargins(TimeGrid::LABEL_WIDTH + 8, 8, 8, 8);
+    allDayLayout->setSpacing(6);
 
     allDayContainer->setStyleSheet(
         "QWidget {"
-        "  background-color: #F4EBE1;" // Sfondo panna per la sezione scadenze/tutto il giorno
-        "  border-bottom: 1px solid #D1C4B4;"
+        "  background-color: #f0efeb;" // --parchment
+        "  border-bottom: 2px solid #eddcd2;"
         "}"
         );
 
@@ -333,16 +344,15 @@ DayWidget::computeGeometry(AbstractActivity* a, int colIdx, int nCols) const
 {
     auto [startMin, endMin] = extractMinutes(a, currentDate);
 
-    const int gridLeft  = TimeGrid::LABEL_WIDTH + 2;
-    const int gridRight = scrollArea->width() - 6;
-
+    const int gridLeft  = TimeGrid::LABEL_WIDTH + 4;
+    const int gridRight = scrollArea->width() - 8;
     const int colW      = (gridRight - gridLeft) / std::max(nCols, 1);
 
     BlockGeometry g;
     g.top    = TimeGrid::minutesToY(startMin) + 2;
-    g.height = std::max(TimeGrid::minutesToY(endMin) - g.top, 26);
+    g.height = std::max(TimeGrid::minutesToY(endMin) - g.top, 28);
     g.left   = gridLeft + colIdx * colW + 3;
-    g.width  = colW - 5;
+    g.width  = colW - 6;
     return g;
 }
 
@@ -437,7 +447,7 @@ void DayWidget::populateBlocks()
         allDayContainer->setVisible(true);
         for (AbstractActivity* act : allDayItems) {
             auto* block = new ActivityBlock(act, allDayContainer);
-            block->setFixedHeight(28);
+            block->setFixedHeight(32);
 
             block->installEventFilter(this);
             block->setProperty("activityPtr", QVariant::fromValue(static_cast<void*>(act)));
@@ -525,7 +535,7 @@ void DayWidget::setDate(const date& d)
     static const char* giorni[]  = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
     static const char* mesi[]    = {"","January","February","March","April","May",
                                  "June","July","August","September","October",
-                                 "November","December"}; // Corretto typo "Dicember"
+                                 "November","December"};
     QDate qd(d.getYear(), d.getMonth(), d.getDay());
     QString dayName = giorni[qd.dayOfWeek() % 7];
     QString dateStr = QString("%1 %2 %3 %4")
@@ -551,12 +561,3 @@ void DayWidget::resizeEvent(QResizeEvent* event)
     QWidget::resizeEvent(event);
     populateBlocks();
 }
-
-void ActivityBlock::setSelectedState(bool isSelected) {
-    if (selected != isSelected) {
-        selected = isSelected;
-        update();
-    }
-}
-
-bool ActivityBlock::isSelectedState() const { return selected; }

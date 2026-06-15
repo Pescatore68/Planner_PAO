@@ -2,7 +2,7 @@
 #define DAYWIDGETVISITOR_H
 
 #include "ActivityVisitor.h"
-#include "../date.h"
+#include "../Model/date.h"
 
 class Event;
 class Reminder;

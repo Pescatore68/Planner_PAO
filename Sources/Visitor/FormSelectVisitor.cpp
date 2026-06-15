@@ -4,11 +4,11 @@
 #include "Headers/UI/Forms/RoutineForm.h"
 #include "Headers/UI/Forms/ReminderForm.h"
 #include "Headers/UI/Forms/ProjectForm.h"
-#include "Headers/event.h"
-#include "Headers/task.h"
-#include "Headers/routine.h"
-#include "Headers/reminder.h"
-#include "Headers/project.h"
+#include "Headers/Model/event.h"
+#include "Headers/Model/task.h"
+#include "Headers/Model/routine.h"
+#include "Headers/Model/reminder.h"
+#include "Headers/Model/project.h"
 
 
 FormSelectVisitor::FormSelectVisitor(tagManager& tm, QWidget* parent) : tm(tm), parent(parent) {}

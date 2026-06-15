@@ -6,11 +6,11 @@
 #include <QHBoxLayout>
 #include <QWidget>
 
-#include "Headers/ActivityManager.h"
-#include "Headers/UI/TagWidget.h"
-#include "Headers/tagManager.h"
-#include "Headers/UI/navBar.h"
-#include "Headers/UI/calendar.h"
+#include "Headers/Model/ActivityManager.h"
+#include "Headers/UI/Widgets/TagWidget.h"
+#include "Headers/Model/tagManager.h"
+#include "Headers/UI/Widgets/navBar.h"
+#include "Headers/UI/Widgets/calendar.h"
 
 class TaskWidget;
 class AbstractActivity;

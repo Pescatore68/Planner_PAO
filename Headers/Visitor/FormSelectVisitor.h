@@ -3,7 +3,7 @@
 
 #include "Headers/Visitor/ActivityVisitor.h"
 #include "Headers/UI/Forms/ActivityForm.h"
-#include "Headers/ActivityManager.h"
+#include "Headers/Model/ActivityManager.h"
 
 class FormSelectVisitor : public ActivityVisitor {
 public:

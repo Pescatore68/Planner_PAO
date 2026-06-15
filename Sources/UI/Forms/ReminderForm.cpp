@@ -1,5 +1,5 @@
 #include "Headers/UI/Forms/ReminderForm.h"
-#include "Headers/reminder.h"
+#include "Headers/Model/reminder.h"
 #include <QMessageBox>
 
 ReminderForm::ReminderForm(tagManager& tm, QWidget* parent)

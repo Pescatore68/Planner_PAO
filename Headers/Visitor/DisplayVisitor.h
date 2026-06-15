@@ -2,11 +2,11 @@
 #define DISPLAYVISITOR_H
 
 #include "Headers/Visitor/ActivityVisitor.h"
-#include "Headers/event.h"
-#include "Headers/reminder.h"
-#include "Headers/routine.h"
-#include "Headers/task.h"
-#include "Headers/project.h"
+#include "Headers/Model/event.h"
+#include "Headers/Model/reminder.h"
+#include "Headers/Model/routine.h"
+#include "Headers/Model/task.h"
+#include "Headers/Model/project.h"
 #include "qboxlayout.h"
 #include "qlabel.h"
 #include <string>

@@ -1,5 +1,5 @@
 #include "Headers/UI/Forms/EventForm.h"
-#include "Headers/event.h"
+#include "Headers/Model/event.h"
 #include <QMessageBox>
 
 EventForm::EventForm(tagManager& tm, QWidget* parent)

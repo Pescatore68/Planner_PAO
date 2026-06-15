@@ -30,7 +30,7 @@ TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
     tree->setSelectionMode(QAbstractItemView::SingleSelection);
     tree->setAnimated(true);
 
-    tree->setStyleSheet(
+    /*tree->setStyleSheet(
         "QTreeView { "
         "  font-family: 'SF Pro Text', '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; "
         "  font-size: 14px; "
@@ -44,7 +44,7 @@ TaskWidget::TaskWidget(ActivityManager& am, QWidget* parent)
         "  background-color: transparent; "
         "  border: none; "
         "}"
-        );
+        );*/
 
     tree->setItemDelegateForColumn(0, new ProgressBarDelegate(tree));
 

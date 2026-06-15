@@ -32,8 +32,6 @@ ActivityBlock::ActivityBlock(AbstractActivity* a, QWidget* parent)
 {
     setCursor(Qt::PointingHandCursor);
     setAttribute(Qt::WA_TransparentForMouseEvents, false);
-
-    // Risolve il bug di inizializzazione forzando il ridisegno immediato all'istanza
     setAutoFillBackground(false);
     update();
 }
@@ -45,37 +43,36 @@ void ActivityBlock::paintEvent(QPaintEvent*)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    // Gestione Palette Pastello Dinamica - Fallback su --powder-blue (#99c1de)
+    // Colore base dal tag. Se non valido, fallback sul nostro --steel-blue (#6096ba)
     QColor base = (activity->getTag() && activity->getTag()->getColor().isValid())
                       ? activity->getTag()->getColor()
-                      : QColor("#99c1de");
+                      : QColor("#6096ba");
 
     QColor bg = base;
-    // Opacità calibrata per l'effetto pastello morbido ma coprente
-    bg.setAlpha(hovered || selected ? 245 : 200);
+    // Tonalità piena e solida, opacità elevata per un look professionale senza trasparenze eccessive
+    bg.setAlpha(hovered || selected ? 255 : 230);
 
-    const int STRIP = 5;
-    QColor strip = base.darker(115);
-    const int R = 10; // Angoli elegantemente stondati (Curvatura Coerente)
+    const int STRIP = 4;
+    QColor strip = base.darker(125); // Accento laterale più scuro e serio
+    const int R = 4; // Angoli squadrati e professionali (ridotti a 4px per uno stile geometrico)
 
     QRectF rect(0, 0, width(), height());
 
-    // Sfondo stondato del blocco attività
+    // Corpo del blocco attività
     QPainterPath path;
     path.addRoundedRect(rect, R, R);
     p.fillPath(path, bg);
 
-    // Barra verticale sinistra decorativa
+    // Striscia di accento verticale netta
     QPainterPath stripPath;
     stripPath.addRoundedRect(QRectF(0, 0, STRIP, height()), R, R);
     p.fillPath(stripPath, strip);
     p.fillRect(QRectF(STRIP / 2.0, 0, STRIP / 2.0, height()), strip);
 
-    // Contorno chiaro protettivo per separare i blocchi sovrapposti
-    p.setPen(QPen(base.darker(108), 1.0));
+    // Bordi di separazione netti ad alto contrasto
+    p.setPen(QPen(base.darker(115), 1.0));
     p.drawPath(path);
 
-    // Estrazione del testo dell'attività
     QString textToDisplay;
     if (selected) {
         DisplayVisitor visitor;
@@ -85,27 +82,26 @@ void ActivityBlock::paintEvent(QPaintEvent*)
         textToDisplay = QString::fromStdString(activity->getName());
     }
 
-    // Forza la visibilità del testo se vuoto o all'avvio
     if (textToDisplay.isEmpty()) {
-        textToDisplay = "Unnamed Activity";
+        textToDisplay = "---";
     }
 
     QFont font = p.font();
-    font.setFamily("Segoe UI");
-    int fontSize = (height() < 24) ? 10 : (height() < 38) ? 11 : 13;
+    font.setFamily("Helvetica");
+    int fontSize = (height() < 24) ? 10 : (height() < 38) ? 11 : 12;
     font.setPixelSize(fontSize);
     font.setBold(true);
     p.setFont(font);
 
-    // Calcolo del contrasto dinamico per sfondo chiaro/scuro
+    // Calcolo contrasto rigoroso per interfacce business
     double luminance = 0.299 * base.red() + 0.587 * base.green() + 0.114 * base.blue();
-    if (luminance < 145) {
-        p.setPen(QColor("#fff1e6")); // --linen (chiaro) se il tag è scuro
+    if (luminance < 135) {
+        p.setPen(QColor("#e7ecef")); // Testo --platinum su tag scuri
     } else {
-        p.setPen(QColor("#4A3E4D")); // Vinaccia scuro ad alto contrasto per i pastello
+        p.setPen(QColor("#274c77")); // Testo --dusk-blue su tag chiari
     }
 
-    QRectF textRect(STRIP + 10, 4, width() - STRIP - 14, height() - 8);
+    QRectF textRect(STRIP + 8, 4, width() - STRIP - 12, height() - 8);
 
     if (height() < 16) return;
     p.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap, textToDisplay);
@@ -135,7 +131,7 @@ void ActivityBlock::setSelectedState(bool isSelected) {
 bool ActivityBlock::isSelectedState() const { return selected; }
 
 
-// ── TIME GRID (Griglia Oraria di Sfondo) ───────────────────────────────────
+// ── TIME GRID (Griglia Oraria Rigorosa) ───────────────────────────────────
 
 TimeGrid::TimeGrid(QWidget* parent)
     : QWidget(parent)
@@ -156,10 +152,10 @@ void TimeGrid::paintEvent(QPaintEvent*)
 
     const int W = width();
 
-    // Sfondo della griglia bianca pulita (fitta con il panna esterno)
+    // Sfondo della griglia: Bianco tecnico pulito
     p.fillRect(rect(), QColor("#FFFFFF"));
 
-    QFont labelFont("Segoe UI");
+    QFont labelFont("Helvetica");
     labelFont.setPixelSize(11);
     labelFont.setBold(true);
     p.setFont(labelFont);
@@ -167,26 +163,26 @@ void TimeGrid::paintEvent(QPaintEvent*)
     for (int h = 0; h < TOTAL_HOURS; h++) {
         int y = h * HOUR_HEIGHT;
 
-        // Linee delle ore piene: Sottili e pulite
-        p.setPen(QPen(QColor("#f0efeb"), 1.2, Qt::SolidLine)); // --parchment
+        // Linee ore piene: Grigio tecnico pulito e sottile
+        p.setPen(QPen(QColor("#e7ecef"), 1.0, Qt::SolidLine)); // --platinum usato come linea
         p.drawLine(LABEL_WIDTH, y, W, y);
 
         QString label = (h == 0) ? QString() : QString("%1:00").arg(h, 2, 10, QChar('0'));
 
         if (!label.isEmpty()) {
-            p.setPen(QColor("#7D6B7F")); // Testo orari perfettamente leggibile
+            p.setPen(QColor("#8b8c89")); // Orari scritti in --grey-olive nitido
             QRectF labelRect(4, y - 7, LABEL_WIDTH - 12, 14);
             p.drawText(labelRect, Qt::AlignRight | Qt::AlignVCenter, label);
         }
 
-        // Linee delle mezz'ore: Tratteggiate chiarissime
+        // Linee di mezz'ora: Tratteggio minimale grigio finissimo
         int yHalf = y + HOUR_HEIGHT / 2;
-        p.setPen(QPen(QColor("#fff1e6"), 1.0, Qt::DashLine)); // --linen
+        p.setPen(QPen(QColor("#f4f6f8"), 1.0, Qt::DashLine));
         p.drawLine(LABEL_WIDTH, yHalf, W, yHalf);
     }
 
-    // Linea verticale principale dell'asse orario
-    p.setPen(QPen(QColor("#eddcd2"), 1.5)); // --powder-petal
+    // Linea verticale divisoria della timeline (In --dusk-blue istituzionale)
+    p.setPen(QPen(QColor("#274c77"), 1.5));
     p.drawLine(LABEL_WIDTH, 0, LABEL_WIDTH, height());
 }
 
@@ -204,7 +200,6 @@ DayWidget::DayWidget(ActivityManager& am, QWidget* parent)
     buildAllDayArea();
     buildScrollArea();
 
-    // Risolve il bug di mancato rendering iniziale forzando la sequenza di caricamento
     QTimer::singleShot(50, this, [this] {
         refresh();
         int currentHour = QTime::currentTime().hour();
@@ -216,11 +211,11 @@ DayWidget::DayWidget(ActivityManager& am, QWidget* parent)
 void DayWidget::buildHeader()
 {
     QWidget* headerContainer = new QWidget(this);
-    headerContainer->setFixedHeight(52);
+    headerContainer->setFixedHeight(48);
     headerContainer->setStyleSheet(
         "QWidget {"
-        "  background-color: #eddcd2;" // --powder-petal
-        "  border-bottom: 2px solid #fff1e6;" // --linen
+        "  background-color: #274c77;" // --dusk-blue (testata scura, formale)
+        "  border-bottom: 2px solid #6096ba;" // --steel-blue
         "}"
         );
 
@@ -228,41 +223,41 @@ void DayWidget::buildHeader()
     headerLayout->setContentsMargins(16, 0, 16, 0);
 
     QPushButton* btnPrev = new QPushButton("<", headerContainer);
-    btnPrev->setFixedSize(32, 32);
+    btnPrev->setFixedSize(28, 28);
     btnPrev->setCursor(Qt::PointingHandCursor);
     btnPrev->setStyleSheet(
         "QPushButton {"
-        "  border: 1px solid #4A3E4D;"
-        "  background: #fff1e6;"
-        "  color: #4A3E4D;"
-        "  font-size: 15px;"
+        "  border: 1px solid #6096ba;"
+        "  background: #274c77;"
+        "  color: #e7ecef;"
+        "  font-size: 13px;"
         "  font-weight: bold;"
-        "  border-radius: 16px;"
+        "  border-radius: 4px;" /* Squadrato, stile gestionale serio */
         "}"
-        "QPushButton:hover { background-color: #4A3E4D; color: #fff1e6; }"
+        "QPushButton:hover { background-color: #6096ba; }"
         );
 
     headerLabel = new QLabel(headerContainer);
     headerLabel->setAlignment(Qt::AlignCenter);
-    QFont f("Segoe UI");
-    f.setPixelSize(15);
+    QFont f("Helvetica");
+    f.setPixelSize(14);
     f.setBold(true);
     headerLabel->setFont(f);
-    headerLabel->setStyleSheet("QLabel { color: #4A3E4D; border: none; background: transparent; }");
+    headerLabel->setStyleSheet("QLabel { color: #e7ecef; border: none; background: transparent; }");
 
     QPushButton* btnNext = new QPushButton(">", headerContainer);
-    btnNext->setFixedSize(32, 32);
+    btnNext->setFixedSize(28, 28);
     btnNext->setCursor(Qt::PointingHandCursor);
     btnNext->setStyleSheet(
         "QPushButton {"
-        "  border: 1px solid #4A3E4D;"
-        "  background: #fff1e6;"
-        "  color: #4A3E4D;"
-        "  font-size: 15px;"
+        "  border: 1px solid #6096ba;"
+        "  background: #274c77;"
+        "  color: #e7ecef;"
+        "  font-size: 13px;"
         "  font-weight: bold;"
-        "  border-radius: 16px;"
+        "  border-radius: 4px;"
         "}"
-        "QPushButton:hover { background-color: #4A3E4D; color: #fff1e6; }"
+        "QPushButton:hover { background-color: #6096ba; }"
         );
 
     headerLayout->addWidget(btnPrev);
@@ -294,8 +289,8 @@ void DayWidget::buildScrollArea()
     scrollArea->setStyleSheet(
         "QScrollArea { background-color: #FFFFFF; border: none; }"
         "QScrollBar:vertical { width: 8px; background: transparent; }"
-        "QScrollBar::handle:vertical { background: #eddcd2; border-radius: 4px; }"
-        "QScrollBar::handle:vertical:hover { background: #99c1de; }"
+        "QScrollBar::handle:vertical { background: #6096ba; border-radius: 4px; }"
+        "QScrollBar::handle:vertical:hover { background: #6096ba; }"
         "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }"
         );
 
@@ -317,13 +312,13 @@ void DayWidget::buildAllDayArea()
 {
     allDayContainer = new QWidget(this);
     allDayLayout = new QVBoxLayout(allDayContainer);
-    allDayLayout->setContentsMargins(TimeGrid::LABEL_WIDTH + 8, 8, 8, 8);
-    allDayLayout->setSpacing(6);
+    allDayLayout->setContentsMargins(TimeGrid::LABEL_WIDTH + 8, 6, 8, 6);
+    allDayLayout->setSpacing(4);
 
     allDayContainer->setStyleSheet(
         "QWidget {"
-        "  background-color: #f0efeb;" // --parchment
-        "  border-bottom: 2px solid #eddcd2;"
+        "  background-color: #e7ecef;" // --platinum per la barra scadenze fisse
+        "  border-bottom: 2px solid #6096ba;"
         "}"
         );
 
@@ -350,9 +345,9 @@ DayWidget::computeGeometry(AbstractActivity* a, int colIdx, int nCols) const
 
     BlockGeometry g;
     g.top    = TimeGrid::minutesToY(startMin) + 2;
-    g.height = std::max(TimeGrid::minutesToY(endMin) - g.top, 28);
-    g.left   = gridLeft + colIdx * colW + 3;
-    g.width  = colW - 6;
+    g.height = std::max(TimeGrid::minutesToY(endMin) - g.top, 26);
+    g.left   = gridLeft + colIdx * colW + 2;
+    g.width  = colW - 4;
     return g;
 }
 
@@ -447,7 +442,7 @@ void DayWidget::populateBlocks()
         allDayContainer->setVisible(true);
         for (AbstractActivity* act : allDayItems) {
             auto* block = new ActivityBlock(act, allDayContainer);
-            block->setFixedHeight(32);
+            block->setFixedHeight(30);
 
             block->installEventFilter(this);
             block->setProperty("activityPtr", QVariant::fromValue(static_cast<void*>(act)));

@@ -89,153 +89,157 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     app.setStyleSheet(
-        // ── Struttura Globale Finestre (Sfondo Panna Naturale) ───────────────────
+        // ── Struttura Finestre Aziendali (Sfondo Platino Pulito) ─────────────────
         "QMainWindow, QDialog, QMessageBox, QStackedWidget, .MonthWidget, .calendar, .TaskWidget, .TagWidget, .AddDialog {"
-        "  background-color: #F4EBE1 !important;" /* Panna di fondo */
-        "  color: #4A3E4D;"                      /* Testo Vinaccia scuro per contrasto eccezionale */
-        "  font-family: 'Segoe UI', -apple-system, sans-serif;"
-        "  font-size: 14px;"
+        "  background-color: #e7ecef !important;" /* Sfondo istituzionale --platinum */
+        "  color: #274c77;"                      /* Testo primario rigoroso --dusk-blue */
+        "  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;"
+        "  font-size: 13px;"
         "}"
-        "QWidget { color: #4A3E4D; }"
+        "QWidget { color: #274c77; }"
 
-        // ── Bottoni Arrotondati Morbidi ─────────────────────────────────────────
+        // ── Pulsanti Solidi e Tecnici (Angoli Squadrati 6px) ───────────────────
         "QPushButton {"
-        "  background-color: #D5A5AA;"           /* --petal-frost alternativo */
-        "  color: #FFFFFF;"
+        "  background-color: #274c77;"           /* --dusk-blue */
+        "  color: #e7ecef;"                      /* Testo --platinum */
         "  border: none;"
-        "  border-radius: 12px;"                 /* Curve morbide coerenti */
-        "  padding: 8px 22px;"
+        "  border-radius: 6px;"                  /* Curve ridotte per un design serio */
+        "  padding: 6px 16px;"
         "  font-weight: 600;"
+        "  font-size: 13px;"
         "}"
         "QPushButton:hover {"
-        "  background-color: #99c1de;"           /* --powder-blue all'hover */
+        "  background-color: #6096ba;"           /* --steel-blue all'hover */
         "}"
         "QPushButton:pressed {"
-        "  background-color: #bcd4e6;"           /* --pale-sky alla pressione */
+        "  background-color: #a3cef1;"           /* --icy-blue alla pressione */
+        "  color: #274c77;"
         "}"
         "QPushButton:checked {"
-        "  background-color: #4A3E4D;"
+        "  background-color: #1e3a5f;"
         "  color: #FFFFFF;"
         "}"
         "QPushButton:disabled {"
-        "  background-color: #f0efeb;"           /* --parchment */
-        "  color: #C2B6A8;"
+        "  background-color: #d1d5db;"
+        "  color: #8b8c89;"
         "}"
 
-        // ── Campi di Input (Bordi Ben Definiti) ──────────────────────────────────
+        // ── Campi Di Input Quadrati e Puliti ──────────────────────────────────
         "QLineEdit, QDateEdit, QTimeEdit {"
         "  background-color: #FFFFFF;"
-        "  color: #4A3E4D;"
-        "  border: 2px solid #eddcd2;"           /* Bordo --powder-petal visibile */
-        "  border-radius: 10px;"                 /* Geometria arrotondata coordinata */
-        "  padding: 6px 12px;"
+        "  color: #274c77;"
+        "  border: 1px solid #8b8c89;"           /* Bordo --grey-olive nitido */
+        "  border-radius: 4px;"
+        "  padding: 5px 10px;"
         "}"
         "QLineEdit:focus, QDateEdit:focus, QTimeEdit:focus {"
-        "  border: 2px solid #99c1de;"           /* Focus illumina in --powder-blue */
+        "  border: 2px solid #274c77;"           /* Il focus marca l'input in blu scuro */
+        "  padding: 4px 9px;"
         "}"
         "QLineEdit::placeholder {"
-        "  color: #A6959B;"
-        "  font-style: italic;"
+        "  color: #8b8c89;"
         "}"
 
-        // ── ComboBox Pastello ───────────────────────────────────────────────────
+        // ── ComboBox Gestionale ────────────────────────────────────────────────
         "QComboBox {"
         "  background-color: #FFFFFF;"
-        "  color: #4A3E4D;"
-        "  border: 2px solid #eddcd2;"
-        "  border-radius: 10px;"
-        "  padding: 6px 30px 6px 12px;"
+        "  color: #274c77;"
+        "  border: 1px solid #8b8c89;"
+        "  border-radius: 4px;"
+        "  padding: 5px 26px 5px 10px;"
         "}"
         "QComboBox:hover {"
-        "  border-color: #99c1de;"
+        "  border-color: #274c77;"
         "}"
         "QComboBox::drop-down {"
         "  subcontrol-origin: padding;"
         "  subcontrol-position: top right;"
-        "  width: 28px;"
-        "  border-left: 1px solid #f0efeb;"
+        "  width: 24px;"
+        "  border-left: 1px solid #e7ecef;"
         "}"
         "QComboBox QAbstractItemView {"
         "  background-color: #FFFFFF;"
-        "  color: #4A3E4D;"
-        "  border: 2px solid #eddcd2;"
-        "  border-radius: 10px;"
-        "  selection-background-color: #fad2e1;" /* --petal-frost per la selezione */
-        "  selection-color: #4A3E4D;"
+        "  color: #274c77;"
+        "  border: 1px solid #274c77;"
+        "  border-radius: 4px;"
+        "  selection-background-color: #a3cef1;" /* Selezione pulita in --icy-blue */
+        "  selection-color: #274c77;"
         "}"
 
-        // ── Calendario Avanzato Stondato ─────────────────────────────────────────
+        // ── Calendario Strutturato ──────────────────────────────────────────────
         "QCalendarWidget {"
-        "  border: 2px solid #eddcd2;"
-        "  border-radius: 14px;"
+        "  border: 1px solid #8b8c89;"
+        "  border-radius: 6px;"
         "}"
         "QCalendarWidget QAbstractItemView:enabled {"
         "  background-color: #FFFFFF;"
-        "  color: #4A3E4D;"
-        "  border-radius: 10px;"
-        "  selection-background-color: #99c1de;" /* Selezione giorno: --powder-blue */
-        "  selection-color: #FFFFFF;"
+        "  color: #274c77;"
+        "  border-radius: 0px;"
+        "  selection-background-color: #274c77;" /* Giorno attivo: Blu Scuro */
+        "  selection-color: #e7ecef;"
         "}"
         "QCalendarWidget QAbstractItemView:disabled {"
-        "  color: #C2B6A8;"
+        "  color: #d1d5db;"
         "}"
         "QCalendarWidget QWidget#qt_calendar_navigationbar {"
-        "  background-color: #eddcd2;"
-        "  border-top-left-radius: 12px;"
-        "  border-top-right-radius: 12px;"
-        "  border-bottom: 2px solid #fff1e6;"
+        "  background-color: #274c77;"
+        "  border-top-left-radius: 6px;"
+        "  border-top-right-radius: 6px;"
+        "  border-bottom: 1px solid #6096ba;"
         "}"
         "QCalendarWidget QToolButton {"
         "  background-color: transparent;"
-        "  color: #4A3E4D;"
+        "  color: #e7ecef;"
         "  font-weight: bold;"
-        "  border-radius: 6px;"
-        "  margin: 4px;"
+        "  border-radius: 4px;"
+        "  margin: 2px;"
         "}"
         "QCalendarWidget QToolButton:hover {"
-        "  background-color: rgba(153, 193, 222, 0.4);"
+        "  background-color: #6096ba;"
         "}"
 
-        // ── CheckBox Custom (Visibilità ad Alto Contrasto) ──────────────────────
+        // ── CheckBox Rigidi ad Alto Contrasto ─────────────────────────────────
         "QCheckBox {"
-        "  spacing: 10px;"
-        "  color: #4A3E4D;"
-        "  font-weight: 600;"
+        "  spacing: 8px;"
+        "  color: #274c77;"
+        "  font-weight: 500;"
         "}"
         "QCheckBox::indicator {"
-        "  width: 20px;"
-        "  height: 20px;"
-        "  border: 2px solid #4A3E4D;"           /* Contorno scuro marcato e visibile */
-        "  border-radius: 6px;"                  /* Angoli arrotondati a quadratino morbido */
-        "  background-color: #FFFFFF;"           /* Sfondo bianco pulito */
+        "  width: 16px;"
+        "  height: 16px;"
+        "  border: 1px solid #274c77;"           /* Linea esterna blu scuro fissa */
+        "  border-radius: 3px;"                  /* Angolo quasi perfettamente dritto */
+        "  background-color: #FFFFFF;"
         "}"
         "QCheckBox::indicator:hover {"
-        "  background-color: #fff1e6;"           /* Illuminazione all'hover */
-        "  border-color: #99c1de;"
+        "  border-color: #6096ba;"
+        "  background-color: #e7ecef;"
         "}"
         "QCheckBox::indicator:checked {"
-        "  background-color: #99c1de;"           /* Si riempie di azzurro quando attivo */
-        "  border-color: #4A3E4D;"
-        "  image: url(data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A3E4D' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'></polyline></svg>);" /* Segno di spunta scuro incorporato */
+        "  background-color: #274c77;"           /* Riempimento blu solido */
+        "  border-color: #274c77;"
+        "  image: url(data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e7ecef' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'></polyline></svg>);" /* Spunta interna in --platinum nitida */
         "}"
 
-        // ── Liste e Viste Dati ──────────────────────────────────────────────────
+        // ── Data Views (Tabelle, Liste e Alberi) ───────────────────────────────
         "QListWidget, QTreeWidget {"
         "  background-color: #FFFFFF;"
-        "  color: #4A3E4D;"
-        "  border: 2px solid #eddcd2;"
-        "  border-radius: 12px;"
+        "  color: #274c77;"
+        "  border: 1px solid #8b8c89;"
+        "  border-radius: 6px;"
+        "}"
+        "QListWidget::item, QTreeWidget::item {"
+        "  border-bottom: 1px solid #e7ecef;"     /* Separazione rigorosa ad elementi */
         "}"
         "QListWidget::item:hover, QTreeWidget::item:hover {"
-        "  background-color: #fff1e6;"
-        "  color: #4A3E4D;"
+        "  background-color: #e7ecef;"
+        "  color: #274c77;"
         "}"
         "QListWidget::item:selected, QTreeWidget::item:selected {"
-        "  background-color: #99c1de;"
+        "  background-color: #6096ba;"           /* Evidenziatore strutturato --steel-blue */
         "  color: #FFFFFF;"
         "}"
         );
-
     // Imposta la directory di lavoro alla cartella dell'eseguibile
     // così i file JSON/XML vengono trovati / scritti sempre nello stesso posto.
     QDir::setCurrent(QCoreApplication::applicationDirPath());

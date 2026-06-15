@@ -12,7 +12,7 @@ public:
     static bool loadDataWithDialog(ActivityManager& am, tagManager& tm, QWidget* parent = nullptr);
     static void saveDataWithDialog(const ActivityManager& am, const tagManager& tm, QWidget* parent = nullptr);
 
-    // json anc xml method
+    // json and xml method
     static bool loadFromFile(ActivityManager& am, tagManager& tm, const std::string& filePath);
     static void saveToFile(const ActivityManager& am, const tagManager& tm, const std::string& filePath);
 };

@@ -44,7 +44,7 @@ Reminder* Reminder::fromJson(const QJsonObject& obj, tagManager& tm) {
                              tm.newTag(obj["tag"].toString().toStdString(), QColor(obj["tagColor"].toString())),
                              date::dateFromString(obj["date"].toString().toStdString()),
                              HourMinute::hmFromString(obj["time"].toString().toStdString()),
-                             obj["message"].toString().toStdString());
+                             obj["location"].toString().toStdString());
     return rem;
 }
 

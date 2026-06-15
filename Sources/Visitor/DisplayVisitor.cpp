@@ -95,7 +95,7 @@ void DisplayVisitor::visit(Event& e) {
     }
 
     if (e.hasTime()) {
-        textSummary += "\nDate: " + e.getStartDate().toString() + "-" + e.getEndDate().toString() + " Time: " + e.getStartTime().toString() + " - " + e.getEndTime().toString();
+        textSummary += "\nDate: " + e.getStartDate().toString() + "-" + e.getEndDate().toString() + "\n Time: " + e.getStartTime().toString() + " - " + e.getEndTime().toString();
     } else {
         textSummary += "\nDate: " + e.getStartDate().toString() + "-" + e.getEndDate().toString();
     }

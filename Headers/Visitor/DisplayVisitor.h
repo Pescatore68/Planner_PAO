@@ -23,6 +23,7 @@ private:
     // Variabili interne per gestire la modalità "Scrittura"
     bool isWriteMode;
     bool newValueToSet;
+    date currentViewDate;
 
     void processTag(const tag* t) {
         if (t && !t->getName().empty()) {
@@ -32,9 +33,18 @@ private:
             tagColor = QColor();
         }
     }
-public:
-    DisplayVisitor() : textSummary(""), tagText(""), isRoutineType(false), hasCheckableStatus(false), isChecked(false), isWriteMode(false), newValueToSet(false) {}
 
+    int getOffset(const date& start) const {
+        QDate s(start.getYear(), start.getMonth(), start.getDay());
+        QDate c(currentViewDate.getYear(), currentViewDate.getMonth(), currentViewDate.getDay());
+        return s.daysTo(c);
+    }
+
+public:
+    DisplayVisitor() : textSummary(""), tagText(""), isRoutineType(false), hasCheckableStatus(false), isChecked(false), isWriteMode(false), newValueToSet(false), currentViewDate(date::today()) {}
+
+
+    void setViewDate(const date& d) { currentViewDate = d; }
     void setWriteMode(bool value) {
         isWriteMode = true;
         newValueToSet = value;
@@ -153,22 +163,57 @@ public:
         isRoutineType = true;
         hasCheckableStatus = true;
 
+        int offset = getOffset(r.getStartDate());
+        std::vector<bool> history = r.getcheckHistory(); // Copia per lavorarci
+
+        // 1. Se siamo in modalità scrittura, aggiorniamo il vettore
         if (isWriteMode) {
-            r.setCheck(newValueToSet);
+            if (offset >= 0) {
+                if (offset >= (int)history.size()) history.resize(offset + 1, false);
+                history[offset] = newValueToSet;
+                r.setCheckHistory(history); // Salva nel modello
+            }
         }
 
-        isChecked = r.getCheck();
+        // 2. Leggiamo lo stato aggiornato (o quello originale se non siamo in scrittura)
+        if (offset >= 0 && offset < (int)history.size()) {
+            isChecked = history[offset];
+        } else {
+            isChecked = false;
+        }
 
+        // 3. Ricostruzione completa della stringa summary (fondamentale!)
         textSummary = r.getName() + " — " + r.FrequencyToString() + " - " + r.getDescription() + "\n";
         textSummary += r.getStartTime().toString() + "–" + r.getEndTime().toString();
         textSummary += " | oggi: ";
         textSummary += isChecked ? "✓" : "○";
 
-        const auto& history = r.getcheckHistory();
         if (!history.empty()) {
-            textSummary += " | ";
-            for (bool b : history) {
-                textSummary += b ? "●" : "○";
+            textSummary += "\nPast: ";
+
+            // Calcoliamo la data di inizio come QDate per gestire i giorni della settimana
+            QDate startDate(r.getStartDate().getYear(), r.getStartDate().getMonth(), r.getStartDate().getDay());
+
+            int count = 0;
+            for (int i = 0; i < (int)history.size(); ++i) {
+                QDate currentDate = startDate.addDays(i);
+                date currentBackendDate(currentDate.day(), currentDate.month(), currentDate.year());
+                // FILTRO FREQUENZA:
+                // Esempio: se è una Routine settimanale (es. frequenza 1 = Weekly)
+                // dovresti controllare se il giorno è coerente con la Routine
+                bool isDayActive = true;
+
+                // Se la tua Routine ha un metodo tipo getActiveDays(), usalo qui:
+                if (!r.isActive(currentBackendDate)) isDayActive = false;
+
+                if (isDayActive) {
+                    // A capo ogni 7 giorni attivi
+                    if (count > 0 && count % 7 == 0) {
+                        textSummary += "\n                  ";
+                    }
+                    textSummary += history[i] ? "●" : "○";
+                    count++;
+                }
             }
         }
         processTag(r.getTag());

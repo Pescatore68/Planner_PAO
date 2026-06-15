@@ -116,6 +116,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
             expansionLayout->setSpacing(5);
 
             DisplayVisitor visitor;
+            visitor.setViewDate(backendDate);
             act->accept(visitor);
 
 
@@ -134,22 +135,26 @@ void MonthWidget::onDateChanged(const QDate& qd)
                 statusCheck->setChecked(visitor.getCheckedState());
                 expansionLayout->addWidget(statusCheck);
 
-                connect(statusCheck, &QCheckBox::toggled, this, [act, contentLayout, contentContainer, this](bool checked) {
+                connect(statusCheck, &QCheckBox::toggled, this, [act, contentLayout, contentContainer, this, backendDate](bool checked) {
+                    // A. Scrittura: uso un visitor per aggiornare il modello
                     DisplayVisitor writeVisitor;
+                    writeVisitor.setViewDate(backendDate);
                     writeVisitor.setWriteMode(checked);
                     act->accept(writeVisitor);
 
-
+                    // B. Pulizia UI esistente
                     QLayoutItem* child;
                     while ((child = contentLayout->takeAt(0)) != nullptr) {
                         if (child->widget()) {
-                            child->widget()->hide(); // Lo nasconde immediatamente per evitare glitch visivi
-                            delete child->widget();  // Lo elimina dalla memoria
+                            child->widget()->hide();
+                            delete child->widget();
                         }
                         delete child;
                     }
-
-                    writeVisitor.applyToLayout(contentLayout, contentContainer);
+                    DisplayVisitor readVisitor;
+                    readVisitor.setViewDate(backendDate);
+                    act->accept(readVisitor); // Rilegge il modello aggiornato
+                    readVisitor.applyToLayout(contentLayout, contentContainer); // Riapplica il layout con la stringa nuova
 
                     emit activityUpdated();
                     this->updateCalendarView();

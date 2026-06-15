@@ -38,6 +38,10 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     mainLayout->addWidget(navContainer);
     mainLayout->addWidget(stackedWidget);
 
+    connect(calendarView->getMonthWidget(), &MonthWidget::dayRequested, this, [this](const QDate& date) {
+        showCalendar();
+    });
+
     connect(calendarView->getMonthWidget(), &MonthWidget::activityUpdated,
             this, [this]() { taskWidget->refresh(); });
 

@@ -20,13 +20,12 @@ private:
     bool hasCheckableStatus;
     bool isChecked;
     QColor tagColor;
-    // Variabili interne per gestire la modalità "Scrittura"
     bool isWriteMode;
     bool newValueToSet;
 
     void processTag(const tag* t) {
         if (t && !t->getName().empty()) {
-            tagText = "@" + t->getName();
+            tagText = " " + t->getName() + " ";
             tagColor = t->getColor();
         } else {
             tagColor = QColor();
@@ -49,36 +48,53 @@ public:
     void applyToLayout(QVBoxLayout* targetLayout, QWidget* parent) const {
         if (!targetLayout) return;
 
-        // 1. Label per il testo dell'attività (Testo scuro standard)
         QLabel* summaryLabel = new QLabel(QString::fromStdString(textSummary), parent);
         summaryLabel->setWordWrap(true);
-        summaryLabel->setStyleSheet("QLabel { color: #555; background-color: #fcfcfc; padding: 5px; border-radius: 4px; }");
+        summaryLabel->setStyleSheet(
+            "QLabel {"
+            "  color: #2c3e50;"
+            "  background-color: #ffffff;"
+            "  padding: 12px 14px;"
+            "  border-radius: 8px;"
+            "  border: 1px solid #e2e8f0;"
+            "  font-size: 13px;"
+            "  line-height: 1.4;"
+            "}"
+            );
         targetLayout->addWidget(summaryLabel);
 
-        // 2. Se c'è un tag, il Visitor crea una riga dedicata sotto con il colore specifico del tag
         if (!tagText.empty() && tagColor.isValid()) {
             QWidget* tagContainer = new QWidget(parent);
             QHBoxLayout* tagLayout = new QHBoxLayout(tagContainer);
-            tagLayout->setContentsMargins(5, 2, 5, 2);
+            tagLayout->setContentsMargins(2, 4, 2, 4);
             tagLayout->setSpacing(0);
 
-            QLabel* sepLabel = new QLabel(" | ", parent);
-            sepLabel->setStyleSheet("QLabel { color: #888; }");
-            tagLayout->addWidget(sepLabel);
-
             QLabel* tagLabel = new QLabel(QString::fromStdString(tagText), parent);
-
             QFont tagFont = tagLabel->font();
+            tagFont.setPixelSize(11);
             tagFont.setBold(true);
             tagLabel->setFont(tagFont);
 
-            // Applichiamo il colore in modo forzato con Style Sheet usando il colore estratto
-            QString hexColor = tagColor.name();
-            tagLabel->setStyleSheet(QString("QLabel { color: %1; }").arg(hexColor));
+            QString baseColor = tagColor.name();
+            QColor translucentBg = tagColor;
+            translucentBg.setAlpha(30);
+            QString bgColor = QString("rgba(%1, %2, %3, 0.12)")
+                                  .arg(translucentBg.red())
+                                  .arg(translucentBg.green())
+                                  .arg(translucentBg.blue());
+
+            tagLabel->setStyleSheet(QString(
+                                        "QLabel {"
+                                        "  color: %1;"
+                                        "  background-color: %2;"
+                                        "  padding: 4px 8px;"
+                                        "  border-radius: 6px;"
+                                        "  border: 1px solid rgba(%3, %4, %5, 0.25);"
+                                        "}"
+                                        ).arg(baseColor).arg(bgColor).arg(tagColor.red()).arg(tagColor.green()).arg(tagColor.blue()));
 
             tagLayout->addWidget(tagLabel);
             tagLayout->addStretch();
-
             targetLayout->addWidget(tagContainer);
         }
     }
@@ -86,24 +102,32 @@ public:
     void visit(Event& e) override {
         isRoutineType = false;
         hasCheckableStatus = false;
-        textSummary = e.getName() + " — " + e.getDescription() + "\n";
-        textSummary += e.getStartDate().toString();
-        if (e.hasTime())
-            textSummary += " " + e.getStartTime().toString() + "–" + e.getEndTime().toString();
-        else
-            textSummary += " → " + e.getEndDate().toString();
+        textSummary = "[EVENT] " + e.getName();
+        if (!e.getDescription().empty()) {
+            textSummary += "\n" + e.getDescription();
+        }
+
+        if (e.hasTime()) {
+            textSummary += "\nDate: " + e.getStartDate().toString() + "-" + e.getEndDate().toString() + " Time: " + e.getStartTime().toString() + " - " + e.getEndTime().toString();
+        } else {
+            textSummary += "\nDate: " + e.getStartDate().toString() + "-" + e.getEndDate().toString();
+        }
+
         if (!e.getLocation().empty())
-            textSummary += " | " + e.getLocation();
+            textSummary += "\nLocation: " + e.getLocation();
         processTag(e.getTag());
     }
 
     void visit(Reminder& r) override {
         isRoutineType = false;
         hasCheckableStatus = false;
-        textSummary = r.getName() + " — " + r.getDescription() + "\n";
-        textSummary += r.getDate().toString() + " " + r.getTime().toString();
+        textSummary = "[REMINDER] " + r.getName();
+        if (!r.getDescription().empty()) {
+            textSummary += "\n" + r.getDescription();
+        }
+        textSummary += "\nDate: " + r.getDate().toString() + " Time: " + r.getTime().toString();
         if (!r.getLocation().empty())
-            textSummary += " | " + r.getLocation();
+            textSummary += "\nLocation: " + r.getLocation();
         processTag(r.getTag());
     }
 
@@ -116,12 +140,12 @@ public:
         }
 
         isChecked = t.isCompleted();
+        std::string status = isChecked ? "[X]" : "[ ]";
 
-        std::string status = isChecked ? "[✓]" : "[ ]";
-        textSummary = status + " " + t.getName() + "\n";
+        textSummary = status + " " + t.getName();
         if (!t.getDescription().empty())
-            textSummary += "  " + t.getDescription() + "\n";
-        textSummary += "  Scadenza: " + t.getDeadline().toString() + " ore " + t.getODeadline().toString() + "\n";
+            textSummary += "\n" + t.getDescription();
+        textSummary += "\nDate: " + t.getDeadline().toString() + " Time: " + t.getODeadline().toString();
         processTag(t.getTag());
     }
 
@@ -134,17 +158,20 @@ public:
         }
 
         isChecked = p.isCompleted();
+        std::string status = isChecked ? "[PROJECT COMPLETED]" : "[PROJECT IN PROGRESS]";
 
-        std::string status = isChecked ? "[✓]" : "[ ]";
-        textSummary = status + " " + p.getName() + "\n";
+        textSummary = status + " " + p.getName();
         if (!p.getDescription().empty())
-            textSummary += "  " + p.getDescription() + "\n";
-        textSummary += "  Scadenza: " + p.getDeadline().toString() + " ore " + p.getODeadline().toString() + "\n";
+            textSummary += "\n" + p.getDescription();
+        textSummary += "\nDate: " + p.getDeadline().toString() + " Time: " + p.getODeadline().toString();
 
-        for (unsigned int i = 0; i < p.size(); i++) {
-            const task* t = p.getSubtask(i);
-            std::string subStatus = t->isCompleted() ? "[✓]" : "[ ]";
-            textSummary += "    " + subStatus + " " + t->getName() + "\n";
+        if (p.size() > 0) {
+            textSummary += "\nSub-tasks:";
+            for (unsigned int i = 0; i < p.size(); i++) {
+                const task* t = p.getSubtask(i);
+                std::string subStatus = t->isCompleted() ? "- [X] " : "- [ ] ";
+                textSummary += "\n" + subStatus + t->getName();
+            }
         }
         processTag(p.getTag());
     }
@@ -158,17 +185,19 @@ public:
         }
 
         isChecked = r.getCheck();
+        std::string status = "[ROUTINE]";
 
-        textSummary = r.getName() + " — " + r.FrequencyToString() + " - " + r.getDescription() + "\n";
-        textSummary += r.getStartTime().toString() + "–" + r.getEndTime().toString();
-        textSummary += " | oggi: ";
-        textSummary += isChecked ? "✓" : "○";
+        textSummary = status + " " + r.getName();
+        if (!r.getDescription().empty())
+            textSummary += "\n" + r.getDescription();
+        textSummary += "\nTime: " + r.getStartTime().toString() + " - " + r.getEndTime().toString() + " | Frequency: " + r.FrequencyToString();
+        textSummary += "\nToday's Status: " + std::string(isChecked ? "Completed" : "Not completed");
 
         const auto& history = r.getcheckHistory();
         if (!history.empty()) {
-            textSummary += " | ";
+            textSummary += " | History: ";
             for (bool b : history) {
-                textSummary += b ? "●" : "○";
+                textSummary += b ? "+" : "-";
             }
         }
         processTag(r.getTag());

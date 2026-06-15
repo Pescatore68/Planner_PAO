@@ -55,7 +55,7 @@ void MonthWidget::setup()
     connect(activityList, &QListWidget::itemClicked, this, [this](QListWidgetItem* item) {
         if (!item) return;
 
-        // Recuperiamo i puntatori grafici che abbiamo salvato nell'item
+
         QWidget* expansionWidget = static_cast<QWidget*>(item->data(Qt::UserRole).value<void*>());
         QWidget* rowContainer = static_cast<QWidget*>(item->data(Qt::UserRole + 1).value<void*>());
 
@@ -83,7 +83,7 @@ void MonthWidget::setup()
     });
 
     connect(calendar, &QCalendarWidget::activated, this, [this](const QDate& date) {
-        emit dayRequested(date); // Notifica al genitore (calendar)
+        emit dayRequested(date);
     });
 }
 void MonthWidget::onDateChanged(const QDate& qd)
@@ -137,13 +137,11 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
                 connect(statusCheck, &QCheckBox::toggled, this, [act, contentLayout, contentContainer, this, backendDate](bool checked) {
 
-                    // A. Scrittura: aggiorniamo il modello usando la data specifica
                     DisplayVisitor writeVisitor;
-                    writeVisitor.setViewDate(backendDate); // Indispensabile!
+                    writeVisitor.setViewDate(backendDate);
                     writeVisitor.setWriteMode(checked);
                     act->accept(writeVisitor);
 
-                    // B. Pulizia UI (il codice di cancellazione che hai già)
                     QLayoutItem* child;
                     while ((child = contentLayout->takeAt(0)) != nullptr) {
                         if (child->widget()) {
@@ -154,7 +152,7 @@ void MonthWidget::onDateChanged(const QDate& qd)
                     }
 
                     DisplayVisitor readVisitor;
-                    readVisitor.setViewDate(backendDate); // Indispensabile!
+                    readVisitor.setViewDate(backendDate);
                     act->accept(readVisitor);
                     readVisitor.applyToLayout(contentLayout, contentContainer);
 
@@ -186,34 +184,27 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
             connect(editBtn, &QPushButton::clicked, this, [this, act]() {
                 if (!act) return;
-
-                // 1. Nascondiamo temporaneamente la lista e il suo titolo a destra
                 this->titleLabel->hide();
                 activityList->hide();
 
-                // 2. Istanziamo il guscio di modifica passandogli l'attività e il tagManager della classe
                 auto* modifyWidget = new ActivityModify(act, tm, this);
                 sideLayout->addWidget(modifyWidget);
 
-                // 3. Quando l'utente finisce (clicca Salva o Annulla) ripristiniamo lo stato precedente
                 connect(modifyWidget, &ActivityModify::modificationFinished, this, [=]() {
                     sideLayout->removeWidget(modifyWidget);
-                    modifyWidget->deleteLater(); // Pulizia della memoria del widget di modifica
+                    modifyWidget->deleteLater();
 
                     this->titleLabel->show();
-                    activityList->show(); // Fa ricomparire la lista originale delle attività
-
-                    // Sincronizza i dati aggiornati graficamente sia sul mese che sulle viste della MainWindow
+                    activityList->show();
                     updateCalendarView();
                     emit activityUpdated();
                 });
             });
 
             connect(deleteBtn, &QPushButton::clicked, this, [this, act, qd]() {
-                // Chiamata alla classe a parte ActivityDelete
                 if (activityDelete.execute(act, this)) {
-                    this->onDateChanged(qd);      // Rinfresca la lista del giorno corrente
-                    this->updateCalendarView();   // Rinfresca il calendario grafico
+                    this->onDateChanged(qd);      // refresh day activity
+                    this->updateCalendarView();   // refresh calendar
                 }
             });
 

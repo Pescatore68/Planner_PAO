@@ -12,8 +12,8 @@ private:
     std::vector<tag*> tags;
     tag* defaultTag;
 
-    tagManager(const tagManager&) = delete; //rendo non disponibile il costruttore di copia
-    tagManager& operator=(const tagManager&) = delete; //"" l'operatore di assegnazione
+    tagManager(const tagManager&) = delete;
+    tagManager& operator=(const tagManager&) = delete;
 
 public:
 

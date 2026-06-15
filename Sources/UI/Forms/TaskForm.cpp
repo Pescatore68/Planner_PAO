@@ -60,7 +60,7 @@ QTimeEdit* TaskForm::getODeadlineEdit() const {
     return oDeadlineEdit;
 }
 
-// Sources/UI/Forms/TaskForm.cpp
+
 void TaskForm::loadFromActivity(AbstractActivity* act) {
     auto* t = dynamic_cast<task*>(act);
     if (!t) return;

@@ -12,7 +12,6 @@ private:
 
 public:
     project(const string&, const string&, const tag*, const date&, const HourMinute&, const bool& = false);
-    //project(const string&, const string&, const date&, const HourMinute&);
     ~project();
     const std::vector<task*>& getSubtasks() const;
     const task* getSubtask(unsigned int) const;
@@ -21,7 +20,7 @@ public:
     unsigned int size() const;
     void remove(task*);
     void remove(unsigned int i);
-    float completionPercentage() const; // nCompleted() / size() * 100 → per la barra
+    float completionPercentage() const;
 
     //data persistence
     QJsonObject toJson() const override;

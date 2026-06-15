@@ -13,7 +13,7 @@ class TagComboBox : public QWidget{
 private:
     tagManager& tm;
     QComboBox* combo;
-    //QPushButton* bAdd;
+
 
 public:
     explicit TagComboBox(tagManager& tm, QWidget* parent = nullptr);
@@ -22,9 +22,6 @@ public:
     void setCurrentIndex(const unsigned int&) const;
     void tagPopulation();
     void setCurrentTagByName(const std::string& tagName) const;
-
-/*private slots:
-void onAddTag();*/
 };
 
 #endif // TAGCOMBOBOX_H

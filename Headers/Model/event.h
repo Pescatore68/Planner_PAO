@@ -30,7 +30,7 @@ public:
     date getEndDate() const;
     HourMinute getStartTime() const;
     HourMinute getEndTime() const;
-    bool hasTime() const; // non so se tenerlo, serve nella gui per mostrare l'HourMinute o allday
+    bool hasTime() const;
     std::string getLocation()const;
 
     void setStartDate(const date&);

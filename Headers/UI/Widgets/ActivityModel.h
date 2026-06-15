@@ -1,4 +1,0 @@
-#ifndef ACTIVITYMODEL_H
-#define ACTIVITYMODEL_H
-
-#endif // ACTIVITYMODEL_H

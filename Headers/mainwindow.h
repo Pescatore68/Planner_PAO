@@ -50,7 +50,6 @@ private:
     QWidget*    searchView   = nullptr;
     TagWidget*  tagView      = nullptr;
 
-    // ← NUOVO: widget di modifica corrente nel navStack (index 3)
     ActivityModify* currentModifyWidget = nullptr;
 
     void setupNavBar();
@@ -73,8 +72,6 @@ public:
     void showDetail(AbstractActivity* a);
     void showForm(AbstractActivity* a = nullptr);
     void onActivitySelected(AbstractActivity* a);
-
-    // ← NUOVO
     void showModify(AbstractActivity* a);
 };
 

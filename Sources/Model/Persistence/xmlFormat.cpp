@@ -29,15 +29,14 @@ bool saveXml(const ActivityManager& am, const tagManager& tm, const std::string&
     QDomElement root = xmlDoc.createElement("activityManager");
     xmlDoc.appendChild(root);
 
-    //save tag, skip deafultTag(build with constructor
     QDomElement tagsObj = xmlDoc.createElement("tags");
     for (tag* t : tm.getTags()) {
-        //if (t != tm.getDefaultTag()){
-            QDomElement tagObj = xmlDoc.createElement("tag");
-            tagObj.setAttribute("name",  QString::fromStdString(t->getName()));
-            tagObj.setAttribute("color", t->getColor().name());
-            tagsObj.appendChild(tagObj);
-        //}
+
+        QDomElement tagObj = xmlDoc.createElement("tag");
+        tagObj.setAttribute("name",  QString::fromStdString(t->getName()));
+        tagObj.setAttribute("color", t->getColor().name());
+        tagsObj.appendChild(tagObj);
+
     }
     root.appendChild(tagsObj);
 

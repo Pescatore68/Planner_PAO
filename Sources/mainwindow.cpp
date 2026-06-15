@@ -228,12 +228,34 @@ void MainWindow::updateSearchUI(const std::vector<AbstractActivity*>& results) {
 
     for (AbstractActivity* act : results) {
         QWidget* container = new QWidget(this);
+        container->setStyleSheet("border: 1px solid #e2e8f0; border-radius: 8px; margin: 5px; padding: 5px;");
         QVBoxLayout* vLayout = new QVBoxLayout(container);
 
         DisplayVisitor visitor;
         act->accept(visitor);
-        visitor.applyToLayout(vLayout, this);
+        visitor.applyToLayout(vLayout, container);
 
+        QHBoxLayout* actionLayout = new QHBoxLayout();
+        QPushButton* btnEdit = new QPushButton("Modifica", container);
+        QPushButton* btnDelete = new QPushButton("Elimina", container);
+
+        actionLayout->addWidget(btnEdit);
+        actionLayout->addWidget(btnDelete);
+        vLayout->addLayout(actionLayout);
+
+        connect(btnEdit, &QPushButton::clicked, this, [this, act]() {
+            showModify(act);
+        });
+        connect(btnDelete, &QPushButton::clicked, this, [this, act, container]() {
+            ActivityDelete deleter(am, this);
+            if (deleter.execute(act, this)) {
+
+                delete container;
+                calendarView->refresh();
+                calendarView->getMonthWidget()->updateCalendarView();
+                taskWidget->refresh();
+            }
+        });
         searchResultLayout->addWidget(container);
     }
 }

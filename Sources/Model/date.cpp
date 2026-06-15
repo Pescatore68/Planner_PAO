@@ -19,7 +19,7 @@ date date::today() {
     tm local = *localtime(&t);
     return date(local.tm_mday, local.tm_mon + 1, local.tm_year + 1900);
 }
-
+//Zeller
 unsigned int date::dayOfWeek() const {
     unsigned int d = day;
     unsigned int m = month;

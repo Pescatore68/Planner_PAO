@@ -3,7 +3,7 @@
 #include <string>
 using std::string;
 
-class HourMinute{ // time creava problemi di conflitto
+class HourMinute{
 private:
     unsigned int min;
 public:

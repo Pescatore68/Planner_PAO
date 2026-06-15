@@ -1,7 +1,7 @@
 #include "Headers/Visitor/TaskWidgetVisitor.h"
-#include "Headers/task.h"
-#include "Headers/project.h"
-#include "Headers/UI/TaskWidget.h"
+#include "Headers/Model/task.h"
+#include "Headers/Model/project.h"
+#include "Headers/UI/Widgets/TaskWidget.h"
 #include <QColor>
 #include <QVariant>
 

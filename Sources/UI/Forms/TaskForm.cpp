@@ -1,5 +1,5 @@
 #include "Headers/UI/Forms/TaskForm.h"
-#include "Headers/task.h"
+#include "Headers/Model/task.h"
 #include <QMessageBox>
 
 TaskForm::TaskForm(tagManager& tm, QWidget* parent)

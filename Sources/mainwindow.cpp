@@ -4,16 +4,16 @@
 #include <QHBoxLayout>
 
 #include "Headers/mainwindow.h"
-#include "Headers/UI/TagWidget.h"
-#include "Headers/UI/navBar.h"
-#include "Headers/UI/TaskWidget.h"
-#include "Headers/Dialog/AddDialog.h"
+#include "Headers/UI/Widgets/TagWidget.h"
+#include "Headers/UI/Widgets/navBar.h"
+#include "Headers/UI/Widgets/TaskWidget.h"
+#include "Headers/UI/Widgets/AddWidget.h"
 #include "Headers/Visitor/DisplayVisitor.h"
-#include "Headers/UI/calendar.h"
-#include "Headers/UI/ActivityDelete.h"
-#include "Headers/UI/ActivitySearch.h"
-#include "Headers/UI/DayWidget.h"
-#include "Headers/UI/ActivityModify.h"
+#include "Headers/UI/Widgets/calendar.h"
+#include "Headers/UI/Widgets/ActivityDelete.h"
+#include "Headers/UI/Widgets/ActivitySearch.h"
+#include "Headers/UI/Widgets/DayWidget.h"
+#include "Headers/UI/Widgets/ActivityModify.h"
 
 MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QMainWindow(parent), am(am), tm(tm)

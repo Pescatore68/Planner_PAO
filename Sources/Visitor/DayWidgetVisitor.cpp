@@ -1,9 +1,9 @@
 #include "Headers/Visitor/DayWidgetVisitor.h"
-#include "Headers/event.h"
-#include "Headers/reminder.h"
-#include "Headers/routine.h"
-#include "Headers/task.h"
-#include "Headers/project.h"
+#include "Headers/Model/event.h"
+#include "Headers/Model/reminder.h"
+#include "Headers/Model/routine.h"
+#include "Headers/Model/task.h"
+#include "Headers/Model/project.h"
 
 void AllDayCheckVisitor::visit(Event& e) {
     isAllDay = !e.hasTime();

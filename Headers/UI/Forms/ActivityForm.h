@@ -6,9 +6,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include "Headers/tagManager.h"
-#include "Headers/AbstractActivity.h"
-#include "Headers/UI/TagComboBox.h"
+#include "Headers/Model/tagManager.h"
+#include "Headers/Model/AbstractActivity.h"
+#include "Headers/UI/Widgets/TagComboBox.h"
 
 class ActivityForm : public QWidget {
     Q_OBJECT

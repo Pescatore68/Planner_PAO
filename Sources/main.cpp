@@ -4,10 +4,10 @@
 #include <QDebug>
 
 #include "Headers/mainwindow.h"
-#include "Headers/ActivityManager.h"
-#include "Headers/tagManager.h"
-#include "Headers/JSONformat.h"
-#include "Headers/xmlFormat.h"
+#include "Headers/Model/ActivityManager.h"
+#include "Headers/Model/tagManager.h"
+#include "Headers/Model/Persistence/JSONformat.h"
+#include "Headers/Model/Persistence/xmlFormat.h"
 
 // ─── Percorsi dei file di salvataggio ────────────────────────────────────────
 // Puoi cambiare i nomi / percorsi a piacere.

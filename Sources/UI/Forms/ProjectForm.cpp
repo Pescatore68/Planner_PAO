@@ -1,6 +1,6 @@
 #include "Headers/UI/Forms/ProjectForm.h"
-#include "Headers/project.h"
-#include "Headers/task.h"
+#include "Headers/Model/project.h"
+#include "Headers/Model/task.h"
 #include <QMessageBox>
 #include <QLabel>
 

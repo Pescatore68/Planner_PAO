@@ -12,15 +12,11 @@ TagComboBox::TagComboBox(tagManager& tm, QWidget* parent): QWidget(parent), tm(t
     layout->setContentsMargins(0, 0, 0, 0);
 
     combo  = new QComboBox(this);
-    /*bAdd = new QPushButton("+", this);
-    bAdd->setFixedWidth(30);*/
 
     layout->addWidget(combo);
-    //layout->addWidget(bAdd);
 
     tagPopulation();
 
-    //connect(bAdd, &QPushButton::clicked, this, &TagComboBox::onAddTag);
 }
 
 void TagComboBox::tagPopulation(){

@@ -24,7 +24,6 @@ void TagWidget::setupUI() {
     tagInput = new QLineEdit(this);
     tagInput->setPlaceholderText("New tag");
 
-    // Pulsante circolare (Anteprima del colore attuale)
     btnColorPick = new QPushButton(this);
     btnColorPick->setFixedSize(28, 28);
     btnColorPick->setCursor(Qt::PointingHandCursor);
@@ -38,10 +37,10 @@ void TagWidget::setupUI() {
     inputRowLayout->addWidget(btnColorPick);
     mainLayout->addLayout(inputRowLayout);
 
-    //tavolozza colori
+    //color palette
     paletteContainer = new QWidget(this);
     createPaletteGrid();
-    paletteContainer->setVisible(false); // Nascosta/Chiusa di default!
+    paletteContainer->setVisible(false);
     mainLayout->addWidget(paletteContainer);
 
     tagList = new QListWidget(this);

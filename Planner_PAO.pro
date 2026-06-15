@@ -49,11 +49,9 @@ HEADERS += \
     Headers/Model/ActivityManager.h \
     Headers/Model/HourMinute.h \
     Headers/Model/Persistence/PersistenceManager.h \
-    Headers/Model/config.h \
     Headers/Model/date.h \
     Headers/Model/event.h \
     Headers/Model/project.h \
-    Headers/Model/rec_ev.h \
     Headers/Model/reminder.h \
     Headers/Model/routine.h \
     Headers/Model/tag.h \
@@ -69,7 +67,6 @@ HEADERS += \
     Headers/UI/Forms/TaskForm.h \
     Headers/UI/StyleHelper.h \
     Headers/UI/Widgets/ActivityDelete.h \
-    Headers/UI/Widgets/ActivityModel.h \
     Headers/UI/Widgets/ActivityModify.h \
     Headers/UI/Widgets/ActivitySearch.h \
     Headers/UI/Widgets/AddWidget.h \
@@ -81,7 +78,6 @@ HEADERS += \
     Headers/UI/Widgets/month.h \
     Headers/UI/Widgets/navBar.h \
     Headers/Visitor/ActivityVisitor.h \
-    Headers/Visitor/AddSubtaskVisitor.h \
     Headers/Visitor/DayWidgetVisitor.h \
     Headers/Visitor/DisplayVisitor.h \
     Headers/Visitor/FormSelectVisitor.h \

@@ -5,9 +5,6 @@
 task::task(const string& name, const string& description, const tag* Tag, const date& end = date::today(), const HourMinute& oEnd = HourMinute(23,59), const bool& b)
     : AbstractActivity(name, description, Tag), deadline(end), oDeadline(oEnd), check(b) {};
 
-/*task::task(const string& name, const string& description, const date& end, const HourMinute& oEnd)
-    : AbstractActivity(name, description), deadline(end), oDeadline(oEnd) {};*/
-
 
 date task::getDeadline() const { return deadline; }
 HourMinute task::getODeadline() const { return oDeadline; }

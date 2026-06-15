@@ -209,8 +209,6 @@ void ProjectForm::loadFromActivity(AbstractActivity* act) {
     getDeadlineEdit()->setDate(QDate(p->getDeadline().getYear(), p->getDeadline().getMonth(), p->getDeadline().getDay()));
     getODeadlineEdit()->setTime(QTime(p->getODeadline().getOre(), p->getODeadline().getMin()));
 
-    // Rimuoviamo eventuali subtask esistenti e ricarichiamo
-    // Assicurati che reset() pulisca la UI prima
     for(auto* sub : p->getSubtasks()) {
         triggerAddSubtaskForm();
         getSubtaskForms().last()->loadFromActivity(sub);
@@ -230,15 +228,12 @@ void ProjectForm::saveToActivity(AbstractActivity* act) {
         p->remove(static_cast<unsigned int>(0));
     }
 
-    // Aggiungiamo i nuovi dati aggiornati
     for (int i = 0; i < subtaskForms.size(); ++i) {
         // Creiamo un task temporaneo
         task* tempTask = new task("", "", nullptr, date(1,1,2000), HourMinute(0,0), false);
 
-        // Deleghiamo il salvataggio al form specifico
         subtaskForms[i]->saveToActivity(tempTask);
 
-        // Aggiungiamo al progetto
         p->add(tempTask->getName(),
                tempTask->getDescription(),
                tempTask->getDeadline(),

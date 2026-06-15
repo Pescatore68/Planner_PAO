@@ -8,6 +8,7 @@ SOURCES += \
     Sources/Model/AbstractActivity.cpp \
     Sources/Model/ActivityManager.cpp \
     Sources/Model/HourMinute.cpp \
+    Sources/Model/Persistence/PersistenceManager.cpp \
     Sources/Model/date.cpp \
     Sources/Model/event.cpp \
     Sources/Model/project.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
     Sources/UI/Forms/ReminderForm.cpp \
     Sources/UI/Forms/RoutineForm.cpp \
     Sources/UI/Forms/TaskForm.cpp \
+    Sources/UI/StyleHelper.cpp \
     Sources/UI/Widgets/ActivityDelete.cpp \
     Sources/UI/Widgets/ActivityModify.cpp \
     Sources/UI/Widgets/ActivitySearch.cpp \
@@ -46,6 +48,7 @@ HEADERS += \
     Headers/Model/AbstractActivity.h \
     Headers/Model/ActivityManager.h \
     Headers/Model/HourMinute.h \
+    Headers/Model/Persistence/PersistenceManager.h \
     Headers/Model/config.h \
     Headers/Model/date.h \
     Headers/Model/event.h \
@@ -64,6 +67,7 @@ HEADERS += \
     Headers/UI/Forms/ReminderForm.h \
     Headers/UI/Forms/RoutineForm.h \
     Headers/UI/Forms/TaskForm.h \
+    Headers/UI/StyleHelper.h \
     Headers/UI/Widgets/ActivityDelete.h \
     Headers/UI/Widgets/ActivityModel.h \
     Headers/UI/Widgets/ActivityModify.h \

@@ -13,6 +13,9 @@ ReminderForm::ReminderForm(tagManager& tm, QWidget* parent)
     timeEdit = new QTimeEdit(QTime::currentTime(), this);
     timeEdit->setDisplayFormat("HH:mm");
 
+    dateEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    timeEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
     locationEdit = new QLineEdit(this);
     locationEdit->setPlaceholderText("Location (optional)");
 

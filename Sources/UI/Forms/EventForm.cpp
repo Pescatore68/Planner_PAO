@@ -7,11 +7,9 @@ EventForm::EventForm(tagManager& tm, QWidget* parent)
 {
 
     startDateEdit = new QDateEdit(QDate::currentDate(), this);
-    startDateEdit->setCalendarPopup(true);
     startDateEdit->setDisplayFormat("dd/MM/yyyy");
 
     endDateEdit = new QDateEdit(QDate::currentDate(), this);
-    endDateEdit->setCalendarPopup(true);
     endDateEdit->setDisplayFormat("dd/MM/yyyy");
 
     allDayCheck = new QCheckBox("All Day", this);
@@ -28,6 +26,11 @@ EventForm::EventForm(tagManager& tm, QWidget* parent)
     addTimeRow("Starts",  startDateEdit, startTimeEdit);
     addTimeRow("Ends",    endDateEdit, endTimeEdit);
     addRow(allDayCheck);
+
+    startDateEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    endDateEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    startTimeEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    endTimeEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
 
     mainLayout->addStretch();

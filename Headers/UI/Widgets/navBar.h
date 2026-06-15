@@ -22,6 +22,8 @@ private:
     QPushButton* btnAdd;
     QLineEdit* searchEdit;
     TagComboBox* filterCombo;
+    QPushButton* loadBtn;
+    QPushButton* saveBtn;
 
     void setup();
 
@@ -34,6 +36,9 @@ signals:
     void tagsClicked();
     void addClicked();
     void searchTextChanged(const QString& text);
+    void loadClicked();
+    void saveClicked();
+
 };
 
 #endif

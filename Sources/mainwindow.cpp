@@ -14,6 +14,7 @@
 #include "Headers/UI/Widgets/ActivitySearch.h"
 #include "Headers/UI/Widgets/DayWidget.h"
 #include "Headers/UI/Widgets/ActivityModify.h"
+#include "Headers/Model/Persistence/PersistenceManager.h"
 
 MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     : QMainWindow(parent), am(am), tm(tm)
@@ -70,25 +71,18 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
     connect(tagView, &TagWidget::tagViewClosed,
             this, [this]{ navStack->setCurrentIndex(NAV_IDX_NAVBAR); });
 
-
-
     connect(tagView, &TagWidget::tagsChanged, this, [this](){
         addView->refreshTagCombo();
-
-        // have to block signal for tagWidget
         navigationBar->getFilterCombo()->getCombo()->blockSignals(true);
         navigationBar->getFilterCombo()->tagPopulation();
         navigationBar->getFilterCombo()->getCombo()->blockSignals(false);
     });
 
-
     connect(navigationBar, &navBar::searchTextChanged, this, [this, &am](const QString &text) {
         if (text.isEmpty()) {
-            showCalendar(); // O nascondi i risultati
+            showCalendar();
             return;
         }
-
-        // Cerca, aggiorna e mostra
         auto results = ActivitySearch::findByName(am, text.toStdString());
         updateSearchUI(results);
         showSearch();
@@ -96,11 +90,9 @@ MainWindow::MainWindow(ActivityManager& am, tagManager& tm, QWidget* parent)
 
     connect(navigationBar->getFilterCombo()->getCombo(), &QComboBox::currentTextChanged, this, [this, &am](const QString& text){
         std::string name = text.toStdString();
-
-        // Filtra e aggiorna
         auto results = ActivitySearch::findByTag(am, name);
         updateSearchUI(results);
-        showSearch(); // Passa alla pagina dei risultati
+        showSearch();
     });
 
     connect(calendarView, &calendar::activityModifyRequested,
@@ -125,7 +117,6 @@ void MainWindow::showModify(AbstractActivity* a)
         currentModifyWidget = nullptr;
     }
 
-    //disable delete while the modify panel is open
     calendarView->getTaskWidget()->setDeleteEnabled(false);
 
     currentModifyWidget = new ActivityModify(a, tm, navContainer);
@@ -138,8 +129,6 @@ void MainWindow::showModify(AbstractActivity* a)
                 calendarView->refresh();
                 calendarView->getMonthWidget()->updateCalendarView();
                 taskWidget->refresh();
-
-                //re-enable delete once modify panel is closed
                 calendarView->getTaskWidget()->setDeleteEnabled(true);
 
                 if (currentModifyWidget) {
@@ -153,7 +142,6 @@ void MainWindow::showModify(AbstractActivity* a)
 void MainWindow::setupStackedWidget()
 {
     stackedWidget = new QStackedWidget(this);
-
 
     calendarView  = new calendar(am, tm, this);
     taskWidget    = new TaskWidget(am, this);
@@ -189,6 +177,25 @@ void MainWindow::setupNavBar()
         navStack->setCurrentIndex(NAV_IDX_ADD);
     });
 
+    connect(navigationBar, &navBar::loadClicked, this, [this]() {
+        if (PersistenceManager::loadDataWithDialog(am, tm, this)) {
+            taskWidget->refresh();
+            calendarView->refresh();
+            calendarView->getMonthWidget()->updateCalendarView();
+            addView->refreshTagCombo();
+
+            navigationBar->getFilterCombo()->getCombo()->blockSignals(true);
+            navigationBar->getFilterCombo()->tagPopulation();
+            navigationBar->getFilterCombo()->getCombo()->blockSignals(false);
+
+            showCalendar();
+        }
+    });
+
+    connect(navigationBar, &navBar::saveClicked, this, [this]() {
+        PersistenceManager::saveDataWithDialog(am, tm, this);
+    });
+
     connect(addView, &AddDialog::activityCreated,
             this, [this](AbstractActivity* a){
                 if (!a) return;
@@ -209,21 +216,17 @@ void MainWindow::showTaskProject()  { stackedWidget->setCurrentWidget(taskWidget
 
 void MainWindow::showTags()
 {
-    // Mostra il widget nel QStackedWidget
     if (tagView) tagView->refresh();
     navStack->setCurrentIndex(NAV_IDX_TAGS);
 }
 
-
 void MainWindow::updateSearchUI(const std::vector<AbstractActivity*>& results) {
-    // 1. Pulisci i risultati precedenti
     QLayoutItem* child;
     while ((child = searchResultLayout->takeAt(0)) != nullptr) {
         if (child->widget()) delete child->widget();
         delete child;
     }
 
-    // 2. Crea i widget per ogni attività trovata usando il Visitor
     for (AbstractActivity* act : results) {
         QWidget* container = new QWidget(this);
         QVBoxLayout* vLayout = new QVBoxLayout(container);

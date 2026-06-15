@@ -13,18 +13,22 @@ RoutineForm::RoutineForm(tagManager& tm, QWidget* parent)
     freqCombo->addItem("Yearly",  static_cast<int>(Routine::Frequency::Yearly));
 
     startDateEdit = new QDateEdit(QDate::currentDate(), this);
-    startDateEdit->setCalendarPopup(true);
     startDateEdit->setDisplayFormat("dd/MM/yyyy");
 
     endDateEdit = new QDateEdit(QDate::currentDate().addMonths(1), this);
-    endDateEdit->setCalendarPopup(true);
     endDateEdit->setDisplayFormat("dd/MM/yyyy");
+
+    startDateEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    endDateEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
     startTimeEdit = new QTimeEdit(QTime::currentTime(), this);
     startTimeEdit->setDisplayFormat("HH:mm");
 
     endTimeEdit = new QTimeEdit(QTime::currentTime().addSecs(3600), this);
     endTimeEdit->setDisplayFormat("HH:mm");
+
+    startTimeEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    endTimeEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
     addRow(freqCombo, "Frequency");
     addTimeRow("Starts", startDateEdit, startTimeEdit);

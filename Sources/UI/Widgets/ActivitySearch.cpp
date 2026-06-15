@@ -7,7 +7,7 @@ std::vector<AbstractActivity*> ActivitySearch::findByName(const ActivityManager&
         AbstractActivity* act = am.get(i);
         if (!act) continue;
 
-        // Ricerca della sottostringa nel nome
+        //search by substring in name
         if (act->getName().find(query) != std::string::npos) {
             results.push_back(act);
         }
@@ -17,7 +17,7 @@ std::vector<AbstractActivity*> ActivitySearch::findByName(const ActivityManager&
 
 std::vector<AbstractActivity*> ActivitySearch::findByTag(const ActivityManager& am, const std::string& tagName) {
     std::vector<AbstractActivity*> results;
-    if (tagName == "Tutti i tag" || tagName.empty()) {
+    if (tagName == "All tags" || tagName.empty()) {
         for(unsigned int i=0; i<am.size(); ++i) results.push_back(am.get(i));
         return results;
     }

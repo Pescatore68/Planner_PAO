@@ -17,14 +17,12 @@ void TagWidget::setupUI() {
     mainLayout->setSpacing(10);
 
     QLabel* titleLabel = new QLabel("Tag Manager", this);
-    titleLabel->setStyleSheet("QLabel { font-size: 18px; font-weight: bold; color: #333; }");
     mainLayout->addWidget(titleLabel);
 
     QHBoxLayout* inputRowLayout = new QHBoxLayout();
 
     tagInput = new QLineEdit(this);
     tagInput->setPlaceholderText("New tag");
-    tagInput->setStyleSheet("QLineEdit { padding: 6px; font-size: 13px; }");
 
     // Pulsante circolare (Anteprima del colore attuale)
     btnColorPick = new QPushButton(this);
@@ -34,7 +32,6 @@ void TagWidget::setupUI() {
 
 
     btnAdd = new QPushButton("add", this);
-    btnAdd->setStyleSheet("QPushButton { padding: 6px 12px; font-weight: bold; background-color: #5cb85c; color: white; border-radius: 4px; }");
 
     inputRowLayout->addWidget(tagInput);
     inputRowLayout->addWidget(btnAdd);
@@ -48,11 +45,9 @@ void TagWidget::setupUI() {
     mainLayout->addWidget(paletteContainer);
 
     tagList = new QListWidget(this);
-    tagList->setStyleSheet("QListWidget { border: 1px solid #ccc; border-radius: 4px; }");
     mainLayout->addWidget(tagList);
 
     btnBack = new QPushButton("back", this);
-    btnBack->setStyleSheet("QPushButton { padding: 6px; font-weight: bold; background-color: #777; color: white; border-radius: 4px; }");
     mainLayout->addWidget(btnBack);
 
     connect(btnBack, &QPushButton::clicked, this, &TagWidget::tagViewClosed);
@@ -71,8 +66,7 @@ void TagWidget::createPaletteGrid() {
     int row = 0;
     int col = 0;
 
-    for (Qt::GlobalColor globalColor : defaultColors) {
-        QColor color(globalColor);
+    for (const QColor& color : defaultColors) {
 
         QPushButton* colorBtn = new QPushButton(paletteContainer);
         colorBtn->setFixedSize(24, 24);
@@ -112,35 +106,38 @@ void TagWidget::populateList() {
 
         std::string tagName = t->getName();
 
-
         if (t == tm.getDefaultTag()) {
-            QListWidgetItem* item = new QListWidgetItem(tagList);
-            QLabel* label = new QLabel(QString::fromStdString(tagName) + " (Default)", this);
-            label->setStyleSheet("QLabel { color: #888; font-style: italic; padding: 7px; }");
-            tagList->addItem(item);
-            tagList->setItemWidget(item, label);
-            item->setSizeHint(label->sizeHint());
-        }
-        else {
-
             QListWidgetItem* item = new QListWidgetItem(tagList);
             QWidget* rowWidget = new QWidget(this);
             QHBoxLayout* rowLayout = new QHBoxLayout(rowWidget);
-            rowLayout->setContentsMargins(5, 2, 5, 2);
+            rowLayout->setContentsMargins(5, 10, 5, 12);
 
             QLabel* label = new QLabel(QString::fromStdString(tagName), this);
+            QLabel* defaultLabel = new QLabel("(Default)", this);
 
+            rowLayout->addWidget(label, 0, Qt::AlignVCenter);
+            rowLayout->addStretch();
+            rowLayout->addWidget(defaultLabel, 0, Qt::AlignVCenter);
+
+            tagList->addItem(item);
+            tagList->setItemWidget(item, rowWidget);
+            item->setSizeHint(rowWidget->sizeHint());
+        } else {
+            QListWidgetItem* item = new QListWidgetItem(tagList);
+            QWidget* rowWidget = new QWidget(this);
+            QHBoxLayout* rowLayout = new QHBoxLayout(rowWidget);
+            rowLayout->setContentsMargins(5, 10, 5, 12);
+
+            QLabel* label = new QLabel(QString::fromStdString(tagName), this);
             label->setStyleSheet(QString("QLabel { color: %1; font-weight: bold; }").arg(t->getColor().name()));
 
             QPushButton* btnDelete = new QPushButton("delete", this);
             btnDelete->setFixedSize(60, 28);
             btnDelete->setCursor(Qt::PointingHandCursor);
-            btnDelete->setStyleSheet("QPushButton { color: #d9534f; background: transparent; font-size: 14px; }"
-                                     "QPushButton:hover { background-color: #f2dede; border-radius: 4px; }");
 
-            rowLayout->addWidget(label);
+            rowLayout->addWidget(label, 0, Qt::AlignVCenter);
             rowLayout->addStretch();
-            rowLayout->addWidget(btnDelete);
+            rowLayout->addWidget(btnDelete, 0, Qt::AlignVCenter);
 
             tagList->addItem(item);
             tagList->setItemWidget(item, rowWidget);
@@ -153,20 +150,16 @@ void TagWidget::populateList() {
     }
 }
 
-
 void TagWidget::onAddClicked() {
     QString text = tagInput->text().trimmed();
     if (text.isEmpty()) return;
 
     std::string newTagName = text.toStdString();
 
-    // Inseriamo nel backend usando il colore associato al cerchietto
     tm.newTag(newTagName, currentSelectedColor);
 
-    // Reset del campo di testo
     tagInput->clear();
 
-    // Ripopoliamo la lista e aggiorniamo i menu a tendina dell'app
     populateList();
     emit tagsChanged();
 }

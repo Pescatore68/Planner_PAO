@@ -236,8 +236,8 @@ void MainWindow::updateSearchUI(const std::vector<AbstractActivity*>& results) {
         visitor.applyToLayout(vLayout, container);
 
         QHBoxLayout* actionLayout = new QHBoxLayout();
-        QPushButton* btnEdit = new QPushButton("Modifica", container);
-        QPushButton* btnDelete = new QPushButton("Elimina", container);
+        QPushButton* btnEdit = new QPushButton("Edit", container);
+        QPushButton* btnDelete = new QPushButton("Delete", container);
 
         actionLayout->addWidget(btnEdit);
         actionLayout->addWidget(btnDelete);

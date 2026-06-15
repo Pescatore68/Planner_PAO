@@ -58,8 +58,6 @@ signals:
     void activityUpdated();
 };
 
-
-//PROGRESS BAR!
 class ProgressBarDelegate : public QStyledItemDelegate {
     Q_OBJECT
 public:
@@ -86,9 +84,12 @@ public:
         QVariant vColor = index.data(TagColorRole);
         QColor barColor = vColor.canConvert<QColor>() ? vColor.value<QColor>() : QColor(200, 200, 200);
 
+        if (pct == 100) {
+            barColor = QColor(150, 150, 150);
+        }
+
         float barHeight = 3.0f;
         float borderRadius = barHeight / 2.0f;
-
 
         float left = option.rect.left() + 16.0f;
         float right = option.rect.right() - 10.0f;

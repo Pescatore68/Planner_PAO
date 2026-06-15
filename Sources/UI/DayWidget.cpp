@@ -39,63 +39,59 @@ void ActivityBlock::paintEvent(QPaintEvent*)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    // Tag base color
     QColor base = activity->getTag()
                       ? activity->getTag()->getColor()
-                      : QColor(100, 149, 237); // cornflower blue fallback
+                      : QColor(100, 149, 237);
 
-    // Translucent background
     QColor bg = base;
-    bg.setAlpha(hovered ? 230 : 200);
+    bg.setAlpha(hovered || selected ? 230 : 200);
 
-    // Darker side strip
     const int STRIP = 4;
     QColor strip = base.darker(130);
 
-    // Rounded edge radius
     const int R = 5;
 
     QRectF rect(0, 0, width(), height());
 
-    // Rounded main body
     QPainterPath path;
     path.addRoundedRect(rect, R, R);
     p.fillPath(path, bg);
 
-    // Render strip
     p.fillRect(QRectF(0, R, STRIP, height() - 2 * R), strip);
     QPainterPath stripPath;
     stripPath.addRoundedRect(QRectF(0, 0, STRIP, height()), R, R);
     p.fillPath(stripPath, strip);
 
-    // Border
     p.setPen(QPen(base.darker(115), 0.5));
     p.drawPath(path);
 
-    // Text configuration
-    QString name = QString::fromStdString(activity->getName());
-    QFont font = p.font();
+    QString textToDisplay;
+    if (selected) {
+        DisplayVisitor visitor;
+        activity->accept(visitor);
+        textToDisplay = QString::fromStdString(visitor.getSummary());
+    } else {
+        textToDisplay = QString::fromStdString(activity->getName());
+    }
 
-    // Dynamic sizing
-    int fontSize = (height() < 20) ? 7 : (height() < 32) ? 8 : 9;
+    QFont font = p.font();
+    int fontSize = (height() < 24) ? 9 : (height() < 38) ? 11 : 13;
     font.setPixelSize(fontSize);
-    font.setBold(true);
+    font.setBold(!selected);
     p.setFont(font);
 
-    // Contrast-based text color
     double luminance = 0.299 * base.red() + 0.587 * base.green() + 0.114 * base.blue();
     p.setPen(luminance < 140 ? QColor(255,255,255,230) : QColor(30,30,30,220));
 
-    QRectF textRect(STRIP + 4, 2, width() - STRIP - 6, height() - 4);
+    QRectF textRect(STRIP + 6, 4, width() - STRIP - 10, height() - 8);
 
-    if (height() < 16) {
-        // Skip text rendering if block is too narrow
+    if (height() < 18) {
         return;
     }
 
     p.drawText(textRect,
                Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap,
-               name);
+               textToDisplay);
 }
 
 void ActivityBlock::enterEvent(QEnterEvent* e)
@@ -132,40 +128,35 @@ void TimeGrid::paintEvent(QPaintEvent*)
 
     const int W = width();
 
-    // Background fill
     p.fillRect(rect(), QColor(255, 255, 255));
 
     QFont labelFont;
-    labelFont.setPixelSize(10);
+    labelFont.setPixelSize(11);
     p.setFont(labelFont);
 
     for (int h = 0; h < TOTAL_HOURS; h++) {
         int y = h * HOUR_HEIGHT;
 
-        // Hour lines
         p.setPen(QPen(QColor(210, 210, 215), 0.8));
         p.drawLine(LABEL_WIDTH, y, W, y);
 
-        // Hour text labels
         QString label = (h == 0)
-                            ? QString() // Skip midnight label
+                            ? QString()
                             : QString("%1:%2")
                                   .arg(h, 2, 10, QChar(' '))
                                   .arg(0, 2, 10, QChar('0'));
 
         if (!label.isEmpty()) {
-            p.setPen(QColor(140, 140, 148)); // Gray text
+            p.setPen(QColor(140, 140, 148));
             QRectF labelRect(2, y - 7, LABEL_WIDTH - 6, 14);
-            p.drawText(labelRect, Qt::AlignRight | Qt::AlignVCenter, label);
+            p.drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, label);
         }
 
-        // Half-hour lines
         int yHalf = y + HOUR_HEIGHT / 2;
         p.setPen(QPen(QColor(230, 230, 234), 0.5));
         p.drawLine(LABEL_WIDTH, yHalf, W, yHalf);
     }
 
-    // Vertical separator column line
     p.setPen(QPen(QColor(210, 210, 215), 0.8));
     p.drawLine(LABEL_WIDTH, 0, LABEL_WIDTH, height());
 }
@@ -181,7 +172,6 @@ DayWidget::DayWidget(ActivityManager& am, QWidget* parent)
     buildAllDayArea();
     buildScrollArea();
 
-    // UI Post-init: Trigger refresh and center current timeline
     QTimer::singleShot(0, this, [this] {
         refresh();
         int currentHour = QTime::currentTime().hour();
@@ -192,7 +182,6 @@ DayWidget::DayWidget(ActivityManager& am, QWidget* parent)
 
 void DayWidget::buildHeader()
 {
-    // Create a container widget for the header bar
     QWidget* headerContainer = new QWidget(this);
     headerContainer->setFixedHeight(44);
     headerContainer->setStyleSheet(
@@ -206,7 +195,6 @@ void DayWidget::buildHeader()
     headerLayout->setContentsMargins(12, 0, 12, 0);
     headerLayout->setSpacing(8);
 
-    //Left Arrow Button (-1 Day)
     QPushButton* btnPrev = new QPushButton("<", headerContainer);
     btnPrev->setFixedSize(28, 28);
     btnPrev->setCursor(Qt::PointingHandCursor);
@@ -221,7 +209,6 @@ void DayWidget::buildHeader()
         "QPushButton:hover { background-color: #e5e5ea; border-radius: 6px; }"
         );
 
-    //Central Date Label
     headerLabel = new QLabel(headerContainer);
     headerLabel->setAlignment(Qt::AlignCenter);
     QFont f = headerLabel->font();
@@ -230,7 +217,6 @@ void DayWidget::buildHeader()
     headerLabel->setFont(f);
     headerLabel->setStyleSheet("QLabel { color: #1c1c1e; border: none; background: transparent; }");
 
-    //Right Arrow Button
     QPushButton* btnNext = new QPushButton(">", headerContainer);
     btnNext->setFixedSize(28, 28);
     btnNext->setCursor(Qt::PointingHandCursor);
@@ -245,12 +231,10 @@ void DayWidget::buildHeader()
         "QPushButton:hover { background-color: #e5e5ea; border-radius: 6px; }"
         );
 
-    //layout
     headerLayout->addWidget(btnPrev);
     headerLayout->addWidget(headerLabel, 1);
     headerLayout->addWidget(btnNext);
 
-    //Connect arrow signals to navigation handlers
     connect(btnPrev, &QPushButton::clicked, this, [this]() {
         QDate qd(currentDate.getYear(), currentDate.getMonth(), currentDate.getDay());
         qd = qd.addDays(-1);
@@ -258,17 +242,14 @@ void DayWidget::buildHeader()
     });
 
     connect(btnNext, &QPushButton::clicked, this, [this]() {
-        // Increment by 1 day
         QDate qd(currentDate.getYear(), currentDate.getMonth(), currentDate.getDay());
         qd = qd.addDays(1);
         setDate(date(qd.day(), qd.month(), qd.year()));
     });
 
-    // Add the completed header block to the main mainLayout
     mainLayout->addWidget(headerContainer);
 }
 
-//ScrollArea and TimeGrid Layout
 void DayWidget::buildScrollArea()
 {
     scrollArea = new QScrollArea(this);
@@ -312,18 +293,16 @@ void DayWidget::buildAllDayArea()
     allDayContainer = new QWidget(this);
     allDayLayout = new QVBoxLayout(allDayContainer);
 
-    // Layout padding alignment matching timeline layout grids
     allDayLayout->setContentsMargins(TimeGrid::LABEL_WIDTH + 4, 4, 4, 4);
     allDayLayout->setSpacing(2);
 
     allDayContainer->setStyleSheet(
         "QWidget {"
-        "  background-color: #f2f2f7;" // Matching generic header styling
+        "  background-color: #f2f2f7;"
         "  border-bottom: 1px solid #d1d1d6;"
         "}"
         );
 
-    // Hidden by default, activated if matching data models are found
     allDayContainer->setVisible(false);
 
     mainLayout->addWidget(allDayContainer);
@@ -343,12 +322,13 @@ DayWidget::computeGeometry(AbstractActivity* a, int colIdx, int nCols) const
     auto [startMin, endMin] = extractMinutes(a, currentDate);
 
     const int gridLeft  = TimeGrid::LABEL_WIDTH + 2;
-    const int gridRight = scrollContent->width() - 4;
+    const int gridRight = scrollArea->width() - 4;
+
     const int colW      = (gridRight - gridLeft) / std::max(nCols, 1);
 
     BlockGeometry g;
     g.top    = TimeGrid::minutesToY(startMin) + 1;
-    g.height = std::max(TimeGrid::minutesToY(endMin) - g.top, 18); // Minimum 18px clipping threshold
+    g.height = std::max(TimeGrid::minutesToY(endMin) - g.top, 24);
     g.left   = gridLeft + colIdx * colW + 2;
     g.width  = colW - 4;
     return g;
@@ -370,8 +350,6 @@ static bool isAllDayActivity(AbstractActivity* a)
     return visitor.isAllDay;
 }
 
-
-
 void DayWidget::clearBlocks()
 {
     for (ActivityBlock* b : blocks) {
@@ -389,7 +367,6 @@ groupOverlapping(const QList<QPair<AbstractActivity*, std::pair<int,int>>>& item
     for (const auto& [act, range] : items) {
         int placed = -1;
 
-        // Check for non-colliding task columns
         for (int c = 0; c < columns.size(); c++) {
             AbstractActivity* last = columns[c].last();
             bool overlaps = false;
@@ -415,7 +392,6 @@ void DayWidget::populateBlocks()
 {
     clearBlocks();
 
-    // Reset upper layout components
     QLayoutItem* item;
     while ((item = allDayLayout->takeAt(0)) != nullptr) {
         if (item->widget()) {
@@ -430,7 +406,6 @@ void DayWidget::populateBlocks()
     QList<AbstractActivity*> allDayItems;
     QList<QPair<AbstractActivity*, std::pair<int,int>>> timedItems;
 
-    // Sorting via target Visitor criteria
     for (AbstractActivity* a : activitiesOnDate) {
         if (!shouldShow(a)) continue;
 
@@ -441,12 +416,11 @@ void DayWidget::populateBlocks()
         }
     }
 
-    //Rendering All-Day Area
     if (!allDayItems.isEmpty()) {
         allDayContainer->setVisible(true);
         for (AbstractActivity* act : allDayItems) {
             auto* block = new ActivityBlock(act, allDayContainer);
-            block->setFixedHeight(24); // Fixed padding height layout constraints
+            block->setFixedHeight(28);
 
             block->installEventFilter(this);
             block->setProperty("activityPtr", QVariant::fromValue(static_cast<void*>(act)));
@@ -490,12 +464,10 @@ void DayWidget::populateBlocks()
         blocks.append(block);
     }
 
-    //Pin timeline layer to background
     timeGrid->lower();
     timeGrid->update();
 }
 
-//for mouse click action
 bool DayWidget::eventFilter(QObject* obj, QEvent* event)
 {
     auto* block = qobject_cast<ActivityBlock*>(obj);
@@ -506,14 +478,22 @@ bool DayWidget::eventFilter(QObject* obj, QEvent* event)
 
     AbstractActivity* act = static_cast<AbstractActivity*>(ptr);
 
-    //double click, modify
     if (event->type() == QEvent::MouseButtonDblClick) {
         emit activityDoubleClicked(act);
         return true;
     }
 
-    //single click, select
     if (event->type() == QEvent::MouseButtonPress) {
+        bool nextState = !block->isSelectedState();
+
+        for (ActivityBlock* b : blocks) {
+            if (b == block) {
+                b->setSelectedState(nextState);
+            } else {
+                b->setSelectedState(false);
+            }
+        }
+
         emit activityClicked(act);
         return true;
     }
@@ -525,7 +505,6 @@ void DayWidget::setDate(const date& d)
 {
     currentDate = d;
 
-    // Build localized day metadata strings
     static const char* giorni[]  = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
     static const char* mesi[]    = {"","January","February","March","April","May",
                                  "June","July","August","September","October",
@@ -555,3 +534,12 @@ void DayWidget::resizeEvent(QResizeEvent* event)
     QWidget::resizeEvent(event);
     populateBlocks();
 }
+
+void ActivityBlock::setSelectedState(bool isSelected) {
+    if (selected != isSelected) {
+        selected = isSelected;
+        update();
+    }
+}
+
+bool ActivityBlock::isSelectedState() const { return selected; }

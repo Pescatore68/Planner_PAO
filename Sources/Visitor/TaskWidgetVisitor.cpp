@@ -13,16 +13,25 @@ void TreeBuilderVisitor::visit(project& p) {
     projItem->setText(0, QString::fromStdString(p.getName()));
     projItem->setText(1, QString::fromStdString(p.getDeadline().toString()));
 
-    //CompletionPercentage has type float
     int pct = static_cast<int>(p.completionPercentage());
-    //create progress bar with complitionPercentege
     projItem->setData(0, ProgressBarDelegate::ProgressRole, pct);
+    QColor tagColor(200, 200, 200); // Fallback standard se il progetto non ha un tag
+    if (p.getTag()) {
+        tagColor = p.getTag()->getColor();
+    }
+    projItem->setData(0, ProgressBarDelegate::TagColorRole, tagColor);
     projItem->setCheckState(0, p.isCompleted() ? Qt::Checked : Qt::Unchecked);
-    //create project
     projItem->setData(0, TaskWidgetRoles::ActivityPtrRole,
                       QVariant::fromValue(static_cast<void*>(&p)));
 
-    //create subtasks
+    if (p.isCompleted()) {
+        projItem->setForeground(0, QColor(150, 150, 150));
+        projItem->setForeground(1, QColor(150, 150, 150));
+    } else if (p.isExpired()) {
+        projItem->setForeground(0, QColor(200, 50, 50));
+        projItem->setForeground(1, QColor(200, 50, 50));
+    }
+
     for (unsigned int j = 0; j < p.size(); ++j) {
         const task* sub = p.getSubtask(j);
         if (!sub) continue;
@@ -31,7 +40,7 @@ void TreeBuilderVisitor::visit(project& p) {
         subItem->setText(0, QString::fromStdString(sub->getName()));
         subItem->setText(1, QString::fromStdString(sub->getDeadline().toString()));
 
-        subItem->setData(0, ProgressBarDelegate::ProgressRole, -1); // No progress bar
+        subItem->setData(0, ProgressBarDelegate::ProgressRole, -1);
         subItem->setCheckState(0, sub->isCompleted() ? Qt::Checked : Qt::Unchecked);
 
         subItem->setData(0, TaskWidgetRoles::ActivityPtrRole,
@@ -39,9 +48,12 @@ void TreeBuilderVisitor::visit(project& p) {
         subItem->setData(0, TaskWidgetRoles::ParentProjectRole,
                          QVariant::fromValue(static_cast<void*>(&p)));
 
-        if (sub->isCompleted()) { //set color if completed
+        if (sub->isCompleted()) {
             subItem->setForeground(0, QColor(150, 150, 150));
             subItem->setForeground(1, QColor(150, 150, 150));
+        } else if (sub->isExpired()) {
+            subItem->setForeground(0, QColor(200, 50, 50));
+            subItem->setForeground(1, QColor(200, 50, 50));
         }
     }
     projItem->setExpanded(true);
@@ -52,26 +64,24 @@ void TreeBuilderVisitor::visit(task& t) {
     taskItem->setText(0, QString::fromStdString(t.getName()));
     taskItem->setText(1, QString::fromStdString(t.getDeadline().toString()));
 
-    taskItem->setData(0, ProgressBarDelegate::ProgressRole, -1); // No progress bar
+    taskItem->setData(0, ProgressBarDelegate::ProgressRole, -1);
     taskItem->setCheckState(0, t.isCompleted() ? Qt::Checked : Qt::Unchecked);
 
     taskItem->setData(0, TaskWidgetRoles::ActivityPtrRole,
                       QVariant::fromValue(static_cast<void*>(&t)));
 
-    if (t.isExpired() && !t.isCompleted()) {
-        taskItem->setForeground(0, QColor(200, 50, 50));
-        taskItem->setForeground(1, QColor(200, 50, 50));
-    }
     if (t.isCompleted()) {
         taskItem->setForeground(0, QColor(150, 150, 150));
         taskItem->setForeground(1, QColor(150, 150, 150));
+    } else if (t.isExpired()) {
+        taskItem->setForeground(0, QColor(200, 50, 50));
+        taskItem->setForeground(1, QColor(200, 50, 50));
     }
 }
 
 void TreeBuilderVisitor::visit(Event&) {}
 void TreeBuilderVisitor::visit(Reminder&) {}
 void TreeBuilderVisitor::visit(Routine&) {}
-
 
 
 ItemChangedVisitor::ItemChangedVisitor(QTreeWidgetItem* treeItem)
@@ -83,7 +93,7 @@ void ItemChangedVisitor::visit(task& t) {
     bool checked = (item->checkState(0) == Qt::Checked);
     t.setCompleted(checked);
 
-    QVariant vp = item->data(0, TaskWidgetRoles::ParentProjectRole); //check if is a subtask
+    QVariant vp = item->data(0, TaskWidgetRoles::ParentProjectRole);
     if (vp.isValid()) {
         project* p = static_cast<project*>(vp.value<void*>());
         QTreeWidgetItem* parentItem = item->parent();
@@ -91,18 +101,34 @@ void ItemChangedVisitor::visit(task& t) {
         if (p && parentItem) {
             if (item->treeWidget())
                 item->treeWidget()->blockSignals(true);
+
             int pct = static_cast<int>(p->completionPercentage());
             parentItem->setData(0, ProgressBarDelegate::ProgressRole, pct);
 
-            //check parent completionPercentage to check or uncheck parent
-            parentItem->setCheckState(0, p->completionPercentage()==100 ? Qt::Checked : Qt::Unchecked);
+            bool parentCompleted = (pct == 100);
+            parentItem->setCheckState(0, parentCompleted ? Qt::Checked : Qt::Unchecked);
+
+            QColor parentColor;
+            if (parentCompleted) {
+                parentColor = QColor(150, 150, 150);
+            } else if (p->isExpired()) {
+                parentColor = QColor(200, 50, 50);
+            }
+
+            parentItem->setForeground(0, parentColor);
+            parentItem->setForeground(1, parentColor);
 
             if (item->treeWidget())
                 item->treeWidget()->blockSignals(false);
         }
     }
 
-    QColor color = checked ? QColor(150, 150, 150) : QColor();
+    QColor color;
+    if (checked) {
+        color = QColor(150, 150, 150);
+    } else if (t.isExpired()) {
+        color = QColor(200, 50, 50);
+    }
     item->setForeground(0, color);
     item->setForeground(1, color);
 }
@@ -117,10 +143,7 @@ void ItemChangedVisitor::visit(project& p) {
 
     p.setCompleted(checked);
 
-
-    //if project checked all subtasks checked
-    int childCount = item->childCount();
-    for (int i = 0; i < childCount; ++i) {
+    for (int i = 0; i < item->childCount(); ++i) {
         QTreeWidgetItem* childItem = item->child(i);
         if (!childItem) continue;
 
@@ -129,20 +152,35 @@ void ItemChangedVisitor::visit(project& p) {
         QVariant v = childItem->data(0, TaskWidgetRoles::ActivityPtrRole);
         if (v.isValid()) {
             task* sub = static_cast<task*>(v.value<void*>());
-            if (sub) sub->setCompleted(checked);
-        }
+            if (sub) {
+                sub->setCompleted(checked);
 
-        QColor color = checked ? QColor(150, 150, 150) : QColor();
-        childItem->setForeground(0, color);
-        childItem->setForeground(1, color);
+                QColor childColor;
+                if (checked) {
+                    childColor = QColor(150, 150, 150);
+                } else if (sub->isExpired()) {
+                    childColor = QColor(200, 50, 50);
+                }
+                childItem->setForeground(0, childColor);
+                childItem->setForeground(1, childColor);
+            }
+        }
     }
 
     item->setData(0, ProgressBarDelegate::ProgressRole, checked ? 100 : 0);
 
+    QColor color;
+    if (checked) {
+        color = QColor(150, 150, 150);
+    } else if (p.isExpired()) {
+        color = QColor(200, 50, 50);
+    }
+    item->setForeground(0, color);
+    item->setForeground(1, color);
+
     if (item->treeWidget())
         item->treeWidget()->blockSignals(false);
 }
-
 
 void ItemChangedVisitor::visit(Event&) {}
 void ItemChangedVisitor::visit(Reminder&) {}

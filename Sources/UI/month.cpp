@@ -15,19 +15,19 @@ MonthWidget::MonthWidget(ActivityManager& am, tagManager& tm, QWidget* parent)
 {
     setup();
 }
+
 void MonthWidget::setup()
 {
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(10, 10, 10, 10);
     mainLayout->setSpacing(15);
 
-
     calendar = new QCalendarWidget(this);
     mainLayout->addWidget(calendar, 2);
 
     QWidget* sidePanel = new QWidget(this);
     sideLayout = new QVBoxLayout(sidePanel);
-    sideLayout->setContentsMargins(0, 0, 0, 0);;
+    sideLayout->setContentsMargins(0, 0, 0, 0);
 
     titleLabel = new QLabel("Day Activity:", this);
 
@@ -42,14 +42,16 @@ void MonthWidget::setup()
 
     mainLayout->addWidget(sidePanel, 1);
 
-
+    // Gestione del singolo click per aggiornare la lista laterale
     connect(calendar, &QCalendarWidget::clicked, this, &MonthWidget::onDateChanged);
-
-
     connect(calendar, &QCalendarWidget::clicked, this, &MonthWidget::dateClicked);
 
-    onDateChanged(calendar->selectedDate());
+    // Gestione del doppio click (o invio) su un giorno del calendario per passare alla vista giornaliera
+    connect(calendar, &QCalendarWidget::activated, this, [this](const QDate& date) {
+        emit dayRequested(date);
+    });
 
+    onDateChanged(calendar->selectedDate());
 
     connect(activityList, &QListWidget::itemClicked, this, [this](QListWidgetItem* item) {
         if (!item) return;
@@ -59,12 +61,10 @@ void MonthWidget::setup()
         QWidget* rowContainer = static_cast<QWidget*>(item->data(Qt::UserRole + 1).value<void*>());
 
         if (expansionWidget && rowContainer) {
-
             bool isCurrentlyVisible = expansionWidget->isVisible();
             expansionWidget->setVisible(!isCurrentlyVisible);
 
             rowContainer->adjustSize();
-
             item->setSizeHint(rowContainer->sizeHint());
 
             activityList->update();
@@ -81,6 +81,7 @@ void MonthWidget::setup()
         }
     });
 }
+
 void MonthWidget::onDateChanged(const QDate& qd)
 {
     activityList->clear();
@@ -98,7 +99,6 @@ void MonthWidget::onDateChanged(const QDate& qd)
         rowLayout->setContentsMargins(5, 5, 5, 5);
         rowLayout->setSpacing(0);
 
-
         QLabel* titleLabel = new QLabel("• " + QString::fromStdString(act->getName()), this);
         titleLabel->setStyleSheet("QLabel { font-weight: bold; font-size: 13px; padding: 4px; }");
         rowLayout->addWidget(titleLabel);
@@ -112,7 +112,6 @@ void MonthWidget::onDateChanged(const QDate& qd)
         DisplayVisitor visitor;
         act->accept(visitor);
 
-
         QWidget* contentContainer = new QWidget(this);
         QVBoxLayout* contentLayout = new QVBoxLayout(contentContainer);
         contentLayout->setContentsMargins(0, 0, 0, 0);
@@ -120,8 +119,6 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
         visitor.applyToLayout(contentLayout, this);
         expansionLayout->addWidget(contentContainer);
-
-
 
         if (visitor.isCheckable()) {
             QCheckBox* statusCheck = new QCheckBox("Complete", this);
@@ -132,7 +129,6 @@ void MonthWidget::onDateChanged(const QDate& qd)
                 DisplayVisitor writeVisitor;
                 writeVisitor.setWriteMode(checked);
                 act->accept(writeVisitor);
-
 
                 QLayoutItem* child;
                 while ((child = contentLayout->takeAt(0)) != nullptr) {
@@ -149,7 +145,6 @@ void MonthWidget::onDateChanged(const QDate& qd)
                 this->updateCalendarView();
             });
         }
-
 
         QWidget* actionButtonsWidget = new QWidget(this);
         QHBoxLayout* actionLayout = new QHBoxLayout(actionButtonsWidget);
@@ -204,7 +199,6 @@ void MonthWidget::onDateChanged(const QDate& qd)
             }
         });
 
-
         expansionWidget->setVisible(false);
         rowLayout->addWidget(expansionWidget);
 
@@ -213,14 +207,13 @@ void MonthWidget::onDateChanged(const QDate& qd)
 
         item->setSizeHint(rowContainer->sizeHint());
 
-
         item->setData(Qt::UserRole, QVariant::fromValue(static_cast<void*>(expansionWidget)));
         item->setData(Qt::UserRole + 1, QVariant::fromValue(static_cast<void*>(rowContainer)));
     }
 }
+
 void MonthWidget::updateCalendarView()
 {
-
     calendar->setDateTextFormat(QDate(), QTextCharFormat());
 
     QTextCharFormat impegnatoFormat;
@@ -247,7 +240,6 @@ void MonthWidget::updateCalendarView()
     }
 
     QDate dataClick = calendar->selectedDate();
-
 
     this->onDateChanged(dataClick);
 }
